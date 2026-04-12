@@ -1,0 +1,6 @@
+.env
+memory/jkai.db
+memory/conversations.json
+logs/
+__pycache__/
+*.pyc
