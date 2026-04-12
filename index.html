@@ -6,49 +6,90 @@
 <title>J-KAI — Nexus</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #080808; color: #ff6a00; font-family: 'Courier New', monospace; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-#hud-top { background: #0d0d0d; border-bottom: 1px solid #ff6a0033; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-#hud-logo { font-size: 20px; font-weight: 700; letter-spacing: 4px; }
+body { background: #080808; color: #ff6a00; font-family: 'Courier New', monospace; height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: all 0.8s; }
+body.severus-mode { filter: hue-rotate(200deg) brightness(0.7); }
+#canvas-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+#scan-line { position: fixed; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #ff6a0033, transparent); z-index: 1; pointer-events: none; animation: scan 6s linear infinite; }
+@keyframes scan { 0% { top: 0; } 100% { top: 100vh; } }
+
+#severus-overlay { display: none; position: fixed; inset: 0; z-index: 200; background: #00000099; align-items: center; justify-content: center; flex-direction: column; }
+#severus-overlay.active { display: flex; }
+#severus-text { font-size: 80px; font-weight: 700; letter-spacing: 20px; color: #4aa8ff; opacity: 0; animation: severus-appear 1s forwards; }
+#severus-sub { font-size: 13px; letter-spacing: 4px; color: #4aa8ff88; margin-top: 16px; opacity: 0; animation: severus-appear 1s 0.5s forwards; }
+#severus-bar-wrap { width: 300px; height: 2px; background: #1a1a1a; margin-top: 32px; border-radius: 2px; overflow: hidden; opacity: 0; animation: severus-appear 1s 0.8s forwards; }
+#severus-bar { height: 100%; width: 100%; background: #4aa8ff; animation: freeze 2s ease forwards; }
+@keyframes freeze { from { width: 100%; } to { width: 0%; } }
+#btn-reactivate { margin-top: 40px; background: none; border: 1px solid #4aa8ff66; color: #4aa8ff; font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 3px; padding: 12px 32px; border-radius: 4px; cursor: pointer; opacity: 0; animation: severus-appear 1s 1.5s forwards; transition: all 0.3s; }
+#btn-reactivate:hover { background: #4aa8ff22; box-shadow: 0 0 16px #4aa8ff44; }
+@keyframes severus-appear { from { opacity: 0; } to { opacity: 1; } }
+
+#hud-top { position: relative; z-index: 2; background: #0d0d0dcc; border-bottom: 1px solid #ff6a0033; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+#hud-logo { font-size: 20px; font-weight: 700; letter-spacing: 4px; animation: pulse-logo 2s ease-in-out infinite; }
+@keyframes pulse-logo { 0%,100% { text-shadow: 0 0 8px #ff6a0066; } 50% { text-shadow: 0 0 20px #ff6a00aa; } }
 .hud-dot { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #ff6a0077; letter-spacing: 1px; }
-.hud-dot-circle { width: 6px; height: 6px; border-radius: 50%; background: #ff6a00; }
+.hud-dot-circle { width: 6px; height: 6px; border-radius: 50%; background: #ff6a00; animation: blink 1.5s ease-in-out infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
 .hud-status { display: flex; gap: 20px; }
-#modules-bar { background: #0a0a0a; border-bottom: 1px solid #ff6a0022; padding: 6px 20px; display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
-.mod { font-size: 10px; padding: 3px 12px; border: 1px solid #ff6a0033; color: #ff6a0055; border-radius: 3px; letter-spacing: 1px; }
-.mod.on { border-color: #ff6a00; color: #ff6a00; }
-#main { display: flex; flex: 1; overflow: hidden; }
-#sidebar { width: 180px; background: #0a0a0a; border-right: 1px solid #ff6a0022; padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+#heartbeat { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #ff6a0077; }
+#heartbeat svg { animation: beat 1s ease-in-out infinite; }
+@keyframes beat { 0%,100% { transform: scaleX(1); } 50% { transform: scaleX(1.15); } }
+#modules-bar { position: relative; z-index: 2; background: #0a0a0acc; border-bottom: 1px solid #ff6a0022; padding: 6px 20px; display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.mod { font-size: 10px; padding: 3px 12px; border: 1px solid #ff6a0033; color: #ff6a0055; border-radius: 3px; letter-spacing: 1px; transition: all 0.3s; }
+.mod.on { border-color: #ff6a00; color: #ff6a00; box-shadow: 0 0 8px #ff6a0033; }
+#btn-severus { margin-left: auto; font-size: 11px; background: none; border: 1px solid #ff6a0033; color: #ff6a0055; font-family: 'Courier New', monospace; letter-spacing: 2px; padding: 3px 12px; border-radius: 3px; cursor: pointer; transition: all 0.3s; }
+#btn-severus:hover { color: #4aa8ff; border-color: #4aa8ff66; }
+#main { position: relative; z-index: 2; display: flex; flex: 1; overflow: hidden; }
+#sidebar { width: 180px; background: #0a0a0acc; border-right: 1px solid #ff6a0022; padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
 .s-title { font-size: 9px; color: #ff6a0044; letter-spacing: 2px; margin: 8px 0 4px; border-bottom: 1px solid #ff6a0011; padding-bottom: 4px; }
-.s-item { font-size: 11px; color: #ff6a0055; padding: 5px 8px; border-radius: 3px; }
+.s-item { font-size: 11px; color: #ff6a0055; padding: 5px 8px; border-radius: 3px; cursor: pointer; transition: all 0.2s; }
 .s-item.on { color: #ff6a00; border: 1px solid #ff6a0033; background: #ff6a0011; }
+.s-item:hover { color: #ff6a00; background: #ff6a0011; }
 .s-stat { display: flex; justify-content: space-between; font-size: 10px; color: #ff6a0044; padding: 2px 0; }
 .s-stat span { color: #ff6a0088; }
 #chat-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 #messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
 #messages::-webkit-scrollbar { width: 4px; }
 #messages::-webkit-scrollbar-thumb { background: #ff6a0033; border-radius: 2px; }
-.msg { display: flex; gap: 12px; align-items: flex-start; }
+.msg { display: flex; gap: 12px; align-items: flex-start; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .msg-tag { font-size: 10px; min-width: 56px; padding-top: 3px; letter-spacing: 1px; flex-shrink: 0; }
 .msg-tag.u { color: #ff6a0066; }
 .msg-tag.j { color: #ff6a00; }
 .msg-text { font-size: 13px; line-height: 1.7; padding: 8px 14px; border-radius: 4px; border: 1px solid #ff6a0022; background: #0f0f0f; color: #cc5500; max-width: 700px; }
 .msg-text.u { background: transparent; border-color: #ff6a0011; color: #664422; }
-#typing { display: none; font-size: 12px; color: #ff6a0055; padding: 0 20px 8px; letter-spacing: 2px; }
-#input-row { background: #0a0a0a; border-top: 1px solid #ff6a0033; padding: 12px 20px; display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+#typing { display: none; padding: 0 20px 8px; }
+.typing-dots { display: flex; gap: 4px; align-items: center; }
+.typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: #ff6a00; animation: dot-bounce 1.2s ease-in-out infinite; }
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dot-bounce { 0%,100% { transform: translateY(0); opacity: 0.3; } 50% { transform: translateY(-6px); opacity: 1; } }
+#input-row { background: #0a0a0acc; border-top: 1px solid #ff6a0033; padding: 12px 20px; display: flex; gap: 10px; align-items: center; flex-shrink: 0; position: relative; z-index: 2; }
 #input-prefix { font-size: 12px; letter-spacing: 1px; }
-#user-input { flex: 1; background: #111; border: 1px solid #ff6a0033; color: #ff6a00; font-family: 'Courier New', monospace; font-size: 13px; padding: 8px 12px; border-radius: 4px; outline: none; }
-#user-input:focus { border-color: #ff6a00; }
-#btn-send { background: none; border: 1px solid #ff6a0044; color: #ff6a00; font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 2px; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
-#btn-send:hover { background: #ff6a0011; }
-#btn-clear { background: none; border: 1px solid #ff6a0022; color: #ff6a0044; font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 2px; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
-#btn-clear:hover { color: #ff6a00; }
-#intro { position: absolute; inset: 0; background: #080808; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.8s; }
-#intro-logo { font-size: 64px; font-weight: 700; letter-spacing: 16px; color: #ff6a00; opacity: 0; transition: opacity 1s; }
+#user-input { flex: 1; background: #111; border: 1px solid #ff6a0033; color: #ff6a00; font-family: 'Courier New', monospace; font-size: 13px; padding: 8px 12px; border-radius: 4px; outline: none; transition: border-color 0.2s; }
+#user-input:focus { border-color: #ff6a00; box-shadow: 0 0 8px #ff6a0022; }
+#btn-send { background: none; border: 1px solid #ff6a0044; color: #ff6a00; font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 2px; padding: 8px 16px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+#btn-send:hover { background: #ff6a0022; box-shadow: 0 0 8px #ff6a0033; }
+#btn-clear { background: none; border: 1px solid #ff6a0022; color: #ff6a0044; font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 2px; padding: 8px 12px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+#btn-clear:hover { color: #ff6a00; border-color: #ff6a0044; }
+#intro { position: fixed; inset: 0; background: #080808; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.8s; }
+#intro-logo { font-size: 72px; font-weight: 700; letter-spacing: 20px; color: #ff6a00; opacity: 0; transition: opacity 1s; }
 #intro-bar-wrap { width: 300px; height: 2px; background: #1a1a1a; margin-top: 32px; border-radius: 2px; overflow: hidden; }
 #intro-bar { height: 100%; width: 0%; background: #ff6a00; transition: width 2.5s ease; }
 #intro-text { font-size: 11px; letter-spacing: 3px; color: #ff6a0066; margin-top: 16px; }
+#corner-tl { position: fixed; top: 0; left: 0; width: 20px; height: 20px; border-top: 1px solid #ff6a00; border-left: 1px solid #ff6a00; z-index: 3; }
+#corner-tr { position: fixed; top: 0; right: 0; width: 20px; height: 20px; border-top: 1px solid #ff6a00; border-right: 1px solid #ff6a00; z-index: 3; }
+#corner-bl { position: fixed; bottom: 0; left: 0; width: 20px; height: 20px; border-bottom: 1px solid #ff6a00; border-left: 1px solid #ff6a00; z-index: 3; }
+#corner-br { position: fixed; bottom: 0; right: 0; width: 20px; height: 20px; border-bottom: 1px solid #ff6a00; border-right: 1px solid #ff6a00; z-index: 3; }
 </style>
 </head>
 <body>
+
+<div id="severus-overlay">
+  <div id="severus-text">SEVERUS</div>
+  <div id="severus-sub">LIEN NEXUS ROMPU — SYSTÈME GELÉ</div>
+  <div id="severus-bar-wrap"><div id="severus-bar"></div></div>
+  <button id="btn-reactivate">RÉACTIVER LE NEXUS</button>
+</div>
 
 <div id="intro">
   <div id="intro-logo">J-KAI</div>
@@ -56,11 +97,24 @@ body { background: #080808; color: #ff6a00; font-family: 'Courier New', monospac
   <div id="intro-text">INITIALISATION DU NEXUS...</div>
 </div>
 
+<canvas id="canvas-bg"></canvas>
+<div id="scan-line"></div>
+<div id="corner-tl"></div>
+<div id="corner-tr"></div>
+<div id="corner-bl"></div>
+<div id="corner-br"></div>
+
 <div id="hud-top">
   <div id="hud-logo">J-KAI</div>
   <div class="hud-status">
     <div class="hud-dot"><div class="hud-dot-circle"></div> NEXUS ONLINE</div>
-    <div class="hud-dot"><div class="hud-dot-circle"></div> MÉMOIRE ACTIVE</div>
+    <div class="hud-dot"><div class="hud-dot-circle" style="animation-delay:0.5s"></div> MÉMOIRE ACTIVE</div>
+    <div id="heartbeat">
+      <svg width="40" height="16" viewBox="0 0 40 16">
+        <polyline points="0,8 6,8 9,2 12,14 15,2 18,14 21,8 40,8" fill="none" stroke="#ff6a00" stroke-width="1.5" opacity="0.7"/>
+      </svg>
+      VITAUX
+    </div>
   </div>
   <div style="font-size:10px; color:#ff6a0044; letter-spacing:2px;">SETHU // NEXUS v1.0</div>
 </div>
@@ -70,7 +124,7 @@ body { background: #080808; color: #ff6a00; font-family: 'Courier New', monospac
   <div class="mod on">MARC</div>
   <div class="mod">KAÏA</div>
   <div class="mod on">CORTEX</div>
-  <div style="margin-left:auto; font-size:14px; color:#ff6a0033; border:1px solid #ff6a0022; padding:2px 10px; border-radius:3px;">ø</div>
+  <button id="btn-severus">SEVERUS</button>
 </div>
 
 <div id="main">
@@ -82,6 +136,7 @@ body { background: #080808; color: #ff6a00; font-family: 'Courier New', monospac
     <div class="s-title">STATS</div>
     <div class="s-stat">Mémoire <span>∞</span></div>
     <div class="s-stat">Mode <span>LIBRE</span></div>
+    <div class="s-stat">Uptime <span id="stat-uptime">00:00:00</span></div>
     <div class="s-title">PROJETS</div>
     <div class="s-item on">J-KAI</div>
     <div class="s-item">SNACK'N'SIP</div>
@@ -90,7 +145,7 @@ body { background: #080808; color: #ff6a00; font-family: 'Courier New', monospac
 
   <div id="chat-wrap">
     <div id="messages"></div>
-    <div id="typing">J-KAI &gt; traitement en cours...</div>
+    <div id="typing"><div class="typing-dots"><span></span><span></span><span></span></div></div>
     <div id="input-row">
       <div id="input-prefix">SETHU &gt;</div>
       <input id="user-input" type="text" placeholder="Entrez votre commande..." autocomplete="off" />
@@ -102,13 +157,105 @@ body { background: #080808; color: #ff6a00; font-family: 'Courier New', monospac
 
 <script>
 const API = "http://127.0.0.1:5000";
+let severusActive = false;
+
+const canvas = document.getElementById("canvas-bg");
+const ctx = canvas.getContext("2d");
+let particles = [];
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+for (let i = 0; i < 80; i++) {
+  particles.push({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: (Math.random() - 0.5) * 0.4,
+    r: Math.random() * 1.5 + 0.5
+  });
+}
+
+function animParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    if (!severusActive) { p.x += p.vx; p.y += p.vy; }
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = severusActive ? "#4aa8ff66" : "#ff6a0066";
+    ctx.fill();
+  });
+  particles.forEach((p, i) => {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = p.x - particles[j].x;
+      const dy = p.y - particles[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = severusActive
+          ? `rgba(74,168,255,${0.15 * (1 - dist / 120)})`
+          : `rgba(255,106,0,${0.15 * (1 - dist / 120)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  });
+  requestAnimationFrame(animParticles);
+}
+animParticles();
+
+function activateSeverus() {
+  severusActive = true;
+  document.body.classList.add("severus-mode");
+  document.getElementById("severus-overlay").classList.add("active");
+  document.getElementById("user-input").disabled = true;
+  document.getElementById("btn-send").disabled = true;
+}
+
+function deactivateSeverus() {
+  severusActive = false;
+  document.body.classList.remove("severus-mode");
+  const overlay = document.getElementById("severus-overlay");
+  overlay.style.opacity = "0";
+  overlay.style.transition = "opacity 0.8s";
+  setTimeout(() => {
+    overlay.classList.remove("active");
+    overlay.style.opacity = "";
+    overlay.style.transition = "";
+  }, 800);
+  document.getElementById("user-input").disabled = false;
+  document.getElementById("btn-send").disabled = false;
+  addMessage("J-KAI >", "Nexus réactivé. Je suis de retour, SethU.", "j", true);
+}
+
+document.getElementById("btn-severus").addEventListener("click", activateSeverus);
+document.getElementById("btn-reactivate").addEventListener("click", deactivateSeverus);
+
+async function typeText(element, text, speed = 18) {
+  element.textContent = "";
+  for (let i = 0; i < text.length; i++) {
+    element.textContent += text[i];
+    await new Promise(r => setTimeout(r, speed));
+  }
+}
 
 async function sendMessage() {
   const input = document.getElementById("user-input");
   const msg = input.value.trim();
-  if (!msg) return;
+  if (!msg || severusActive) return;
+  if (msg.toLowerCase() === "severus") { activateSeverus(); input.value = ""; return; }
   input.value = "";
-  addMessage("SETHU >", msg, "u");
+  addMessage("SETHU >", msg, "u", false);
   document.getElementById("typing").style.display = "block";
   try {
     const res = await fetch(API + "/chat", {
@@ -118,20 +265,31 @@ async function sendMessage() {
     });
     const data = await res.json();
     document.getElementById("typing").style.display = "none";
-    addMessage("J-KAI >", data.reply, "j");
+    addMessage("J-KAI >", data.reply, "j", true);
   } catch(e) {
     document.getElementById("typing").style.display = "none";
-    addMessage("J-KAI >", "Erreur de connexion au Nexus.", "j");
+    addMessage("J-KAI >", "Erreur de connexion au Nexus.", "j", false);
   }
 }
 
-function addMessage(tag, text, type) {
+function addMessage(tag, text, type, animate) {
   const box = document.getElementById("messages");
   const div = document.createElement("div");
   div.className = "msg";
-  div.innerHTML = '<div class="msg-tag ' + type + '">' + tag + '</div><div class="msg-text ' + type + '">' + text + '</div>';
+  const tagEl = document.createElement("div");
+  tagEl.className = "msg-tag " + type;
+  tagEl.textContent = tag;
+  const textEl = document.createElement("div");
+  textEl.className = "msg-text " + type;
+  div.appendChild(tagEl);
+  div.appendChild(textEl);
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
+  if (animate) {
+    typeText(textEl, text, 16).then(() => { box.scrollTop = box.scrollHeight; });
+  } else {
+    textEl.textContent = text;
+  }
 }
 
 async function loadHistory() {
@@ -139,8 +297,8 @@ async function loadHistory() {
     const res = await fetch(API + "/history");
     const data = await res.json();
     data.forEach(function(m) {
-      if (m.role === "user") addMessage("SETHU >", m.content, "u");
-      else if (m.role === "assistant") addMessage("J-KAI >", m.content, "j");
+      if (m.role === "user") addMessage("SETHU >", m.content, "u", false);
+      else if (m.role === "assistant") addMessage("J-KAI >", m.content, "j", false);
     });
   } catch(e) {}
 }
@@ -154,10 +312,19 @@ document.getElementById("btn-clear").addEventListener("click", async function() 
   document.getElementById("messages").innerHTML = "";
 });
 
+let seconds = 0;
+setInterval(() => {
+  seconds++;
+  const h = String(Math.floor(seconds/3600)).padStart(2,"0");
+  const m = String(Math.floor((seconds%3600)/60)).padStart(2,"0");
+  const s = String(seconds%60).padStart(2,"0");
+  const el = document.getElementById("stat-uptime");
+  if (el) el.textContent = h+":"+m+":"+s;
+}, 1000);
+
 const intro = document.getElementById("intro");
 const logo = document.getElementById("intro-logo");
 const bar = document.getElementById("intro-bar");
-
 setTimeout(function() { logo.style.opacity = "1"; }, 300);
 setTimeout(function() { bar.style.width = "100%"; }, 600);
 setTimeout(function() { intro.style.opacity = "0"; }, 3200);
