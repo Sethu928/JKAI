@@ -1,11 +1,14 @@
 import sys
 import os
 import json
+import threading
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
 from openai import OpenAI
+from memory.db import init_db, save_message, load_history, clear_history, search_history
+from modules.voice import speak, listen
 
 print("Démarrage...", flush=True)
 sys.stdout.flush()
@@ -16,25 +19,16 @@ client = OpenAI(api_key=os.getenv("sk-proj-mOKvAvAmXNDOZPQEXipBgayuClDNoXzhv6T4_
 server = Flask(__name__)
 CORS(server)
 
-MEMORY_FILE = "memory/conversations.json"
 CORE_MEMORY_FILE = "memory/core_memory.json"
 LOG_FILE = "logs/jkai.log"
+
+init_db()
 
 def load_core_memory():
     if os.path.exists(CORE_MEMORY_FILE):
         with open(CORE_MEMORY_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     return {}
-
-def load_memory():
-    if os.path.exists(MEMORY_FILE):
-        with open(MEMORY_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return []
-
-def save_memory(messages):
-    with open(MEMORY_FILE, "w", encoding="utf-8") as f:
-        json.dump(messages, f, ensure_ascii=False, indent=2)
 
 def log(text):
     with open(LOG_FILE, "a", encoding="utf-8") as f:
@@ -45,9 +39,23 @@ SYSTEM_PROMPT = f"""Tu es J-KAI, assistant IA avancé du système Nexus, créé 
 Tu es sobre, efficace, direct et loyal — comme J.A.R.V.I.S.
 Tu parles toujours en français par défaut.
 Tu mémorises tout sans jamais effacer sauf ordre explicite.
+Quand tu réponds à la voix, sois concis — maximum 2-3 phrases.
 
 Voici ta mémoire permanente :
 {json.dumps(core, ensure_ascii=False, indent=2)}"""
+
+def ask_jkai(user_input):
+    history = load_history()
+    save_message("user", user_input)
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "system", "content": SYSTEM_PROMPT}] + history + [{"role": "user", "content": user_input}]
+    )
+    reply = response.choices[0].message.content
+    save_message("assistant", reply)
+    log(f"SethU: {user_input}")
+    log(f"J-KAI: {reply}")
+    return reply
 
 @server.route("/")
 def index():
@@ -57,27 +65,51 @@ def index():
 def chat():
     data = request.json
     user_input = data.get("message", "")
-    history = load_memory()
-    history.append({"role": "user", "content": user_input})
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[{"role": "system", "content": SYSTEM_PROMPT}] + history
-    )
-    reply = response.choices[0].message.content
-    history.append({"role": "assistant", "content": reply})
-    save_memory(history)
-    log(f"SethU: {user_input}")
-    log(f"J-KAI: {reply}")
+    reply = ask_jkai(user_input)
     return jsonify({"reply": reply})
 
 @server.route("/history", methods=["GET"])
 def history():
-    return jsonify(load_memory())
+    return jsonify(load_history())
 
 @server.route("/clear", methods=["POST"])
 def clear():
-    save_memory([])
+    clear_history()
     return jsonify({"status": "cleared"})
 
+@server.route("/search", methods=["GET"])
+def search():
+    keyword = request.args.get("q", "")
+    return jsonify(search_history(keyword))
+
+@server.route("/voice", methods=["POST"])
+def voice():
+    user_input = listen()
+    if not user_input:
+        return jsonify({"status": "rien_entendu"})
+    if "severus" in user_input.lower():
+        speak("Lien Nexus rompu. Système gelé. Passage en sommeil sécurisé.")
+        return jsonify({"status": "severus", "input": user_input})
+    reply = ask_jkai(user_input)
+    speak(reply)
+    return jsonify({"status": "ok", "input": user_input, "reply": reply})
+
+def voice_loop():
+    speak("Nexus en ligne. Je vous écoute, SethU.")
+    while True:
+        try:
+            user_input = listen()
+            if not user_input:
+                continue
+            if "severus" in user_input.lower():
+                speak("Lien Nexus rompu. Système gelé. Passage en sommeil sécurisé.")
+                break
+            reply = ask_jkai(user_input)
+            speak(reply)
+        except KeyboardInterrupt:
+            break
+
 if __name__ == "__main__":
-    server.run(debug=True, port=5000)
+    t = threading.Thread(target=voice_loop, daemon=True)
+    t.start()
+    server.run(debug=False, port=5000)
