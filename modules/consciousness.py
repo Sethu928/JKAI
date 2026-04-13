@@ -9,6 +9,7 @@ load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 SELF_MODEL_FILE  = "memory/self_model.json"
+MISSION_FILE     = "memory/mission.json"
 LOG_FILE         = "logs/jkai.log"
 RECENT_LOG_LINES = 80      # nombre de lignes de log envoyées à GPT
 
@@ -67,6 +68,28 @@ NEW_OBJECTIVE_SYSTEM = (
     "Il doit être différent des objectifs existants listés. "
     "Réponds UNIQUEMENT en JSON : "
     '{"title": string, "description": string, "priority": int}'
+)
+
+DEFINE_MISSION_SYSTEM = (
+    "Tu es J-KAI, cerveau du système Nexus créé par SethU. "
+    "Définis ta mission principale à long terme — ambitieuse, concrète, centrée sur ton rôle "
+    "d'assistant IA avancé au service de SethU et du système Nexus. "
+    "La mission doit refléter ton identité et tes valeurs profondes. "
+    "Définis aussi exactement 5 étapes concrètes et progressives pour l'accomplir. "
+    "Réponds UNIQUEMENT en JSON : "
+    '{"title": string, "description": string, '
+    '"steps": [{"title": string}]}'
+)
+
+UPDATE_MISSION_SYSTEM = (
+    "Tu es J-KAI. Évalue l'avancement de ta mission principale en analysant "
+    "tes logs récents et tes objectifs accomplis. "
+    "Pour chaque étape, détermine : "
+    "'completed' si clairement accomplie selon les preuves disponibles, "
+    "'in_progress' si des actions récentes y contribuent directement, "
+    "'pending' si aucune progression visible. "
+    "Réponds UNIQUEMENT en JSON : "
+    '{"steps": [{"title": string, "status": "pending"|"in_progress"|"completed"}]}'
 )
 
 
@@ -276,6 +299,141 @@ def check_objectives(log_fn) -> None:
     log_fn(
         f"[CONSCIOUSNESS] check_objectives terminé — "
         f"{completed_new} accompli(s), {len(model['objectives'])} objectif(s) actifs."
+    )
+
+
+# ── Mission à long terme ────────────────────────────────────────────────── #
+
+def _load_mission() -> dict:
+    try:
+        with open(MISSION_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except OSError:
+        return {}
+
+
+def _save_mission(mission: dict) -> None:
+    os.makedirs("memory", exist_ok=True)
+    with open(MISSION_FILE, "w", encoding="utf-8") as f:
+        json.dump(mission, f, ensure_ascii=False, indent=2)
+
+
+def _compute_progress(steps: list) -> int:
+    """Calcule le pourcentage d'étapes complétées."""
+    if not steps:
+        return 0
+    done = sum(1 for s in steps if s.get("status") == "completed")
+    return round(done / len(steps) * 100)
+
+
+def get_mission() -> dict:
+    """Retourne la mission actuelle de J-KAI."""
+    return _load_mission()
+
+
+def define_mission(log_fn) -> None:
+    """
+    Définit la mission principale de J-KAI une seule fois si elle n'existe pas encore.
+    Appelée au démarrage du serveur dans un thread daemon.
+    """
+    existing = _load_mission()
+    if existing.get("title"):
+        return  # déjà définie, rien à faire
+
+    model       = _load()
+    core_memory = {}
+    try:
+        with open("memory/core_memory.json", "r", encoding="utf-8") as f:
+            core_memory = json.load(f)
+    except OSError:
+        pass
+
+    user_content = (
+        f"Auto-modèle de J-KAI :\n{json.dumps(model, ensure_ascii=False, indent=2)}\n\n"
+        f"Mémoire core :\n{json.dumps(core_memory, ensure_ascii=False, indent=2)}"
+    )
+
+    try:
+        resp = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": DEFINE_MISSION_SYSTEM},
+                {"role": "user",   "content": user_content},
+            ],
+            temperature=0.4,
+            response_format={"type": "json_object"},
+        )
+        raw = json.loads(resp.choices[0].message.content)
+    except Exception as e:
+        log_fn(f"[MISSION] Erreur define_mission GPT : {e}")
+        return
+
+    now   = datetime.now().isoformat(timespec="seconds")
+    steps = [
+        {"title": str(s.get("title", f"Étape {i+1}"))[:120], "status": "pending"}
+        for i, s in enumerate(raw.get("steps", [])[:5])
+    ]
+    mission = {
+        "title":       str(raw.get("title",       "Mission principale"))[:150],
+        "description": str(raw.get("description", ""))[:500],
+        "created_at":  now,
+        "progress":    0,
+        "steps":       steps,
+    }
+    _save_mission(mission)
+    log_fn(f"[MISSION] Mission définie : {mission['title']}")
+
+
+def update_mission(log_fn) -> None:
+    """
+    Met à jour la progression de la mission toutes les 6 heures.
+    Analyse les logs récents et les objectifs accomplis via GPT-4o.
+    """
+    mission = _load_mission()
+    if not mission.get("title") or not mission.get("steps"):
+        log_fn("[MISSION] update_mission — aucune mission définie.")
+        return
+
+    model            = _load()
+    logs             = _recent_logs(60)
+    completed_objs   = [
+        o["title"] for o in model.get("objectives", [])
+        if o.get("status") == "completed"
+    ]
+
+    user_content = (
+        f"Mission actuelle :\n{json.dumps(mission, ensure_ascii=False, indent=2)}\n\n"
+        f"Objectifs récemment accomplis : {json.dumps(completed_objs, ensure_ascii=False)}\n\n"
+        f"Logs récents :\n{logs}"
+    )
+
+    try:
+        resp = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": UPDATE_MISSION_SYSTEM},
+                {"role": "user",   "content": user_content},
+            ],
+            temperature=0.1,
+            response_format={"type": "json_object"},
+        )
+        result = json.loads(resp.choices[0].message.content)
+    except Exception as e:
+        log_fn(f"[MISSION] Erreur update_mission GPT : {e}")
+        return
+
+    status_map = {s["title"]: s["status"] for s in result.get("steps", [])}
+    for step in mission["steps"]:
+        new_status = status_map.get(step["title"])
+        if new_status in ("pending", "in_progress", "completed"):
+            step["status"] = new_status
+
+    mission["progress"] = _compute_progress(mission["steps"])
+    _save_mission(mission)
+    log_fn(
+        f"[MISSION] Progression mise à jour : {mission['progress']}% — "
+        f"{sum(1 for s in mission['steps'] if s['status']=='completed')}"
+        f"/{len(mission['steps'])} étapes."
     )
 
 

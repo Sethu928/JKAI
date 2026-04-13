@@ -15,7 +15,8 @@ from killswitch import register_killswitch
 from modules.scheduler import create_default_scheduler
 from modules.monitor import Monitor
 from modules.autonomy import analyze_and_act
-from modules.consciousness import reflect, get_self_model, check_objectives, get_objectives
+from modules.consciousness import (reflect, get_self_model, check_objectives, get_objectives,
+                                   define_mission, update_mission, get_mission)
 from modules.agent import start_agent, read_agent_log
 
 print("Démarrage...", flush=True)
@@ -156,6 +157,10 @@ def serve_log(filename):
 def objectives():
     return jsonify(get_objectives())
 
+@server.route("/mission", methods=["GET"])
+def mission():
+    return jsonify(get_mission())
+
 @server.route("/severus", methods=["POST"])
 def severus():
     return jsonify({"status": "severus"})
@@ -163,10 +168,14 @@ def severus():
 register_killswitch(server, log)
 
 scheduler = create_default_scheduler(log)
-scheduler.add_task("consciousness_reflect", 3600, lambda: reflect(log))
+scheduler.add_task("consciousness_reflect", 3600,  lambda: reflect(log))
 scheduler.add_task("check_objectives",       600,  lambda: check_objectives(log))
+scheduler.add_task("update_mission",        21600, lambda: update_mission(log))
 scheduler.start()
 start_agent(log)
+
+# Définit la mission au premier démarrage (thread daemon, non bloquant)
+threading.Thread(target=lambda: define_mission(log), daemon=True, name="define-mission").start()
 
 monitor = Monitor()
 monitor.start()

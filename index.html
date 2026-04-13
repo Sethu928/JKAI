@@ -63,6 +63,17 @@ body.cortex-mode { filter: hue-rotate(34deg) brightness(1.05); }
 .obj-status.pending { color: #ff6a0044; }
 .obj-status.in_progress { color: #f5c518aa; }
 .obj-status.completed { color: #00c9a7aa; }
+.mission-title-text { font-size: 10px; color: #ff6a0088; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mission-bar-row { display: flex; align-items: center; gap: 5px; margin: 4px 0 2px; }
+.mission-bar-wrap { flex: 1; height: 3px; background: #1a0a0044; border-radius: 2px; overflow: hidden; }
+.mission-bar { height: 100%; background: #ff6a00; border-radius: 2px; transition: width 1s ease; }
+.mission-pct { font-size: 8px; color: #ff6a0055; letter-spacing: 0.5px; flex-shrink: 0; }
+.mission-step { font-size: 9px; color: #ff6a0033; padding: 2px 0 2px 8px; border-left: 1px solid #ff6a0011; display: flex; gap: 5px; align-items: flex-start; line-height: 1.5; }
+.mission-step.in_progress { color: #f5c518aa; border-left-color: #f5c51844; }
+.mission-step.completed { color: #00c9a766; border-left-color: #00c9a733; }
+.step-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; background: #ff6a0022; }
+.step-dot.in_progress { background: #f5c518aa; }
+.step-dot.completed { background: #00c9a7aa; }
 body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
 #monitor-panel { flex: 1; display: none; flex-direction: row; overflow: hidden; }
 #mon-left { flex: 1; display: flex; flex-direction: column; border-right: 1px solid #ff6a0022; overflow: hidden; min-height: 0; }
@@ -256,6 +267,10 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
     <div class="s-item">NEXUS VR</div>
     <div class="s-title">OBJECTIFS</div>
     <div id="obj-list" style="display:flex;flex-direction:column;gap:4px;">
+      <div style="color:#ff6a0022;font-size:9px;letter-spacing:1px;">CHARGEMENT...</div>
+    </div>
+    <div class="s-title">MISSION</div>
+    <div id="mission-block" style="display:flex;flex-direction:column;gap:3px;">
       <div style="color:#ff6a0022;font-size:9px;letter-spacing:1px;">CHARGEMENT...</div>
     </div>
   </div>
@@ -730,6 +745,36 @@ async function loadObjectives() {
 }
 setTimeout(loadObjectives, 6000);
 setInterval(loadObjectives, 120000);
+
+// ── Mission long terme ───────────────────────────────────────────────────
+async function loadMission() {
+  try {
+    const res = await fetch(API + "/mission");
+    const m   = await res.json();
+    const block = document.getElementById("mission-block");
+    if (!m || !m.title) {
+      block.innerHTML = '<div style="color:#ff6a0022;font-size:9px;letter-spacing:1px;">EN COURS DE DÉFINITION...</div>';
+      return;
+    }
+    const pct   = Math.max(0, Math.min(100, m.progress || 0));
+    const steps = (m.steps || []).map(s => {
+      const st = s.status || "pending";
+      return `<div class="mission-step ${st}">` +
+               `<div class="step-dot ${st}"></div>` +
+               `<span>${escapeHtml(s.title)}</span>` +
+             `</div>`;
+    }).join("");
+    block.innerHTML =
+      `<div class="mission-title-text" title="${escapeHtml(m.description || '')}">${escapeHtml(m.title)}</div>` +
+      `<div class="mission-bar-row">` +
+        `<div class="mission-bar-wrap"><div class="mission-bar" style="width:${pct}%"></div></div>` +
+        `<div class="mission-pct">${pct}%</div>` +
+      `</div>` +
+      steps;
+  } catch(e) {}
+}
+setTimeout(loadMission, 7000);
+setInterval(loadMission, 180000);
 </script>
 </body>
 </html>
