@@ -40,6 +40,13 @@ body.cortex-mode { filter: hue-rotate(34deg) brightness(1.05); }
 .mod.on { border-color: #ff6a00; color: #ff6a00; box-shadow: 0 0 8px #ff6a0033; }
 #btn-severus { margin-left: auto; font-size: 11px; background: none; border: 1px solid #ff6a0033; color: #ff6a0055; font-family: 'Courier New', monospace; letter-spacing: 2px; padding: 3px 12px; border-radius: 3px; cursor: pointer; transition: all 0.3s; }
 #btn-severus:hover { color: #4aa8ff; border-color: #4aa8ff66; }
+#btn-kill { font-size: 9px; background: none; border: 1px solid #5c000022; color: #5c000088; font-family: 'Courier New', monospace; letter-spacing: 3px; padding: 3px 10px; border-radius: 3px; cursor: pointer; transition: all 0.3s; }
+#btn-kill:hover { color: #cc0000bb; border-color: #cc000055; background: #cc000011; }
+#kill-overlay { display: none; position: fixed; inset: 0; background: #0a0000f8; z-index: 200; flex-direction: column; align-items: center; justify-content: center; gap: 18px; }
+#kill-overlay.active { display: flex; }
+#kill-overlay-title { font-size: 52px; font-weight: 700; letter-spacing: 14px; color: #8b0000; animation: kill-flicker 1.8s ease-in-out infinite; }
+#kill-overlay-sub { font-size: 11px; letter-spacing: 5px; color: #5c000099; }
+@keyframes kill-flicker { 0%,100% { opacity: 1; } 48% { opacity: 1; } 50% { opacity: 0.4; } 52% { opacity: 1; } }
 #main { position: relative; z-index: 2; display: flex; flex: 1; overflow: hidden; }
 #sidebar { width: 180px; background: #0a0a0acc; border-right: 1px solid #ff6a0022; padding: 14px; display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
 .s-title { font-size: 9px; color: #ff6a0044; letter-spacing: 2px; margin: 8px 0 4px; border-bottom: 1px solid #ff6a0011; padding-bottom: 4px; }
@@ -225,6 +232,12 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
   <div class="mod on" id="mod-cortex" onclick="setEntity('cortex')">CORTEX</div>
   <div class="mod" id="mod-monitor" onclick="setEntity('monitor')">MONITOR</div>
   <button id="btn-severus">SEVERUS</button>
+  <button id="btn-kill">KILL</button>
+</div>
+
+<div id="kill-overlay">
+  <div id="kill-overlay-title">NEXUS TERMINÉ</div>
+  <div id="kill-overlay-sub">SYSTÈME ARRÊTÉ — CONNEXION ROMPUE</div>
 </div>
 
 <div id="main">
@@ -465,6 +478,18 @@ function deactivateSeverus() {
 
 document.getElementById("btn-severus").addEventListener("click", activateSeverus);
 document.getElementById("btn-reactivate").addEventListener("click", deactivateSeverus);
+
+document.getElementById("btn-kill").addEventListener("click", async function() {
+  if (!confirm("Confirmer l'arrêt total de J-KAI ?")) return;
+  try {
+    await fetch(API + "/ks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: "nexus_off" }),
+    });
+  } catch(e) { /* le serveur coupe la connexion — erreur réseau attendue */ }
+  document.getElementById("kill-overlay").classList.add("active");
+});
 
 async function typeText(element, text, speed = 18) {
   element.textContent = "";
