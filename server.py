@@ -11,12 +11,13 @@ from memory.db import init_db, save_message, load_history, clear_history, search
 from modules.voice import speak, listen
 from modules.marc import ask_marc
 from modules.cortex import ask_cortex
+from killswitch import register_killswitch
 
 print("Démarrage...", flush=True)
 sys.stdout.flush()
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("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"))
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 server = Flask(__name__)
 CORS(server)
@@ -108,21 +109,6 @@ def voice():
     speak(reply)
     return jsonify({"status": "ok", "input": user_input, "reply": reply})
 
-def voice_loop():
-    speak("Nexus en ligne. Je vous écoute, SethU.")
-    while True:
-        try:
-            user_input = listen()
-            if not user_input:
-                continue
-            if "severus" in user_input.lower():
-                speak("Lien Nexus rompu. Système gelé. Passage en sommeil sécurisé.")
-                break
-            reply = ask_jkai(user_input)
-            speak(reply)
-        except KeyboardInterrupt:
-            break
-
 @server.route("/cortex", methods=["POST"])
 def cortex():
     data = request.json
@@ -136,7 +122,7 @@ def cortex():
 def severus():
     return jsonify({"status": "severus"})
 
+register_killswitch(server, log)
+
 if __name__ == "__main__":
-    t = threading.Thread(target=voice_loop, daemon=True)
-    t.start()
     server.run(debug=False, port=5000)
