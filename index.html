@@ -107,6 +107,15 @@ body.cortex-mode { filter: hue-rotate(34deg) brightness(1.05); }
 .h-tag.m { color: #00c9a799; }
 .h-text { font-size: 11px; line-height: 1.6; color: #664422; border-left: 1px solid #ff6a0022; padding-left: 10px; }
 .h-text.highlight { color: #ff6a00; }
+#agent-notif { position: fixed; bottom: 24px; right: 24px; z-index: 40; display: none; flex-direction: column; gap: 6px; max-width: 320px; background: #0a0a0af0; border: 1px solid #a855f733; border-radius: 6px; padding: 10px 14px; box-shadow: 0 0 20px #a855f722; animation: fadeIn 0.4s ease; }
+#agent-notif.active { display: flex; }
+#agent-notif-header { display: flex; align-items: center; gap: 8px; }
+#agent-notif-dot { width: 7px; height: 7px; border-radius: 50%; background: #a855f7; flex-shrink: 0; animation: agent-pulse 2s ease-in-out infinite; }
+@keyframes agent-pulse { 0%,100% { box-shadow: 0 0 0 0 #a855f755; } 50% { box-shadow: 0 0 0 5px #a855f700; } }
+#agent-notif-title { font-size: 9px; letter-spacing: 2px; color: #a855f7; flex: 1; }
+#agent-notif-close { background: none; border: none; color: #a855f755; cursor: pointer; font-size: 11px; padding: 0; line-height: 1; transition: color 0.2s; }
+#agent-notif-close:hover { color: #a855f7; }
+#agent-notif-text { font-size: 11px; color: #7c3aed99; line-height: 1.6; border-left: 1px solid #a855f733; padding-left: 10px; word-break: break-word; }
 #corner-tl { position: fixed; top: 0; left: 0; width: 20px; height: 20px; border-top: 1px solid #ff6a00; border-left: 1px solid #ff6a00; z-index: 3; }
 #corner-tr { position: fixed; top: 0; right: 0; width: 20px; height: 20px; border-top: 1px solid #ff6a00; border-right: 1px solid #ff6a00; z-index: 3; }
 #corner-bl { position: fixed; bottom: 0; left: 0; width: 20px; height: 20px; border-bottom: 1px solid #ff6a00; border-left: 1px solid #ff6a00; z-index: 3; }
@@ -137,6 +146,15 @@ body.cortex-mode { filter: hue-rotate(34deg) brightness(1.05); }
     <input id="history-search" type="text" placeholder="Rechercher dans la mémoire..." oninput="filterHistory()" />
   </div>
   <div id="history-list"></div>
+</div>
+
+<div id="agent-notif">
+  <div id="agent-notif-header">
+    <div id="agent-notif-dot"></div>
+    <span id="agent-notif-title">AGENT AUTONOME</span>
+    <button id="agent-notif-close" onclick="document.getElementById('agent-notif').classList.remove('active')" title="Fermer">&#10005;</button>
+  </div>
+  <div id="agent-notif-text"></div>
 </div>
 
 <canvas id="canvas-bg"></canvas>
@@ -489,6 +507,30 @@ setTimeout(function() { logo.style.opacity = "1"; }, 300);
 setTimeout(function() { bar.style.width = "100%"; }, 600);
 setTimeout(function() { intro.style.opacity = "0"; }, 3200);
 setTimeout(function() { intro.style.display = "none"; }, 4000);
+
+// ── Notification agent autonome ─────────────────────────────────────────
+let _lastAgentLine = "";
+
+async function pollAgentLog() {
+  try {
+    const res = await fetch(API + "/agent/log");
+    const data = await res.json();
+    const lines = (data.lines || []).filter(l => l.trim());
+    if (!lines.length) return;
+    const last = lines[lines.length - 1];
+    if (last === _lastAgentLine) return;   // rien de nouveau
+    _lastAgentLine = last;
+    // Extrait la notification après "| NOTIF: "
+    const match = last.match(/\|\s*NOTIF:\s*(.+)$/);
+    const notif = match ? match[1].trim() : last.replace(/^\[.*?\]\s*/, "").trim();
+    document.getElementById("agent-notif-text").textContent = notif;
+    document.getElementById("agent-notif").classList.add("active");
+  } catch(e) {}
+}
+
+// Premier poll après l'intro, puis toutes les 60 s
+setTimeout(pollAgentLog, 5000);
+setInterval(pollAgentLog, 60000);
 </script>
 </body>
 </html>

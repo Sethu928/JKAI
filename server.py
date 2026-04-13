@@ -16,6 +16,7 @@ from modules.scheduler import create_default_scheduler
 from modules.monitor import Monitor
 from modules.autonomy import analyze_and_act
 from modules.consciousness import reflect, get_self_model
+from modules.agent import run_agent_cycle, read_agent_log
 
 print("Démarrage...", flush=True)
 sys.stdout.flush()
@@ -133,6 +134,10 @@ def autonomy():
 def consciousness():
     return jsonify(get_self_model())
 
+@server.route("/agent/log", methods=["GET"])
+def agent_log():
+    return jsonify({"lines": read_agent_log(20)})
+
 @server.route("/severus", methods=["POST"])
 def severus():
     return jsonify({"status": "severus"})
@@ -141,6 +146,7 @@ register_killswitch(server, log)
 
 scheduler = create_default_scheduler(log)
 scheduler.add_task("consciousness_reflect", 3600, lambda: reflect(log))
+scheduler.add_task("agent_cycle",          300,  lambda: run_agent_cycle(log))
 scheduler.start()
 
 monitor = Monitor()
