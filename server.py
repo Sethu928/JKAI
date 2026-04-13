@@ -10,6 +10,7 @@ from openai import OpenAI
 from memory.db import init_db, save_message, load_history, clear_history, search_history
 from modules.voice import speak, listen
 from modules.marc import ask_marc
+from modules.cortex import ask_cortex
 
 print("Démarrage...", flush=True)
 sys.stdout.flush()
@@ -121,6 +122,15 @@ def voice_loop():
             speak(reply)
         except KeyboardInterrupt:
             break
+
+@server.route("/cortex", methods=["POST"])
+def cortex():
+    data = request.json
+    user_input = data.get("message", "")
+    result = ask_cortex(user_input)
+    log(f"SethU → Cortex: {user_input}")
+    log(f"Cortex output: {result.get('output', '')[:200]}")
+    return jsonify(result)
 
 @server.route("/severus", methods=["POST"])
 def severus():

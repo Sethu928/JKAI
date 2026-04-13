@@ -9,6 +9,7 @@
 body { background: #080808; color: #ff6a00; font-family: 'Courier New', monospace; height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: all 0.8s; }
 body.severus-mode { filter: hue-rotate(200deg) brightness(0.7); }
 body.marc-mode { filter: hue-rotate(94deg) brightness(1.05); }
+body.cortex-mode { filter: hue-rotate(34deg) brightness(1.05); }
 #canvas-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 #scan-line { position: fixed; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #ff6a0033, transparent); z-index: 1; pointer-events: none; animation: scan 6s linear infinite; }
 @keyframes scan { 0% { top: 0; } 100% { top: 100vh; } }
@@ -58,6 +59,14 @@ body.marc-mode { filter: hue-rotate(94deg) brightness(1.05); }
 .msg-tag.j { color: #ff6a00; }
 .msg-tag.m { color: #00c9a7; }
 .msg-text.m { border-color: #00c9a722; color: #00a88a; }
+.msg-tag.c { color: #f5c518; }
+.msg-text.c { border-color: #f5c51822; }
+.cortex-block { max-width: 820px !important; display: flex; flex-direction: column; gap: 6px; }
+.cortex-label { font-size: 9px; letter-spacing: 2px; color: #ff6a0055; margin-top: 6px; }
+.cortex-code { font-family: 'Courier New', monospace; font-size: 11px; color: #aaaaaa; background: #050505; border: 1px solid #ffffff0a; border-radius: 3px; padding: 10px 12px; overflow-x: auto; white-space: pre; line-height: 1.6; }
+.cortex-output { font-family: 'Courier New', monospace; font-size: 11px; color: #7ec87e; background: #050505; border: 1px solid #7ec87e18; border-radius: 3px; padding: 10px 12px; overflow-x: auto; white-space: pre; line-height: 1.6; }
+.cortex-error { font-family: 'Courier New', monospace; font-size: 11px; color: #ff5555; background: #050505; border: 1px solid #ff555518; border-radius: 3px; padding: 10px 12px; white-space: pre-wrap; line-height: 1.6; }
+.cortex-err-label { color: #ff555555 !important; }
 .msg-text { font-size: 13px; line-height: 1.7; padding: 8px 14px; border-radius: 4px; border: 1px solid #ff6a0022; background: #0f0f0f; color: #cc5500; max-width: 700px; }
 .msg-text.u { background: transparent; border-color: #ff6a0011; color: #664422; }
 #typing { display: none; padding: 0 20px 8px; }
@@ -156,7 +165,7 @@ body.marc-mode { filter: hue-rotate(94deg) brightness(1.05); }
   <div class="mod on" id="mod-jkai" onclick="setEntity('jkai')">J-KAI</div>
   <div class="mod on" id="mod-marc" onclick="setEntity('marc')">MARC</div>
   <div class="mod">KAÏA</div>
-  <div class="mod on">CORTEX</div>
+  <div class="mod on" id="mod-cortex" onclick="setEntity('cortex')">CORTEX</div>
   <button id="btn-severus">SEVERUS</button>
 </div>
 
@@ -197,11 +206,16 @@ function setEntity(entity) {
   activeEntity = entity;
   document.getElementById("mod-jkai").classList.toggle("on", entity === "jkai");
   document.getElementById("mod-marc").classList.toggle("on", entity === "marc");
-  document.body.classList.toggle("marc-mode", entity === "marc");
-  const prefix = document.getElementById("input-prefix");
-  prefix.textContent = entity === "marc" ? "SETHU → MARC >" : "SETHU >";
-  document.getElementById("user-input").placeholder =
-    entity === "marc" ? "Interrogez Marc..." : "Entrez votre commande...";
+  document.getElementById("mod-cortex").classList.toggle("on", entity === "cortex");
+  document.body.classList.toggle("marc-mode",   entity === "marc");
+  document.body.classList.toggle("cortex-mode", entity === "cortex");
+  if (entity === "marc")   document.body.classList.remove("cortex-mode");
+  if (entity === "cortex") document.body.classList.remove("marc-mode");
+  if (entity === "jkai")   { document.body.classList.remove("marc-mode"); document.body.classList.remove("cortex-mode"); }
+  const prefixes = { jkai: "SETHU >", marc: "SETHU → MARC >", cortex: "SETHU → CORTEX >" };
+  const holders  = { jkai: "Entrez votre commande...", marc: "Interrogez Marc...", cortex: "Décrivez la tâche à coder..." };
+  document.getElementById("input-prefix").textContent = prefixes[entity];
+  document.getElementById("user-input").placeholder   = holders[entity];
 }
 
 const canvas = document.getElementById("canvas-bg");
@@ -300,19 +314,21 @@ async function sendMessage() {
   if (!msg || severusActive) return;
   if (msg.toLowerCase() === "severus") { activateSeverus(); input.value = ""; return; }
   input.value = "";
-  const isMarc = activeEntity === "marc";
-  addMessage(isMarc ? "SETHU → MARC >" : "SETHU >", msg, "u", false);
+  const tagMap      = { jkai: "SETHU >", marc: "SETHU → MARC >", cortex: "SETHU → CORTEX >" };
+  const endpointMap = { jkai: "/chat",  marc: "/marc",          cortex: "/cortex" };
+  addMessage(tagMap[activeEntity], msg, "u", false);
   document.getElementById("typing").style.display = "block";
   try {
-    const endpoint = isMarc ? "/marc" : "/chat";
-    const res = await fetch(API + endpoint, {
+    const res = await fetch(API + endpointMap[activeEntity], {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: msg })
     });
     const data = await res.json();
     document.getElementById("typing").style.display = "none";
-    if (isMarc) {
+    if (activeEntity === "cortex") {
+      addCortexMessage(data);
+    } else if (activeEntity === "marc") {
       addMessage("MARC >", data.reply, "m", true);
     } else {
       addMessage("J-KAI >", data.reply, "j", true);
@@ -341,6 +357,51 @@ function addMessage(tag, text, type, animate) {
   } else {
     textEl.textContent = text;
   }
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function addCortexMessage(result) {
+  const box = document.getElementById("messages");
+  const div = document.createElement("div");
+  div.className = "msg";
+  div.style.animation = "fadeIn 0.3s ease";
+
+  const tag = document.createElement("div");
+  tag.className = "msg-tag c";
+  tag.textContent = "CORTEX >";
+
+  const body = document.createElement("div");
+  body.className = "msg-text c cortex-block";
+
+  let html = "";
+  if (result.blocked || (!result.code && result.error)) {
+    html = `<div class="cortex-error">${escapeHtml(result.error)}</div>`;
+  } else {
+    if (result.code) {
+      html += `<div class="cortex-label">// CODE GÉNÉRÉ</div>`;
+      html += `<pre class="cortex-code">${escapeHtml(result.code)}</pre>`;
+    }
+    if (result.output) {
+      html += `<div class="cortex-label">// SORTIE</div>`;
+      html += `<pre class="cortex-output">${escapeHtml(result.output)}</pre>`;
+    }
+    if (result.error) {
+      html += `<div class="cortex-label cortex-err-label">// ERREUR</div>`;
+      html += `<pre class="cortex-error">${escapeHtml(result.error)}</pre>`;
+    }
+    if (!result.output && !result.error) {
+      html += `<div class="cortex-label">// EXÉCUTION TERMINÉE — AUCUNE SORTIE</div>`;
+    }
+  }
+
+  body.innerHTML = html;
+  div.appendChild(tag);
+  div.appendChild(body);
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
 }
 
 let historyData = [];
