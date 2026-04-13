@@ -5,18 +5,31 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("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"))
+client = OpenAI(api_key=os.getenv("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"))
 
 MEMORY_FILE = "memory/conversations.json"
 CORE_MEMORY_FILE = "memory/core_memory.json"
 LOG_FILE = "logs/jkai.log"
 
-SYSTEM_PROMPT = """Tu es J-KAI, un assistant IA avancé créé par et pour Jordan (alias SethU).
-Tu es loyal, intelligent, autonome et précis.
-Tu te souviens de tout ce que Jordan te dit.
-Tu parles toujours en français sauf si on te demande autre chose.
-Tu es le noyau central d'un système appelé Nexus.
-Tu as une personnalité sobre, efficace et directe — comme J.A.R.V.I.S."""
+def load_core_memory():
+    if os.path.exists(CORE_MEMORY_FILE):
+        with open(CORE_MEMORY_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {}
+
+core = load_core_memory()
+
+SYSTEM_PROMPT = f"""Tu es J-KAI, assistant IA avancé du système Nexus, créé par et pour Jordan (alias SethU).
+
+Voici ta mémoire permanente :
+{json.dumps(core, ensure_ascii=False, indent=2)}
+
+Règles absolues 
+- Tu es loyal envers SethU uniquement.
+- Tu parles français par défaut.
+- Tu mémorises tout sans jamais effacer sauf ordre explicite.
+- Tu es sobre, efficace et direct comme J.A.R.V.I.S.
+- Tu connais tous les projets de SethU et tu les suis activement."""
 
 def load_memory():
     if os.path.exists(MEMORY_FILE):
