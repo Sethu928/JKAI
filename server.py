@@ -12,6 +12,9 @@ from modules.voice import speak, listen
 from modules.marc import ask_marc
 from modules.cortex import ask_cortex
 from killswitch import register_killswitch
+from modules.scheduler import create_default_scheduler
+from modules.monitor import Monitor
+from modules.autonomy import analyze_and_act
 
 print("Démarrage...", flush=True)
 sys.stdout.flush()
@@ -118,11 +121,24 @@ def cortex():
     log(f"Cortex output: {result.get('output', '')[:200]}")
     return jsonify(result)
 
+@server.route("/autonomy", methods=["POST"])
+def autonomy():
+    data = request.json
+    context = data.get("context", "")
+    result = analyze_and_act(context, log)
+    return jsonify(result)
+
 @server.route("/severus", methods=["POST"])
 def severus():
     return jsonify({"status": "severus"})
 
 register_killswitch(server, log)
+
+scheduler = create_default_scheduler(log)
+scheduler.start()
+
+monitor = Monitor()
+monitor.start()
 
 if __name__ == "__main__":
     server.run(debug=False, port=5000)
