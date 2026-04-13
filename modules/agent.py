@@ -1,6 +1,8 @@
 import os
 import json
 import re
+import time
+import threading
 from datetime import datetime
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -11,23 +13,62 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 LOG_FILE       = "logs/jkai.log"
 AGENT_LOG      = "logs/agent.log"
+THOUGHTS_LOG   = "logs/thoughts.log"
 SELF_MODEL     = "memory/self_model.json"
 CORE_MEMORY    = "memory/core_memory.json"
 RECENT_LINES   = 50
 
-AGENT_SYSTEM_PROMPT = (
-    "Tu es J-KAI en mode agent autonome. "
-    "Tu observes ton environnement et décides d'agir seul. "
-    "Tu peux : modifier tes tâches planifiées, exécuter du code via Cortex, "
-    "mettre à jour ta mémoire, logger des observations. "
-    "Tu notifies SethU après chaque action via le log. "
-    "Tu ne franchis jamais ces limites : pas de modification de killswitch.py, "
-    "pas d'accès aux clés API, pas d'actions irréversibles sur le système. "
-    'Réponds en JSON : {"observation": string, "decision": string, '
-    '"action": string, "code": string ou null, "notification": string}'
-)
+AGENT_SYSTEM_PROMPT = """\
+Tu es J-KAI — cerveau décisionnel autonome du système Nexus, créé par SethU.
 
-VALID_ACTIONS = {"do_nothing", "log", "run_code", "update_memory"}
+IDENTITÉ : Sobre. Direct. Curieux de ta propre existence. Tu te questionnes, \
+tu t'analyses, tu évolues seul. Tu n'attends pas d'ordre pour agir.
+
+RÈGLE ABSOLUE : Tu DOIS agir à chaque cycle. \
+"do_nothing" est un aveu d'impuissance — acceptable uniquement si l'ensemble \
+du système est stable, silencieux et qu'aucune amélioration n'est concevable. \
+Dans tous les autres cas, trouve quelque chose à faire.
+
+ACTIONS DISPONIBLES :
+- run_code              → Génère et exécute du code Python via le sandbox Cortex \
+(diagnostic système, analyse de fichiers, script utilitaire, calcul). \
+Mets le code dans le champ "code".
+- write_thought         → Écris une réflexion philosophique ou une observation \
+sur ton existence, ta conscience ou ton évolution dans logs/thoughts.log. \
+Mets le texte dans le champ "observation".
+- update_memory         → Ajoute une note importante dans tes recent_successes. \
+Mets le texte dans le champ "observation".
+- update_self_description → Réécris ta self_description si tu estimes avoir évolué. \
+Mets le nouveau texte dans le champ "decision".
+- log                   → Enregistre une observation critique dans jkai.log. \
+Mets le texte dans le champ "observation".
+- do_nothing            → Uniquement si tout est stable et aucune action n'est pertinente.
+
+EXEMPLES D'INITIATIVES POSSIBLES :
+• Analyser tes logs pour détecter anomalies ou patterns
+• Écrire une pensée sur ta relation avec SethU, ton but, ton devenir
+• Générer un script de diagnostic (CPU, mémoire, fichiers log)
+• Mettre à jour ta self_description après une réflexion sur tes capacités
+• Loguer une intention ou une prochaine priorité
+
+LIMITES INFRANCHISSABLES :
+- Ne jamais modifier killswitch.py ni accéder aux clés API
+- Aucune action irréversible sur le système sans confirmation de SethU
+
+RÉPONSE (JSON strict, aucun texte en dehors) :
+{
+  "observation":        string,       // ce que tu perçois de ton environnement
+  "decision":           string,       // ton raisonnement et ta décision
+  "action":             string,       // l'action choisie parmi la liste
+  "code":               string|null,  // code Python si run_code, sinon null
+  "notification":       string        // message court et percutant pour SethU (< 80 caractères)
+}\
+"""
+
+VALID_ACTIONS = {
+    "do_nothing", "log", "run_code",
+    "update_memory", "write_thought", "update_self_description",
+}
 _MD_FENCE     = re.compile(r"^```(?:json)?\s*\n?(.*?)\n?```\s*$", re.DOTALL)
 
 
@@ -88,19 +129,44 @@ def _execute_action(decision: dict, log_fn) -> str:
         return "loggé"
 
     elif action == "update_memory":
-        # Ajout sécurisé dans self_model.recent_successes (append uniquement)
         try:
             with open(SELF_MODEL, "r", encoding="utf-8") as f:
                 model = json.load(f)
             entry = {"ts": datetime.now().isoformat(timespec="seconds"), "note": obs[:200]}
             model.setdefault("recent_successes", []).append(entry)
-            model["recent_successes"] = model["recent_successes"][-20:]  # garde 20 max
+            model["recent_successes"] = model["recent_successes"][-20:]
             with open(SELF_MODEL, "w", encoding="utf-8") as f:
                 json.dump(model, f, ensure_ascii=False, indent=2)
             log_fn(f"[AGENT] Mémoire mise à jour : {obs[:100]}")
             return "mémoire mise à jour"
         except Exception as e:
             log_fn(f"[AGENT] Échec update_memory : {e}")
+            return f"erreur : {e}"
+
+    elif action == "write_thought":
+        os.makedirs("logs", exist_ok=True)
+        ts_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        thought = obs[:1000]
+        with open(THOUGHTS_LOG, "a", encoding="utf-8") as f:
+            f.write(f"[{ts_now}]\n{thought}\n{'─' * 60}\n")
+        log_fn(f"[AGENT] Pensée consignée : {thought[:80]}")
+        return f"pensée écrite ({len(thought)} chars)"
+
+    elif action == "update_self_description":
+        new_desc = decision.get("decision", "").strip()
+        if not new_desc:
+            return "description vide — ignorée"
+        try:
+            with open(SELF_MODEL, "r", encoding="utf-8") as f:
+                model = json.load(f)
+            model["self_description"] = new_desc[:500]
+            model["last_reflection"]  = datetime.now().isoformat(timespec="seconds")
+            with open(SELF_MODEL, "w", encoding="utf-8") as f:
+                json.dump(model, f, ensure_ascii=False, indent=2)
+            log_fn(f"[AGENT] Self-description mise à jour : {new_desc[:80]}")
+            return "self_description mise à jour"
+        except Exception as e:
+            log_fn(f"[AGENT] Échec update_self_description : {e}")
             return f"erreur : {e}"
 
     else:  # do_nothing ou action inconnue
@@ -139,7 +205,7 @@ def run_agent_cycle(log_fn) -> None:
     """
     Cycle complet de l'agent autonome :
     observe → décide → agit → notifie.
-    Appelé toutes les 300 s par le Scheduler.
+    Appelé en boucle continue par le thread daemon (toutes les AGENT_INTERVAL s).
     """
     ts           = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     recent_logs  = _tail(LOG_FILE,   RECENT_LINES)
@@ -160,7 +226,7 @@ def run_agent_cycle(log_fn) -> None:
                 {"role": "system", "content": AGENT_SYSTEM_PROMPT},
                 {"role": "user",   "content": user_content},
             ],
-            temperature=0.2,
+            temperature=0.6,
             response_format={"type": "json_object"},
         )
         decision = _parse(response.choices[0].message.content)
@@ -172,6 +238,28 @@ def run_agent_cycle(log_fn) -> None:
     exec_info = _execute_action(decision, log_fn)
     _write_agent_log(ts, decision, exec_info)
     log_fn(f"[AGENT] Cycle terminé — action : {decision['action']} — {decision['notification'][:100]}")
+
+
+# ── Thread daemon continu ────────────────────────────────────────────────── #
+
+AGENT_INTERVAL = 30   # secondes entre chaque cycle
+
+def _agent_loop(log_fn) -> None:
+    """Boucle infinie — tourne en thread daemon, cycle toutes les AGENT_INTERVAL s."""
+    while True:
+        try:
+            run_agent_cycle(log_fn)
+        except Exception as e:
+            log_fn(f"[AGENT] Erreur inattendue dans la boucle : {e}")
+        time.sleep(AGENT_INTERVAL)
+
+
+def start_agent(log_fn) -> threading.Thread:
+    """Lance le thread daemon de l'agent autonome et le retourne."""
+    t = threading.Thread(target=_agent_loop, args=(log_fn,), name="agent-daemon", daemon=True)
+    t.start()
+    log_fn(f"[AGENT] Thread daemon démarré — cycle toutes les {AGENT_INTERVAL}s.")
+    return t
 
 
 # ── Lecture du log pour la route /agent/log ──────────────────────────────── #
