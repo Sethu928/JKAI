@@ -8,6 +8,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #080808; color: #ff6a00; font-family: 'Courier New', monospace; height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: all 0.8s; }
 body.severus-mode { filter: hue-rotate(200deg) brightness(0.7); }
+body.marc-mode { filter: hue-rotate(94deg) brightness(1.05); }
 #canvas-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 #scan-line { position: fixed; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #ff6a0033, transparent); z-index: 1; pointer-events: none; animation: scan 6s linear infinite; }
 @keyframes scan { 0% { top: 0; } 100% { top: 100vh; } }
@@ -196,6 +197,7 @@ function setEntity(entity) {
   activeEntity = entity;
   document.getElementById("mod-jkai").classList.toggle("on", entity === "jkai");
   document.getElementById("mod-marc").classList.toggle("on", entity === "marc");
+  document.body.classList.toggle("marc-mode", entity === "marc");
   const prefix = document.getElementById("input-prefix");
   prefix.textContent = entity === "marc" ? "SETHU → MARC >" : "SETHU >";
   document.getElementById("user-input").placeholder =
