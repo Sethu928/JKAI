@@ -15,6 +15,7 @@ from killswitch import register_killswitch
 from modules.scheduler import create_default_scheduler
 from modules.monitor import Monitor
 from modules.autonomy import analyze_and_act
+from modules.consciousness import reflect, get_self_model
 
 print("Démarrage...", flush=True)
 sys.stdout.flush()
@@ -128,6 +129,10 @@ def autonomy():
     result = analyze_and_act(context, log)
     return jsonify(result)
 
+@server.route("/consciousness", methods=["GET"])
+def consciousness():
+    return jsonify(get_self_model())
+
 @server.route("/severus", methods=["POST"])
 def severus():
     return jsonify({"status": "severus"})
@@ -135,6 +140,7 @@ def severus():
 register_killswitch(server, log)
 
 scheduler = create_default_scheduler(log)
+scheduler.add_task("consciousness_reflect", 3600, lambda: reflect(log))
 scheduler.start()
 
 monitor = Monitor()
