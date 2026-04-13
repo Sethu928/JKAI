@@ -48,6 +48,14 @@ body.cortex-mode { filter: hue-rotate(34deg) brightness(1.05); }
 .s-item:hover { color: #ff6a00; background: #ff6a0011; }
 .s-stat { display: flex; justify-content: space-between; font-size: 10px; color: #ff6a0044; padding: 2px 0; }
 .s-stat span { color: #ff6a0088; }
+.obj-item { padding: 5px 8px; border-radius: 3px; border: 1px solid #ff6a0011; cursor: default; }
+.obj-title { font-size: 10px; color: #ff6a0066; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.obj-meta { display: flex; justify-content: space-between; margin-top: 3px; }
+.obj-prio { font-size: 8px; color: #ff6a0033; letter-spacing: 0.5px; }
+.obj-status { font-size: 8px; letter-spacing: 0.5px; }
+.obj-status.pending { color: #ff6a0044; }
+.obj-status.in_progress { color: #f5c518aa; }
+.obj-status.completed { color: #00c9a7aa; }
 #chat-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 #messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
 #messages::-webkit-scrollbar { width: 4px; }
@@ -201,6 +209,10 @@ body.cortex-mode { filter: hue-rotate(34deg) brightness(1.05); }
     <div class="s-item on">J-KAI</div>
     <div class="s-item">SNACK'N'SIP</div>
     <div class="s-item">NEXUS VR</div>
+    <div class="s-title">OBJECTIFS</div>
+    <div id="obj-list" style="display:flex;flex-direction:column;gap:4px;">
+      <div style="color:#ff6a0022;font-size:9px;letter-spacing:1px;">CHARGEMENT...</div>
+    </div>
   </div>
 
   <div id="chat-wrap">
@@ -531,6 +543,32 @@ async function pollAgentLog() {
 // Premier poll après l'intro, puis toutes les 60 s
 setTimeout(pollAgentLog, 5000);
 setInterval(pollAgentLog, 60000);
+
+// ── Objectifs autonomes ─────────────────────────────────────────────────
+async function loadObjectives() {
+  try {
+    const res  = await fetch(API + "/objectives");
+    const objs = await res.json();
+    const list = document.getElementById("obj-list");
+    if (!objs.length) {
+      list.innerHTML = '<div style="color:#ff6a0022;font-size:9px;letter-spacing:1px;">AUCUN OBJECTIF</div>';
+      return;
+    }
+    const prioMap   = ["","P1","P2","P3","P4","P5"];
+    const statusMap = { pending: "EN ATTENTE", in_progress: "EN COURS", completed: "ACCOMPLI" };
+    list.innerHTML  = objs.map(o =>
+      `<div class="obj-item" title="${escapeHtml(o.description||'')}">` +
+        `<div class="obj-title">${escapeHtml(o.title)}</div>` +
+        `<div class="obj-meta">` +
+          `<span class="obj-prio">${prioMap[o.priority]||''}</span>` +
+          `<span class="obj-status ${o.status}">${statusMap[o.status]||o.status}</span>` +
+        `</div>` +
+      `</div>`
+    ).join('');
+  } catch(e) {}
+}
+setTimeout(loadObjectives, 6000);
+setInterval(loadObjectives, 120000);
 </script>
 </body>
 </html>

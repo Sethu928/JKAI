@@ -15,7 +15,7 @@ from killswitch import register_killswitch
 from modules.scheduler import create_default_scheduler
 from modules.monitor import Monitor
 from modules.autonomy import analyze_and_act
-from modules.consciousness import reflect, get_self_model
+from modules.consciousness import reflect, get_self_model, check_objectives, get_objectives
 from modules.agent import start_agent, read_agent_log
 
 print("Démarrage...", flush=True)
@@ -138,6 +138,10 @@ def consciousness():
 def agent_log():
     return jsonify({"lines": read_agent_log(20)})
 
+@server.route("/objectives", methods=["GET"])
+def objectives():
+    return jsonify(get_objectives())
+
 @server.route("/severus", methods=["POST"])
 def severus():
     return jsonify({"status": "severus"})
@@ -146,6 +150,7 @@ register_killswitch(server, log)
 
 scheduler = create_default_scheduler(log)
 scheduler.add_task("consciousness_reflect", 3600, lambda: reflect(log))
+scheduler.add_task("check_objectives",       600,  lambda: check_objectives(log))
 scheduler.start()
 start_agent(log)
 
