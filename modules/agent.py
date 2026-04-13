@@ -116,9 +116,9 @@ def _execute_action(decision: dict, log_fn) -> str:
     if action == "run_code" and code:
         result = execute_code(code)
         if result.get("blocked"):
-            info = f"BLOQUÉ — {result.get('error','')[:100]}"
+            info = f"BLOQUÉ — {result.get('error','')[:500]}"
         elif result.get("error"):
-            info = f"ERREUR — {result.get('error','')[:100]}"
+            info = f"ERREUR — {result.get('error','')[:500]}"
         else:
             info = f"OK — {result.get('output','')[:150]}"
         log_fn(f"[AGENT] run_code → {info}")

@@ -26,7 +26,7 @@ _BLOCKLIST = [
     r'__import__\s*\(',
     r'\beval\s*\(',
     r'\bexec\s*\(',
-    r'open\s*\([^)]*["\'][wa]["\']',   # écriture fichier
+    r'open\s*\(\s*(?!["\'](?:logs|memory)/)[^)]*["\'][wa]["\']',  # écriture hors logs/ et memory/
     r'shutil\.',
     r'os\.remove\s*\(',
     r'os\.unlink\s*\(',
