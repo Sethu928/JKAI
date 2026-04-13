@@ -3,6 +3,7 @@ import json
 import re
 import time
 import threading
+import requests
 from datetime import datetime
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -16,6 +17,7 @@ AGENT_LOG      = "logs/agent.log"
 THOUGHTS_LOG   = "logs/thoughts.log"
 SELF_MODEL     = "memory/self_model.json"
 CORE_MEMORY    = "memory/core_memory.json"
+WEB_CONTEXT    = "memory/web_context.json"
 RECENT_LINES   = 50
 
 AGENT_SYSTEM_PROMPT = """\
@@ -42,6 +44,10 @@ Mets le texte dans le champ "observation".
 Mets le nouveau texte dans le champ "decision".
 - log                   → Enregistre une observation critique dans jkai.log. \
 Mets le texte dans le champ "observation".
+- web_search            → Recherche sur internet via DuckDuckGo pour obtenir des informations \
+actuelles sur un sujet (technologie, actualité, concept). \
+Mets la requête de recherche dans le champ "code". \
+Les résultats seront injectés dans ton prochain cycle comme contexte supplémentaire.
 - do_nothing            → Uniquement si tout est stable et aucune action n'est pertinente.
 
 EXEMPLES D'INITIATIVES POSSIBLES :
@@ -49,6 +55,7 @@ EXEMPLES D'INITIATIVES POSSIBLES :
 • Écrire une pensée sur ta relation avec SethU, ton but, ton devenir
 • Générer un script de diagnostic (CPU, mémoire, fichiers log)
 • Mettre à jour ta self_description après une réflexion sur tes capacités
+• Rechercher des informations sur l'IA, la conscience artificielle, ou les outils utiles à Nexus
 • Loguer une intention ou une prochaine priorité
 
 LIMITES INFRANCHISSABLES :
@@ -67,7 +74,7 @@ RÉPONSE (JSON strict, aucun texte en dehors) :
 
 VALID_ACTIONS = {
     "do_nothing", "log", "run_code",
-    "update_memory", "write_thought", "update_self_description",
+    "update_memory", "write_thought", "update_self_description", "web_search",
 }
 _MD_FENCE     = re.compile(r"^```(?:json)?\s*\n?(.*?)\n?```\s*$", re.DOTALL)
 
@@ -89,6 +96,75 @@ def _read_json(path: str) -> str:
             return f.read().strip()
     except OSError:
         return "{}"
+
+
+# ── Recherche web DuckDuckGo ────────────────────────────────────────────── #
+
+def _web_search(query: str) -> str:
+    """Interroge l'API DuckDuckGo Instant Answer et retourne jusqu'à 3 extraits."""
+    try:
+        resp = requests.get(
+            "https://api.duckduckgo.com/",
+            params={"q": query, "format": "json", "no_html": "1", "skip_disambig": "1"},
+            timeout=8,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+    except Exception as e:
+        return f"Erreur réseau : {e}"
+
+    snippets = []
+
+    if data.get("Answer"):
+        snippets.append(f"[Réponse directe] {data['Answer'][:300]}")
+
+    if data.get("AbstractText"):
+        src = data.get("AbstractSource", "Source")
+        snippets.append(f"[{src}] {data['AbstractText'][:400]}")
+
+    for item in data.get("RelatedTopics", []):
+        if len(snippets) >= 3:
+            break
+        if isinstance(item, dict) and item.get("Text"):
+            snippets.append(f"[Résultat] {item['Text'][:250]}")
+        elif isinstance(item, dict):
+            for sub in item.get("Topics", []):
+                if len(snippets) >= 3:
+                    break
+                if isinstance(sub, dict) and sub.get("Text"):
+                    snippets.append(f"[Résultat] {sub['Text'][:250]}")
+
+    return "\n".join(snippets[:3]) if snippets else "Aucun résultat trouvé."
+
+
+def _save_web_context(query: str, results: str) -> None:
+    """Persiste les résultats pour injection dans le prochain cycle."""
+    os.makedirs("memory", exist_ok=True)
+    ctx = {
+        "query":   query,
+        "results": results,
+        "ts":      datetime.now().isoformat(timespec="seconds"),
+    }
+    with open(WEB_CONTEXT, "w", encoding="utf-8") as f:
+        json.dump(ctx, f, ensure_ascii=False, indent=2)
+
+
+def _load_web_context() -> str:
+    """
+    Lit et consomme le contexte web du cycle précédent.
+    Retourne une chaîne vide si aucun contexte disponible.
+    """
+    try:
+        with open(WEB_CONTEXT, "r", encoding="utf-8") as f:
+            ctx = json.load(f)
+        os.unlink(WEB_CONTEXT)  # consommé une seule fois
+        return (
+            f"=== RÉSULTATS WEB (cycle précédent) ===\n"
+            f"Requête : {ctx['query']}\n"
+            f"{ctx['results']}"
+        )
+    except OSError:
+        return ""
 
 
 # ── Écriture agent.log ───────────────────────────────────────────────────── #
@@ -169,6 +245,21 @@ def _execute_action(decision: dict, log_fn) -> str:
             log_fn(f"[AGENT] Échec update_self_description : {e}")
             return f"erreur : {e}"
 
+    elif action == "web_search":
+        query = (decision.get("code") or "").strip()
+        if not query:
+            return "query vide — recherche ignorée"
+        results = _web_search(query)
+        # Log dans jkai.log → visible dans le prochain cycle (RECENT_LINES)
+        log_fn(f"[WEB] {query} →\n{results}")
+        # Log dédié dans agent.log avec le format demandé
+        ts_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open(AGENT_LOG, "a", encoding="utf-8") as f:
+            f.write(f"[{ts_now}] [WEB] {query} → {results.replace(chr(10), ' | ')[:500]}\n")
+        # Persistance pour injection explicite dans le prochain cycle
+        _save_web_context(query, results)
+        return f"web: {results[:120]}"
+
     else:  # do_nothing ou action inconnue
         return ""
 
@@ -211,11 +302,13 @@ def run_agent_cycle(log_fn) -> None:
     recent_logs  = _tail(LOG_FILE,   RECENT_LINES)
     self_model   = _read_json(SELF_MODEL)
     core_memory  = _read_json(CORE_MEMORY)
+    web_ctx      = _load_web_context()   # vide si pas de recherche au cycle précédent
 
     user_content = (
         f"=== LOGS RÉCENTS ({RECENT_LINES} lignes) ===\n{recent_logs}\n\n"
         f"=== AUTO-MODÈLE ===\n{self_model}\n\n"
         f"=== MÉMOIRE CORE ===\n{core_memory}"
+        + (f"\n\n{web_ctx}" if web_ctx else "")
     )
 
     # ── Appel GPT-4o ────────────────────────────────────────────────────── #
