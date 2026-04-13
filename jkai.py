@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("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"))
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 MEMORY_FILE = "memory/conversations.json"
 CORE_MEMORY_FILE = "memory/core_memory.json"
