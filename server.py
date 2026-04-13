@@ -138,6 +138,20 @@ def consciousness():
 def agent_log():
     return jsonify({"lines": read_agent_log(20)})
 
+ALLOWED_LOGS = {"jkai.log", "agent.log", "thoughts.log", "autonomy.log", "monitor.log", "killswitch.log"}
+
+@server.route("/logs/<filename>", methods=["GET"])
+def serve_log(filename):
+    if filename not in ALLOWED_LOGS:
+        return jsonify({"error": "fichier non autorisé"}), 403
+    path = os.path.join("logs", filename)
+    try:
+        with open(path, "r", encoding="utf-8", errors="replace") as f:
+            lines = f.readlines()
+        return jsonify({"lines": [l.rstrip("\n") for l in lines[-50:]]})
+    except OSError:
+        return jsonify({"lines": []})
+
 @server.route("/objectives", methods=["GET"])
 def objectives():
     return jsonify(get_objectives())
