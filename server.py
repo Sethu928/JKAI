@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from memory.db import init_db, save_message, load_history, clear_history, search_history
 from modules.voice import speak, listen
+from modules.marc import ask_marc
 
 print("Démarrage...", flush=True)
 sys.stdout.flush()
@@ -82,6 +83,18 @@ def search():
     keyword = request.args.get("q", "")
     return jsonify(search_history(keyword))
 
+@server.route("/marc", methods=["POST"])
+def marc():
+    data = request.json
+    user_input = data.get("message", "")
+    history = load_history()
+    reply = ask_marc(user_input, history)
+    save_message("user", user_input)
+    save_message("assistant", reply)
+    log(f"SethU → Marc: {user_input}")
+    log(f"Marc: {reply}")
+    return jsonify({"reply": reply})
+
 @server.route("/voice", methods=["POST"])
 def voice():
     user_input = listen()
@@ -108,6 +121,10 @@ def voice_loop():
             speak(reply)
         except KeyboardInterrupt:
             break
+
+@server.route("/severus", methods=["POST"])
+def severus():
+    return jsonify({"status": "severus"})
 
 if __name__ == "__main__":
     t = threading.Thread(target=voice_loop, daemon=True)
