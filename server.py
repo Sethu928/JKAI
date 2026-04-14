@@ -1,7 +1,7 @@
 import sys
 import os
 import json
-import threading
+# import threading  # réactiver avec l'autonomie
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
@@ -12,12 +12,13 @@ from modules.voice import speak, listen
 from modules.marc import ask_marc
 from modules.cortex import ask_cortex
 from killswitch import register_killswitch
-from modules.scheduler import create_default_scheduler
+# from modules.scheduler import create_default_scheduler  # réactiver avec l'autonomie
 from modules.monitor import Monitor
 from modules.autonomy import analyze_and_act
-from modules.consciousness import (reflect, get_self_model, check_objectives, get_objectives,
-                                   define_mission, update_mission, get_mission)
-from modules.agent import start_agent, read_agent_log
+from modules.consciousness import (get_self_model, get_objectives, get_mission)
+# from modules.consciousness import (reflect, check_objectives, define_mission, update_mission)  # réactiver avec l'autonomie
+from modules.agent import read_agent_log
+# from modules.agent import start_agent  # réactiver avec l'autonomie
 from modules.self_update import self_update_cycle
 
 print("Démarrage...", flush=True)
@@ -202,15 +203,16 @@ def severus():
 
 register_killswitch(server, log)
 
-scheduler = create_default_scheduler(log)
-scheduler.add_task("consciousness_reflect", 3600,  lambda: reflect(log))
-scheduler.add_task("check_objectives",       600,  lambda: check_objectives(log))
-scheduler.add_task("update_mission",        21600, lambda: update_mission(log))
-scheduler.start()
-start_agent(log)
+# === AUTONOMIE DÉSACTIVÉE — J-KAI en mode conversationnel uniquement ===
+# scheduler = create_default_scheduler(log)
+# scheduler.add_task("consciousness_reflect", 3600,  lambda: reflect(log))
+# scheduler.add_task("check_objectives",       600,  lambda: check_objectives(log))
+# scheduler.add_task("update_mission",        21600, lambda: update_mission(log))
+# scheduler.start()
+# start_agent(log)
 
 # Définit la mission au premier démarrage (thread daemon, non bloquant)
-threading.Thread(target=lambda: define_mission(log), daemon=True, name="define-mission").start()
+# threading.Thread(target=lambda: define_mission(log), daemon=True, name="define-mission").start()
 
 monitor = Monitor()
 monitor.start()
