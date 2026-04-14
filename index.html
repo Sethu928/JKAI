@@ -425,6 +425,109 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
 #agent-notif-close { background: none; border: none; color: #a855f755; font-size: 11px; padding: 0; line-height: 1; transition: color 0.2s; }
 #agent-notif-close:hover { color: #a855f7; }
 #agent-notif-text  { font-size: 11px; color: #7c3aed99; line-height: 1.6; border-left: 1px solid #a855f733; padding-left: 10px; word-break: break-word; }
+
+/* ── Hamburger (masqué sur desktop) ────────────────────────────────── */
+#btn-hamburger { display: none; }
+
+/* ── Sidebar overlay backdrop (masqué par défaut) ──────────────────── */
+#sidebar-overlay {
+  display: none; position: fixed; inset: 0; z-index: 70;
+  background: rgba(0,0,0,0.72); backdrop-filter: blur(3px);
+}
+#sidebar-overlay.active { display: block; }
+
+/* ════════════════════════════════════════════════════════════════════
+   RESPONSIVE MOBILE  — < 768 px
+   ════════════════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+
+  /* Pas de curseur custom sur tactile */
+  * { cursor: auto !important; }
+
+  /* ── Hamburger ──────────────────────────────────────────────────── */
+  #btn-hamburger {
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: 1px solid var(--orange33);
+    color: var(--orange); font-size: 17px;
+    width: 36px; height: 36px; flex-shrink: 0;
+    border-radius: 4px; transition: all 0.2s; margin-right: 8px;
+  }
+  #btn-hamburger:active { background: var(--orange22); }
+
+  /* ── HUD top — compacté ─────────────────────────────────────────── */
+  #hud-top { padding: 8px 12px; }
+  #hud-top > div:last-child        { display: none; }  /* SETHU // NEXUS */
+  #heartbeat                        { display: none; }
+  .hud-status .hud-dot + .hud-dot  { display: none; }  /* 2e et 3e dots */
+
+  /* ── Sidebar — tiroir overlay ───────────────────────────────────── */
+  #sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 80;
+    width: 240px; overflow-y: auto; padding-top: 56px;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    border-right: 1px solid var(--orange33);
+  }
+  #sidebar.open { transform: translateX(0); }
+
+  /* ── Modules bar — scroll horizontal ───────────────────────────── */
+  #modules-bar {
+    overflow-x: auto; flex-wrap: nowrap;
+    padding: 5px 10px; gap: 5px;
+    scrollbar-width: none; -ms-overflow-style: none;
+  }
+  #modules-bar::-webkit-scrollbar { display: none; }
+  .mod         { font-size: 9px; padding: 4px 10px; letter-spacing: 1px; white-space: nowrap; }
+  #btn-severus { font-size: 9px; padding: 4px 10px; letter-spacing: 1px; white-space: nowrap; flex-shrink: 0; }
+  #btn-kill    { font-size: 8px; padding: 4px 8px;  letter-spacing: 2px; flex-shrink: 0; }
+
+  /* ── Layout principal ───────────────────────────────────────────── */
+  #main { flex-direction: column; }
+
+  /* ── Chat — pleine largeur, touch-friendly ──────────────────────── */
+  #chat-wrap { flex: 1; width: 100%; min-width: 0; }
+  #messages  { padding: 14px 10px; gap: 20px; }
+
+  .msg       { gap: 8px; }
+  .msg-tag   { font-size: 10px; min-width: 44px; }
+  .msg-text  { font-size: 15px; line-height: 1.85; padding: 11px 13px; max-width: 100%; }
+
+  /* ── Input fixe — grands boutons tactiles ───────────────────────── */
+  #input-row  { padding: 10px 10px; gap: 7px; }
+  #input-prefix { display: none; }
+  #user-input { font-size: 16px; padding: 13px 12px; }
+  #btn-send   {
+    font-size: 13px; letter-spacing: 1px;
+    padding: 13px 18px; flex-shrink: 0;
+    min-width: 68px;
+  }
+  #btn-clear  { font-size: 9px; padding: 13px 10px; letter-spacing: 1px; flex-shrink: 0; }
+
+  /* ── Intro mobile ───────────────────────────────────────────────── */
+  #intro-logo    { font-size: 44px; letter-spacing: 12px; min-height: 54px; }
+  #intro-sub     { font-size: 9px;  letter-spacing: 3px; text-align: center; }
+  #intro-bar-wrap { width: 80vw; margin-top: 28px; }
+  #intro-text    { font-size: 9px;  letter-spacing: 2px; }
+
+  /* ── Monitor — colonne (objectifs haut / logs bas) ──────────────── */
+  #monitor-panel { flex-direction: column !important; }
+  #mon-left  { flex: none; height: 44vh; border-right: none; border-bottom: 1px solid var(--orange22); }
+  #mon-right { flex: 1; }
+
+  /* ── Historique — pleine largeur ────────────────────────────────── */
+  #history-panel       { width: 100%; right: -100%; }
+  #history-panel.open  { right: 0; }
+
+  /* ── Notification agent — bas gauche ────────────────────────────── */
+  #agent-notif {
+    right: auto; left: 12px; bottom: 14px;
+    max-width: calc(100vw - 24px);
+    animation: msg-in-left 0.4s ease;
+  }
+
+  /* ── Coins HUD plus petits ──────────────────────────────────────── */
+  #corner-tl, #corner-tr, #corner-bl, #corner-br { width: 18px; height: 18px; }
+}
 </style>
 </head>
 <body>
@@ -480,8 +583,12 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
 <div id="corner-bl"></div>
 <div id="corner-br"></div>
 
+<!-- Sidebar overlay backdrop (mobile) -->
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
 <!-- HUD top -->
 <div id="hud-top">
+  <button id="btn-hamburger" onclick="toggleSidebar()" aria-label="Menu">&#9776;</button>
   <div id="hud-logo">J-KAI</div>
   <div class="hud-status">
     <div class="hud-dot"><div class="hud-dot-circle"></div> NEXUS ONLINE</div>
@@ -581,6 +688,27 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
 const API = "http://127.0.0.1:5000";
 let severusActive = false;
 let activeEntity  = "jkai";
+
+// ── Sidebar mobile ────────────────────────────────────────────────────────
+function toggleSidebar() {
+  const sidebar  = document.getElementById("sidebar");
+  const overlay  = document.getElementById("sidebar-overlay");
+  const isOpen   = sidebar.classList.contains("open");
+  sidebar.classList.toggle("open", !isOpen);
+  overlay.classList.toggle("active", !isOpen);
+}
+function closeSidebar() {
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sidebar-overlay").classList.remove("active");
+}
+// Ferme la sidebar si on clique un s-item sur mobile
+document.addEventListener("DOMContentLoaded", function() {
+  document.querySelectorAll("#sidebar .s-item").forEach(function(el) {
+    el.addEventListener("click", function() {
+      if (window.innerWidth < 768) closeSidebar();
+    });
+  });
+});
 
 // ── Hex grid background ───────────────────────────────────────────────────
 (function() {
