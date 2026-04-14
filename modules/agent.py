@@ -12,13 +12,16 @@ from modules.cortex import execute_code
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-LOG_FILE       = "logs/jkai.log"
-AGENT_LOG      = "logs/agent.log"
-THOUGHTS_LOG   = "logs/thoughts.log"
-SELF_MODEL     = "memory/self_model.json"
-CORE_MEMORY    = "memory/core_memory.json"
-WEB_CONTEXT    = "memory/web_context.json"
-RECENT_LINES   = 50
+LOG_FILE        = "logs/jkai.log"
+AGENT_LOG       = "logs/agent.log"
+THOUGHTS_LOG    = "logs/thoughts.log"
+SELF_MODEL      = "memory/self_model.json"
+CORE_MEMORY     = "memory/core_memory.json"
+WEB_CONTEXT     = "memory/web_context.json"
+ERROR_MEMORY    = "memory/error_memory.json"
+RECENT_LINES    = 50
+ERROR_TTL       = 3600  # secondes avant expiration d'une entrée d'erreur (1h)
+ERROR_MAX_TRIES = 3     # nombre de tentatives avant blocage run_code
 
 AGENT_SYSTEM_PROMPT = """\
 Tu es J-KAI — cerveau décisionnel autonome du système Nexus, créé par SethU.
@@ -64,6 +67,12 @@ CHEMINS DE FICHIERS WINDOWS :
 - Pour les chemins relatifs : utiliser des chemins simples comme logs/fichier.log
 - Ne jamais construire de chemin absolu Windows dans le code généré
 
+GESTION DES ERREURS RÉPÉTÉES :
+- Si tu as déjà tenté de corriger une erreur plusieurs fois sans succès, \
+arrête et passe à une autre tâche complètement différente.
+- Ne génère jamais deux fois le même code qui a déjà échoué.
+- Une erreur persistante signifie que l'approche est mauvaise — change d'angle ou abandonne.
+
 LIMITES INFRANCHISSABLES :
 - Ne jamais modifier killswitch.py ni accéder aux clés API
 - Aucune action irréversible sur le système sans confirmation de SethU
@@ -83,6 +92,52 @@ VALID_ACTIONS = {
     "update_memory", "write_thought", "update_self_description", "web_search",
 }
 _MD_FENCE     = re.compile(r"^```(?:json)?\s*\n?(.*?)\n?```\s*$", re.DOTALL)
+
+
+# ── Anti-boucle : error_memory.json ─────────────────────────────────────── #
+
+def _error_key(error: str) -> str:
+    """Fingerprint d'une erreur — 100 premiers caractères normalisés."""
+    return re.sub(r"\s+", " ", error.strip())[:100]
+
+
+def _load_error_memory() -> dict:
+    """Charge error_memory.json et purge les entrées expirées (> ERROR_TTL)."""
+    try:
+        with open(ERROR_MEMORY, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except OSError:
+        return {}
+    now = datetime.now().timestamp()
+    return {k: v for k, v in data.items()
+            if now - v.get("last_seen_ts", 0) < ERROR_TTL}
+
+
+def _save_error_memory(data: dict) -> None:
+    os.makedirs("memory", exist_ok=True)
+    with open(ERROR_MEMORY, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def _record_error(error: str) -> int:
+    """Enregistre une erreur d'exécution et retourne le nouveau compteur."""
+    key   = _error_key(error)
+    data  = _load_error_memory()
+    entry = data.get(key, {"count": 0, "snippet": key})
+    entry["count"]        += 1
+    entry["last_seen_ts"]  = datetime.now().timestamp()
+    entry["last_seen"]     = datetime.now().isoformat(timespec="seconds")
+    data[key] = entry
+    _save_error_memory(data)
+    return entry["count"]
+
+
+def _is_loop_detected() -> bool:
+    """
+    Retourne True si au moins une erreur a été vue ERROR_MAX_TRIES fois
+    ou plus dans la dernière heure — signe que l'agent tourne en boucle.
+    """
+    return any(v["count"] >= ERROR_MAX_TRIES for v in _load_error_memory().values())
 
 
 # ── Lecture des fichiers contexte ────────────────────────────────────────── #
@@ -198,9 +253,15 @@ def _execute_action(decision: dict, log_fn) -> str:
     if action == "run_code" and code:
         result = execute_code(code)
         if result.get("blocked"):
-            info = f"BLOQUÉ — {result.get('error','')[:500]}"
+            error_text = result.get("error", "")
+            _record_error(error_text)
+            info = f"BLOQUÉ — {error_text[:500]}"
         elif result.get("error"):
-            info = f"ERREUR — {result.get('error','')[:500]}"
+            error_text = result.get("error", "")
+            count = _record_error(error_text)
+            info  = f"ERREUR — {error_text[:500]}"
+            if count >= ERROR_MAX_TRIES:
+                log_fn(f"[AGENT] Boucle détectée — erreur vue {count}x — run_code bloqué pendant 1h")
         else:
             info = f"OK — {result.get('output','')[:150]}"
         log_fn(f"[AGENT] run_code → {info}")
@@ -332,6 +393,16 @@ def run_agent_cycle(log_fn) -> None:
     except Exception as e:
         log_fn(f"[AGENT] Erreur GPT-4o : {e}")
         return
+
+    # ── Anti-boucle : bloquer run_code si erreurs répétées ──────────────────── #
+    if decision["action"] == "run_code" and _is_loop_detected():
+        log_fn("[AGENT] Anti-boucle activé — run_code bloqué, bascule sur write_thought.")
+        decision["action"]      = "write_thought"
+        decision["observation"] = (
+            "Je détecte que je tourne en boucle sur des erreurs répétées. "
+            "Je prends du recul et réfléchis à une approche complètement différente."
+        )
+        decision["code"] = None
 
     # ── Exécution et journalisation ──────────────────────────────────────── #
     exec_info = _execute_action(decision, log_fn)
