@@ -218,4 +218,4 @@ monitor = Monitor()
 monitor.start()
 
 if __name__ == "__main__":
-    server.run(debug=False, port=5000)
+    server.run(debug=False, port=5000, host="0.0.0.0")
