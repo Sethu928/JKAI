@@ -18,7 +18,7 @@
   --bg3:      #0f0f0f;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
+* { box-sizing: border-box; margin: 0; padding: 0; cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cline x1='12' y1='0' x2='12' y2='10' stroke='%23ff5500' stroke-width='1.5'/%3E%3Cline x1='12' y1='14' x2='12' y2='24' stroke='%23ff5500' stroke-width='1.5'/%3E%3Cline x1='0' y1='12' x2='10' y2='12' stroke='%23ff5500' stroke-width='1.5'/%3E%3Cline x1='14' y1='12' x2='24' y2='12' stroke='%23ff5500' stroke-width='1.5'/%3E%3Ccircle cx='12' cy='12' r='2' fill='none' stroke='%23ff5500' stroke-width='1.5'/%3E%3C/svg%3E") 12 12, crosshair !important; }
 
 body {
   background: var(--bg);
@@ -34,43 +34,6 @@ body.severus-mode { filter: hue-rotate(200deg) brightness(0.7); }
 body.marc-mode    { filter: hue-rotate(94deg)  brightness(1.05); }
 body.cortex-mode  { filter: hue-rotate(34deg)  brightness(1.05); }
 body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
-
-/* ── Custom crosshair cursor ───────────────────────────────────────── */
-#cursor {
-  position: fixed;
-  pointer-events: none;
-  z-index: 99999;
-  width: 22px;
-  height: 22px;
-  transform: translate(-50%, -50%);
-  transition: opacity 0.15s;
-}
-#cursor::before, #cursor::after {
-  content: '';
-  position: absolute;
-  background: var(--orange);
-}
-#cursor::before {
-  left: 50%; top: 0;
-  width: 1.5px; height: 9px;
-  transform: translateX(-50%);
-  box-shadow: 0 13px 0 var(--orange);
-}
-#cursor::after {
-  top: 50%; left: 0;
-  height: 1.5px; width: 9px;
-  transform: translateY(-50%);
-  box-shadow: 13px 0 0 var(--orange);
-}
-#cursor-dot {
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 3px; height: 3px;
-  border-radius: 50%;
-  background: var(--orange);
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 6px var(--orange);
-}
 
 /* ── Canvas & particles ────────────────────────────────────────────── */
 #canvas-bg {
@@ -466,9 +429,6 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
 </head>
 <body>
 
-<!-- Custom cursor -->
-<div id="cursor"><div id="cursor-dot"></div></div>
-
 <!-- Overlays -->
 <div id="severus-overlay">
   <div id="severus-text">SEVERUS</div>
@@ -621,17 +581,6 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
 const API = "http://127.0.0.1:5000";
 let severusActive = false;
 let activeEntity  = "jkai";
-
-// ── Custom cursor ─────────────────────────────────────────────────────────
-(function() {
-  const cur = document.getElementById("cursor");
-  document.addEventListener("mousemove", function(e) {
-    cur.style.left = e.clientX + "px";
-    cur.style.top  = e.clientY + "px";
-  });
-  document.addEventListener("mouseenter", function() { cur.style.opacity = "1"; });
-  document.addEventListener("mouseleave", function() { cur.style.opacity = "0"; });
-})();
 
 // ── Hex grid background ───────────────────────────────────────────────────
 (function() {
