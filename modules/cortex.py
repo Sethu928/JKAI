@@ -62,16 +62,19 @@ def _is_safe(code: str) -> tuple[bool, str]:
 
 def generate_code(prompt: str) -> str:
     """Demande à GPT-4o de générer du code Python pour la tâche donnée."""
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": CORTEX_SYSTEM_PROMPT},
-            {"role": "user",   "content": prompt},
-        ],
-        temperature=0.2,
-    )
-    raw = response.choices[0].message.content.strip()
-    return _strip_markdown(raw)
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": CORTEX_SYSTEM_PROMPT},
+                {"role": "user",   "content": prompt},
+            ],
+            temperature=0.2,
+        )
+        raw = response.choices[0].message.content.strip()
+        return _strip_markdown(raw)
+    except Exception as e:
+        return f"CORTEX_ERREUR: GPT-4o indisponible — {e}"
 
 
 def execute_code(code: str) -> dict:

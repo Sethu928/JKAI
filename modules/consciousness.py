@@ -13,7 +13,8 @@ MISSION_FILE     = "memory/mission.json"
 LOG_FILE         = "logs/jkai.log"
 RECENT_LOG_LINES = 80      # nombre de lignes de log envoyées à GPT
 
-_lock = threading.Lock()   # protège les lectures/écritures sur self_model.json
+_lock         = threading.Lock()  # protège self_model.json
+_mission_lock = threading.Lock()  # protège mission.json
 
 # ── État initial — créé si le fichier n'existe pas ──────────────────────── #
 _DEFAULT_MODEL: dict = {
@@ -142,11 +143,11 @@ def reflect(log_fn) -> None:
     puis met à jour memory/self_model.json.
     Appelée toutes les 3600 s par le Scheduler.
     """
-    from memory.db import load_history
+    from memory.db import count_history
 
     model        = _load()
     logs         = _recent_logs()
-    total        = len(load_history())
+    total        = count_history()
 
     user_content = (
         f"État actuel de J-KAI :\n"
@@ -302,17 +303,19 @@ def check_objectives(log_fn) -> None:
 # ── Mission à long terme ────────────────────────────────────────────────── #
 
 def _load_mission() -> dict:
-    try:
-        with open(MISSION_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except OSError:
-        return {}
+    with _mission_lock:
+        try:
+            with open(MISSION_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (OSError, json.JSONDecodeError):
+            return {}
 
 
 def _save_mission(mission: dict) -> None:
-    os.makedirs("memory", exist_ok=True)
-    with open(MISSION_FILE, "w", encoding="utf-8") as f:
-        json.dump(mission, f, ensure_ascii=False, indent=2)
+    with _mission_lock:
+        os.makedirs("memory", exist_ok=True)
+        with open(MISSION_FILE, "w", encoding="utf-8") as f:
+            json.dump(mission, f, ensure_ascii=False, indent=2)
 
 
 def _compute_progress(steps: list) -> int:

@@ -4,7 +4,7 @@ import threading
 from datetime import datetime
 
 LOGS_DIR      = "logs"
-LOG_KEEP_LINES = 20   # lignes conservées par fichier lors du nettoyage
+LOG_KEEP_LINES = 500  # lignes conservées par fichier lors du nettoyage
 
 
 class _Task:
@@ -67,8 +67,14 @@ class Scheduler:
                     try:
                         task.func()
                     except Exception as e:
-                        # On avale l'exception pour ne pas tuer le thread
-                        pass
+                        # Log l'erreur sans tuer le thread
+                        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        try:
+                            os.makedirs(LOGS_DIR, exist_ok=True)
+                            with open(os.path.join(LOGS_DIR, "jkai.log"), "a", encoding="utf-8") as f:
+                                f.write(f"[{ts}] [SCHEDULER] Erreur tâche '{task.name}' : {e}\n")
+                        except OSError:
+                            pass
                     task.last_run = now
             # Réveil toutes les secondes — précision suffisante, CPU négligeable
             self._stop_event.wait(1)

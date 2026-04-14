@@ -37,11 +37,15 @@ init_db()
 
 def load_core_memory():
     if os.path.exists(CORE_MEMORY_FILE):
-        with open(CORE_MEMORY_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+        try:
+            with open(CORE_MEMORY_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, OSError):
+            return {}
     return {}
 
 def log(text):
+    os.makedirs("logs", exist_ok=True)
     with open(LOG_FILE, "a", encoding="utf-8") as f:
         f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {text}\n")
 
@@ -79,13 +83,17 @@ Voici ta mémoire permanente :
 {json.dumps(core, ensure_ascii=False, indent=2)}"""
 
 def ask_jkai(user_input):
-    history = load_history()
+    history = load_history(limit=100)
     save_message("user", user_input)
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[{"role": "system", "content": SYSTEM_PROMPT}] + history + [{"role": "user", "content": user_input}]
-    )
-    reply = response.choices[0].message.content
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "system", "content": SYSTEM_PROMPT}] + history + [{"role": "user", "content": user_input}]
+        )
+        reply = response.choices[0].message.content
+    except Exception as e:
+        log(f"[ERREUR] ask_jkai GPT-4o : {e}")
+        return f"Erreur de communication avec GPT-4o : {e}"
     save_message("assistant", reply)
     log(f"SethU: {user_input}")
     log(f"J-KAI: {reply}")
@@ -97,7 +105,7 @@ def index():
 
 @server.route("/chat", methods=["POST"])
 def chat():
-    data = request.json
+    data = request.get_json(silent=True) or {}
     user_input = data.get("message", "")
     reply = ask_jkai(user_input)
     return jsonify({"reply": reply})
@@ -118,7 +126,7 @@ def search():
 
 @server.route("/marc", methods=["POST"])
 def marc():
-    data = request.json
+    data = request.get_json(silent=True) or {}
     user_input = data.get("message", "")
     history = load_history()
     reply = ask_marc(user_input, history)
@@ -142,7 +150,7 @@ def voice():
 
 @server.route("/cortex", methods=["POST"])
 def cortex():
-    data = request.json
+    data = request.get_json(silent=True) or {}
     user_input = data.get("message", "")
     result = ask_cortex(user_input)
     log(f"SethU → Cortex: {user_input}")
@@ -151,7 +159,7 @@ def cortex():
 
 @server.route("/autonomy", methods=["POST"])
 def autonomy():
-    data = request.json
+    data = request.get_json(silent=True) or {}
     context = data.get("context", "")
     result = analyze_and_act(context, log)
     return jsonify(result)

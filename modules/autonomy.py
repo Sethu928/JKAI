@@ -27,8 +27,12 @@ _MD_FENCE = re.compile(r"^```(?:json)?\s*\n?(.*?)\n?```\s*$", re.DOTALL)
 
 
 def _write_autonomy_log(ts: str, context: str, decision: dict, exec_result: dict | None) -> None:
-    os.makedirs("logs", exist_ok=True)
-    with open(AUTONOMY_LOG, "a", encoding="utf-8") as f:
+    try:
+        os.makedirs("logs", exist_ok=True)
+        f = open(AUTONOMY_LOG, "a", encoding="utf-8")
+    except OSError:
+        return
+    with f:
         f.write(f"[{ts}] DÉCISION AUTONOME\n")
         f.write(f"  CONTEXTE  : {context[:200]}\n")
         f.write(f"  DÉCISION  : {decision.get('decision', '—')}\n")
