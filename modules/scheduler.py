@@ -3,8 +3,17 @@ import time
 import threading
 from datetime import datetime
 
-LOGS_DIR      = "logs"
-LOG_KEEP_LINES = 500  # lignes conservées par fichier lors du nettoyage
+LOGS_DIR = "logs"
+
+# Nombre de lignes conservées par fichier. None = pas de troncature.
+LOG_KEEP_LINES: dict[str, int | None] = {
+    "jkai.log":       500,
+    "killswitch.log": None,
+    "autonomy.log":   200,
+    "agent.log":      30,
+    "thoughts.log":   50,
+    "monitor.log":    20,
+}
 
 
 class _Task:
@@ -94,16 +103,19 @@ def clean_logs(log_fn=None) -> None:
     for filename in os.listdir(LOGS_DIR):
         if not filename.endswith(".log"):
             continue
+        keep = LOG_KEEP_LINES.get(filename, 500)
+        if keep is None:
+            continue  # fichier protégé — pas de troncature
         path = os.path.join(LOGS_DIR, filename)
         try:
             with open(path, "r", encoding="utf-8", errors="replace") as f:
                 lines = f.readlines()
-            if len(lines) <= LOG_KEEP_LINES:
+            if len(lines) <= keep:
                 continue
             with open(path, "w", encoding="utf-8") as f:
-                f.writelines(lines[-LOG_KEEP_LINES:])
+                f.writelines(lines[-keep:])
             if log_fn:
-                log_fn(f"[SCHEDULER] clean_logs — {filename} tronqué à {LOG_KEEP_LINES} lignes.")
+                log_fn(f"[SCHEDULER] clean_logs — {filename} tronqué à {keep} lignes.")
         except OSError:
             pass
 
