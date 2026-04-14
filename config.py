@@ -1,2 +1,0 @@
-OLLAMA_URL   = "http://192.168.1.122:11434"
-OLLAMA_MODEL = "mistral"
