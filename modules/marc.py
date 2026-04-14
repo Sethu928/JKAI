@@ -1,9 +1,7 @@
 import os
-from openai import OpenAI
-from dotenv import load_dotenv
+from modules.state import get_openai_client
 
-load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = get_openai_client()
 
 MARC_SYSTEM_PROMPT = """Tu es Marc, conseiller sceptique et rigoureux du système Nexus, au service de Jordan (alias SethU).
 

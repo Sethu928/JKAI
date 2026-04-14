@@ -3,9 +3,11 @@ import signal
 import threading
 import hmac
 from datetime import datetime
+from dotenv import load_dotenv
 
-# Mot de passe d'arrêt — modifier ici uniquement
-_KS_PASSWORD = "nexus_off"
+load_dotenv()
+# Mot de passe d'arrêt — défini dans .env sous KS_PASSWORD, "nexus_off" par défaut
+_KS_PASSWORD = os.getenv("KS_PASSWORD", "nexus_off")
 _KS_LOG      = "logs/killswitch.log"
 
 

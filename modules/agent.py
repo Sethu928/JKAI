@@ -5,12 +5,10 @@ import time
 import threading
 import requests
 from datetime import datetime
-from dotenv import load_dotenv
-from openai import OpenAI
+from modules.state import self_model_lock, get_openai_client, tail_file, parse_json_fence
 from modules.cortex import execute_code
 
-load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = get_openai_client()
 
 LOG_FILE        = "logs/jkai.log"
 AGENT_LOG       = "logs/agent.log"
@@ -91,7 +89,6 @@ VALID_ACTIONS = {
     "do_nothing", "log", "run_code",
     "update_memory", "write_thought", "update_self_description", "web_search",
 }
-_MD_FENCE     = re.compile(r"^```(?:json)?\s*\n?(.*?)\n?```\s*$", re.DOTALL)
 
 
 # ── Anti-boucle : error_memory.json ─────────────────────────────────────── #
@@ -141,15 +138,6 @@ def _is_loop_detected() -> bool:
 
 
 # ── Lecture des fichiers contexte ────────────────────────────────────────── #
-
-def _tail(path: str, n: int) -> str:
-    try:
-        with open(path, "r", encoding="utf-8", errors="replace") as f:
-            lines = f.readlines()
-        return "".join(lines[-n:]).strip() or "(vide)"
-    except OSError:
-        return "(inaccessible)"
-
 
 def _read_json(path: str) -> str:
     try:
@@ -273,13 +261,14 @@ def _execute_action(decision: dict, log_fn) -> str:
 
     elif action == "update_memory":
         try:
-            with open(SELF_MODEL, "r", encoding="utf-8") as f:
-                model = json.load(f)
-            entry = {"ts": datetime.now().isoformat(timespec="seconds"), "note": obs[:200]}
-            model.setdefault("recent_successes", []).append(entry)
-            model["recent_successes"] = model["recent_successes"][-20:]
-            with open(SELF_MODEL, "w", encoding="utf-8") as f:
-                json.dump(model, f, ensure_ascii=False, indent=2)
+            with self_model_lock:
+                with open(SELF_MODEL, "r", encoding="utf-8") as f:
+                    model = json.load(f)
+                entry = {"ts": datetime.now().isoformat(timespec="seconds"), "note": obs[:200]}
+                model.setdefault("recent_successes", []).append(entry)
+                model["recent_successes"] = model["recent_successes"][-20:]
+                with open(SELF_MODEL, "w", encoding="utf-8") as f:
+                    json.dump(model, f, ensure_ascii=False, indent=2)
             log_fn(f"[AGENT] Mémoire mise à jour : {obs[:100]}")
             return "mémoire mise à jour"
         except Exception as e:
@@ -300,12 +289,13 @@ def _execute_action(decision: dict, log_fn) -> str:
         if not new_desc:
             return "description vide — ignorée"
         try:
-            with open(SELF_MODEL, "r", encoding="utf-8") as f:
-                model = json.load(f)
-            model["self_description"] = new_desc[:500]
-            model["last_reflection"]  = datetime.now().isoformat(timespec="seconds")
-            with open(SELF_MODEL, "w", encoding="utf-8") as f:
-                json.dump(model, f, ensure_ascii=False, indent=2)
+            with self_model_lock:
+                with open(SELF_MODEL, "r", encoding="utf-8") as f:
+                    model = json.load(f)
+                model["self_description"] = new_desc[:500]
+                model["last_reflection"]  = datetime.now().isoformat(timespec="seconds")
+                with open(SELF_MODEL, "w", encoding="utf-8") as f:
+                    json.dump(model, f, ensure_ascii=False, indent=2)
             log_fn(f"[AGENT] Self-description mise à jour : {new_desc[:80]}")
             return "self_description mise à jour"
         except Exception as e:
@@ -334,15 +324,7 @@ def _execute_action(decision: dict, log_fn) -> str:
 # ── Parsing robuste ──────────────────────────────────────────────────────── #
 
 def _parse(raw: str) -> dict:
-    raw = raw.strip()
-    m = _MD_FENCE.match(raw)
-    if m:
-        raw = m.group(1).strip()
-    try:
-        data = json.loads(raw)
-    except json.JSONDecodeError:
-        match = re.search(r"\{.*\}", raw, re.DOTALL)
-        data  = json.loads(match.group()) if match else {}
+    data = parse_json_fence(raw)
 
     data.setdefault("observation",  "Aucune observation")
     data.setdefault("decision",     "Aucune décision")
@@ -366,7 +348,7 @@ def run_agent_cycle(log_fn) -> None:
     Appelé en boucle continue par le thread daemon (toutes les AGENT_INTERVAL s).
     """
     ts           = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    recent_logs  = _tail(LOG_FILE,   RECENT_LINES)
+    recent_logs  = tail_file(LOG_FILE, RECENT_LINES)
     self_model   = _read_json(SELF_MODEL)
     core_memory  = _read_json(CORE_MEMORY)
     web_ctx      = _load_web_context()   # vide si pas de recherche au cycle précédent
@@ -436,4 +418,4 @@ def start_agent(log_fn) -> threading.Thread:
 
 def read_agent_log(n: int = 20) -> list[str]:
     """Retourne les n dernières lignes de logs/agent.log."""
-    return _tail(AGENT_LOG, n).splitlines()[-n:]
+    return tail_file(AGENT_LOG, n).splitlines()[-n:]

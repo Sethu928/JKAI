@@ -3,11 +3,9 @@ import re
 import sys
 import subprocess
 import tempfile
-from openai import OpenAI
-from dotenv import load_dotenv
+from modules.state import get_openai_client
 
-load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = get_openai_client()
 
 CORTEX_SYSTEM_PROMPT = """Tu es Cortex, le module Dev AI du système Nexus, au service de Jordan (alias SethU).
 Tu es une intelligence brute spécialisée dans le développement logiciel.

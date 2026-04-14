@@ -121,15 +121,16 @@ def _get_remote_url() -> str:
         return ""
 
 
-def git_commit_and_push(message: str, log_fn) -> bool:
+def git_commit_and_push(file_path: str, message: str, log_fn) -> bool:
     """
-    git add . → git commit -m message → git push.
+    git add <file_path> → git commit -m message → git push.
+    Seul le fichier ciblé est stagé — évite de commiter des fichiers non liés.
     Si GITHUB_TOKEN est défini, injecte le token dans l'URL HTTPS de origin
     pour le push, puis restaure l'URL d'origine.
     Retourne True si le push réussit.
     """
-    ok, out = _run_git(["add", "."], log_fn)
-    log_fn(f"[SELF_UPDATE] git add → {'OK' if ok else 'ERREUR'} | {out[:200]}")
+    ok, out = _run_git(["add", "--", file_path], log_fn)
+    log_fn(f"[SELF_UPDATE] git add {file_path} → {'OK' if ok else 'ERREUR'} | {out[:200]}")
     if not ok:
         return False
 
@@ -169,7 +170,7 @@ def deploy_to_pi(log_fn) -> bool:
     """
     SSH vers le Raspberry Pi (192.168.1.122 / pi).
     Exécute : git pull && sudo systemctl restart jkai.
-    Authentification par clé SSH (~/.ssh/id_rsa).
+    Authentification par clé SSH (~/.ssh/jkai_key).
     Retourne True si succès.
     """
     try:
@@ -189,7 +190,7 @@ def deploy_to_pi(log_fn) -> bool:
         )
         log_fn(f"[SELF_UPDATE] SSH connecté à {PI_HOST} ({PI_USER})")
 
-        _, stdout, stderr = ssh.exec_command(PI_CMD)
+        _, stdout, stderr = ssh.exec_command(PI_CMD, timeout=30)
         out = stdout.read().decode(errors="replace").strip()
         err = stderr.read().decode(errors="replace").strip()
 
@@ -231,7 +232,7 @@ def self_update_cycle(file_path: str, new_code: str, message: str, log_fn) -> di
         return result
     result["write_ok"] = True
 
-    if not git_commit_and_push(message, log_fn):
+    if not git_commit_and_push(file_path, message, log_fn):
         result["error"] = "Échec git commit/push"
         return result
     result["commit_ok"] = True

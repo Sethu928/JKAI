@@ -1,13 +1,10 @@
 import os
 import json
-import re
 from datetime import datetime
-from openai import OpenAI
-from dotenv import load_dotenv
+from modules.state import get_openai_client, parse_json_fence
 from modules.cortex import execute_code
 
-load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = get_openai_client()
 
 AUTONOMY_LOG = "logs/autonomy.log"
 
@@ -21,9 +18,6 @@ AUTONOMY_SYSTEM_PROMPT = (
 )
 
 VALID_ACTIONS = {"log", "alert", "run_code", "do_nothing"}
-
-# Retire les blocs ```json ... ``` si GPT en ajoute malgré la consigne
-_MD_FENCE = re.compile(r"^```(?:json)?\s*\n?(.*?)\n?```\s*$", re.DOTALL)
 
 
 def _write_autonomy_log(ts: str, context: str, decision: dict, exec_result: dict | None) -> None:
@@ -47,19 +41,9 @@ def _write_autonomy_log(ts: str, context: str, decision: dict, exec_result: dict
 
 def _parse_decision(raw: str) -> dict:
     """Parse la réponse JSON de GPT-4o de façon robuste."""
-    raw = raw.strip()
-    m = _MD_FENCE.match(raw)
-    if m:
-        raw = m.group(1).strip()
-    try:
-        data = json.loads(raw)
-    except json.JSONDecodeError:
-        # Dernier recours : extraction du premier bloc JSON dans le texte
-        match = re.search(r"\{.*\}", raw, re.DOTALL)
-        if match:
-            data = json.loads(match.group())
-        else:
-            raise ValueError(f"Réponse GPT non parseable : {raw[:200]}")
+    data = parse_json_fence(raw)
+    if not data:
+        raise ValueError(f"Réponse GPT non parseable : {raw[:200]}")
 
     # Valeurs par défaut / normalisation
     data.setdefault("decision", "Aucune décision")

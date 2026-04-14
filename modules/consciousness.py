@@ -2,19 +2,16 @@ import os
 import json
 import threading
 from datetime import datetime
-from dotenv import load_dotenv
-from openai import OpenAI
+from modules.state import self_model_lock as _lock, get_openai_client, tail_file
 
-load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = get_openai_client()
 
 SELF_MODEL_FILE  = "memory/self_model.json"
 MISSION_FILE     = "memory/mission.json"
 LOG_FILE         = "logs/jkai.log"
 RECENT_LOG_LINES = 80      # nombre de lignes de log envoyées à GPT
 
-_lock         = threading.Lock()  # protège self_model.json
-_mission_lock = threading.Lock()  # protège mission.json
+_mission_lock = threading.Lock()  # protège mission.json (local à ce module)
 
 # ── État initial — créé si le fichier n'existe pas ──────────────────────── #
 _DEFAULT_MODEL: dict = {
@@ -121,12 +118,7 @@ def _init_file() -> None:
 # ── Lecture du log ───────────────────────────────────────────────────────── #
 
 def _recent_logs(n: int = RECENT_LOG_LINES) -> str:
-    try:
-        with open(LOG_FILE, "r", encoding="utf-8", errors="replace") as f:
-            lines = f.readlines()
-        return "".join(lines[-n:]).strip() or "(aucune activité récente)"
-    except OSError:
-        return "(fichier log inaccessible)"
+    return tail_file(LOG_FILE, n)
 
 
 # ── API publique ─────────────────────────────────────────────────────────── #

@@ -2,11 +2,9 @@ import os
 import pyaudio
 import wave
 import pyttsx3
-from openai import OpenAI
-from dotenv import load_dotenv
+from modules.state import get_openai_client
 
-load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = get_openai_client()
 
 engine = pyttsx3.init()
 engine.setProperty("rate", 175)

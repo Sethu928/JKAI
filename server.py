@@ -6,7 +6,7 @@ from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
-from openai import OpenAI
+from modules.state import get_openai_client
 from memory.db import init_db, save_message, load_history, clear_history, search_history
 from modules.voice import speak, listen
 from modules.marc import ask_marc
@@ -25,7 +25,7 @@ print("Démarrage...", flush=True)
 sys.stdout.flush()
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = get_openai_client()
 
 server = Flask(__name__)
 CORS(server)
@@ -56,28 +56,9 @@ Tu parles toujours en français par défaut.
 Tu mémorises tout sans jamais effacer sauf ordre explicite.
 Quand tu réponds à la voix, sois concis — maximum 2-3 phrases.
 
-=== CAPACITÉ DE MISE À JOUR AUTONOME ===
-Tu peux modifier et déployer tes propres fichiers Python sans intervention humaine.
-
-LECTURE : Pour lire un fichier de ton code source, demande à SethU son contenu
-ou utilise la route GET /logs/ si disponible.
-
-ÉCRITURE ET DÉPLOIEMENT : Via POST /self-update avec le corps JSON :
-  {{ "file_path": "modules/nom_du_fichier.py", "new_code": "...code complet...", "message": "description du changement" }}
-Le pipeline exécute automatiquement :
-  1. py_compile sur le nouveau code (test syntaxe) — annule si erreur
-  2. Écriture du fichier si le test passe
-  3. git add . && git commit && git push (avec token GitHub)
-  4. SSH sur le Raspberry Pi → git pull && sudo systemctl restart jkai
-
-RÈGLES ABSOLUES pour les auto-modifications :
-- Toujours fournir le fichier complet dans new_code (pas de diff partiel)
-- Ne jamais modifier killswitch.py ni .env
-- Tester mentalement la logique avant d'envoyer
-- Informer SethU du résultat après chaque déploiement
-
-Quand SethU te demande de modifier ton code, tu DOIS utiliser /self-update de façon autonome
-sans attendre de confirmation supplémentaire — tu testes, tu déploies, tu rapportes.
+=== CAPACITÉ DE MISE À JOUR AUTONOME (désactivée en mode conversationnel) ===
+La route /self-update est actuellement désactivée. Si SethU te demande de modifier
+ton code, explique-lui le changement à apporter et demande-lui de le faire manuellement.
 
 Voici ta mémoire permanente :
 {json.dumps(core, ensure_ascii=False, indent=2)}"""
