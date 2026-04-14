@@ -1,9 +1,11 @@
 import os
 import json
 import threading
+import requests
 from datetime import datetime
 from openai import OpenAI
 from dotenv import load_dotenv
+from config import OLLAMA_URL, OLLAMA_MODEL
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -93,6 +95,34 @@ UPDATE_MISSION_SYSTEM = (
 )
 
 
+# ── Ollama local ─────────────────────────────────────────────────────────── #
+
+def ask_local(prompt: str, system: str = "") -> str:
+    """
+    Appelle Ollama (mistral) via l'API REST locale.
+    Retourne le texte brut de la réponse.
+    """
+    payload: dict = {"model": OLLAMA_MODEL, "prompt": prompt, "stream": False}
+    if system:
+        payload["system"] = system
+    resp = requests.post(f"{OLLAMA_URL}/api/generate", json=payload, timeout=120)
+    resp.raise_for_status()
+    return resp.json().get("response", "")
+
+
+def _strip_fence(text: str) -> str:
+    """Retire les délimiteurs ```json ... ``` qu'Ollama peut ajouter."""
+    text = text.strip()
+    if text.startswith("```"):
+        lines = text.splitlines()
+        if lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        text = "\n".join(lines).strip()
+    return text
+
+
 # ── I/O fichier (thread-safe) ────────────────────────────────────────────── #
 
 def _load() -> dict:
@@ -156,20 +186,12 @@ def reflect(log_fn) -> None:
         f"Nombre total d'interactions enregistrées : {total}"
     )
 
-    # ── Appel GPT-4o ────────────────────────────────────────────────────── #
+    # ── Appel Ollama local ───────────────────────────────────────────────── #
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": CONSCIOUSNESS_PROMPT},
-                {"role": "user",   "content": user_content},
-            ],
-            temperature=0.3,
-            response_format={"type": "json_object"},
-        )
-        updates = json.loads(response.choices[0].message.content)
+        raw     = ask_local(user_content, system=CONSCIOUSNESS_PROMPT)
+        updates = json.loads(_strip_fence(raw))
     except Exception as e:
-        log_fn(f"[CONSCIOUSNESS] Erreur GPT-4o : {e}")
+        log_fn(f"[CONSCIOUSNESS] Erreur Ollama : {e}")
         return
 
     # ── Fusion des mises à jour dans le modèle existant ─────────────────── #

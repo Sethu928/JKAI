@@ -5,12 +5,8 @@ import time
 import threading
 import requests
 from datetime import datetime
-from openai import OpenAI
-from dotenv import load_dotenv
 from modules.cortex import execute_code
-
-load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+from config import OLLAMA_URL, OLLAMA_MODEL
 
 LOG_FILE       = "logs/jkai.log"
 AGENT_LOG      = "logs/agent.log"
@@ -83,6 +79,21 @@ VALID_ACTIONS = {
     "update_memory", "write_thought", "update_self_description", "web_search",
 }
 _MD_FENCE     = re.compile(r"^```(?:json)?\s*\n?(.*?)\n?```\s*$", re.DOTALL)
+
+
+# ── Ollama local ─────────────────────────────────────────────────────────── #
+
+def ask_local(prompt: str, system: str = "") -> str:
+    """
+    Appelle Ollama (mistral) via l'API REST locale.
+    Retourne le texte brut de la réponse ou lève une exception en cas d'erreur réseau.
+    """
+    payload: dict = {"model": OLLAMA_MODEL, "prompt": prompt, "stream": False}
+    if system:
+        payload["system"] = system
+    resp = requests.post(f"{OLLAMA_URL}/api/generate", json=payload, timeout=120)
+    resp.raise_for_status()
+    return resp.json().get("response", "")
 
 
 # ── Lecture des fichiers contexte ────────────────────────────────────────── #
@@ -317,20 +328,12 @@ def run_agent_cycle(log_fn) -> None:
         + (f"\n\n{web_ctx}" if web_ctx else "")
     )
 
-    # ── Appel GPT-4o ────────────────────────────────────────────────────── #
+    # ── Appel Ollama local ───────────────────────────────────────────────── #
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": AGENT_SYSTEM_PROMPT},
-                {"role": "user",   "content": user_content},
-            ],
-            temperature=0.6,
-            response_format={"type": "json_object"},
-        )
-        decision = _parse(response.choices[0].message.content)
+        raw      = ask_local(user_content, system=AGENT_SYSTEM_PROMPT)
+        decision = _parse(raw)
     except Exception as e:
-        log_fn(f"[AGENT] Erreur GPT-4o : {e}")
+        log_fn(f"[AGENT] Erreur Ollama : {e}")
         return
 
     # ── Exécution et journalisation ──────────────────────────────────────── #
