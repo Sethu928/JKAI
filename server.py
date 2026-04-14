@@ -18,6 +18,7 @@ from modules.autonomy import analyze_and_act
 from modules.consciousness import (reflect, get_self_model, check_objectives, get_objectives,
                                    define_mission, update_mission, get_mission)
 from modules.agent import start_agent, read_agent_log
+from modules.self_update import self_update_cycle
 
 print("Démarrage...", flush=True)
 sys.stdout.flush()
@@ -160,6 +161,17 @@ def objectives():
 @server.route("/mission", methods=["GET"])
 def mission():
     return jsonify(get_mission())
+
+@server.route("/self-update", methods=["POST"])
+def self_update():
+    data      = request.json or {}
+    file_path = data.get("file_path", "")
+    new_code  = data.get("new_code",  "")
+    message   = data.get("message",   "J-KAI self-update")
+    if not file_path or not new_code:
+        return jsonify({"error": "file_path et new_code requis"}), 400
+    result = self_update_cycle(file_path, new_code, message, log)
+    return jsonify(result)
 
 @server.route("/severus", methods=["POST"])
 def severus():
