@@ -463,7 +463,7 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
   /* ── Sidebar — tiroir overlay ───────────────────────────────────── */
   #sidebar {
     position: fixed; top: 0; left: 0; bottom: 0; z-index: 80;
-    width: 240px; overflow-y: auto; padding-top: 56px;
+    width: min(75vw, 280px); overflow-y: auto; padding-top: 56px;
     transform: translateX(-100%);
     transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
     border-right: 1px solid var(--orange33);
@@ -481,6 +481,15 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
   .mod         { font-size: 9px; padding: 4px 10px; letter-spacing: 1px; white-space: nowrap; }
   #btn-severus { font-size: 9px; padding: 4px 10px; letter-spacing: 1px; white-space: nowrap; flex-shrink: 0; }
   #btn-kill    { font-size: 8px; padding: 4px 8px;  letter-spacing: 2px; flex-shrink: 0; }
+
+  /* ── Lisibilité mobile — textes orange plus visibles ────────────── */
+  .s-title { color: #ff5500aa; letter-spacing: 2px; }
+  .s-item  { color: #ff550099; font-size: 12px; }
+  .s-item.on { color: var(--orange); }
+  .s-stat  { color: #ff550077; font-size: 11px; }
+  .s-stat span { color: #ff5500bb; }
+  .mod     { color: #ff550077; border-color: #ff550044; }
+  .mod.on  { color: var(--orange); border-color: var(--orange); }
 
   /* ── Layout principal ───────────────────────────────────────────── */
   #main { flex-direction: column; }
