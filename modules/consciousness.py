@@ -3,12 +3,7 @@ import json
 import threading
 import requests
 from datetime import datetime
-from openai import OpenAI
-from dotenv import load_dotenv
 from config import OLLAMA_URL, OLLAMA_MODEL
-
-load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 SELF_MODEL_FILE  = "memory/self_model.json"
 MISSION_FILE     = "memory/mission.json"
@@ -260,18 +255,10 @@ def check_objectives(log_fn) -> None:
 
     # ── 1. Évaluation du statut ──────────────────────────────────────────── #
     try:
-        resp = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": CHECK_OBJECTIVES_SYSTEM},
-                {"role": "user",   "content": user_content},
-            ],
-            temperature=0.1,
-            response_format={"type": "json_object"},
-        )
-        results = json.loads(resp.choices[0].message.content).get("results", [])
+        raw     = ask_local(user_content, system=CHECK_OBJECTIVES_SYSTEM)
+        results = json.loads(_strip_fence(raw)).get("results", [])
     except Exception as e:
-        log_fn(f"[CONSCIOUSNESS] check_objectives erreur GPT : {e}")
+        log_fn(f"[CONSCIOUSNESS] check_objectives erreur Ollama : {e}")
         return
 
     status_map     = {r["title"]: r["status"] for r in results}
@@ -294,16 +281,11 @@ def check_objectives(log_fn) -> None:
             break
         existing_titles = [o["title"] for o in remaining]
         try:
-            resp2 = client.chat.completions.create(
-                model="gpt-4o",
-                messages=[
-                    {"role": "system", "content": NEW_OBJECTIVE_SYSTEM},
-                    {"role": "user",   "content": f"Objectifs existants : {json.dumps(existing_titles, ensure_ascii=False)}"},
-                ],
-                temperature=0.7,
-                response_format={"type": "json_object"},
+            raw2    = ask_local(
+                f"Objectifs existants : {json.dumps(existing_titles, ensure_ascii=False)}",
+                system=NEW_OBJECTIVE_SYSTEM,
             )
-            raw_obj = json.loads(resp2.choices[0].message.content)
+            raw_obj = json.loads(_strip_fence(raw2))
             new_obj = {
                 "title":       str(raw_obj.get("title",       "Nouvel objectif"))[:100],
                 "description": str(raw_obj.get("description", ""))[:300],
@@ -376,18 +358,10 @@ def define_mission(log_fn) -> None:
     )
 
     try:
-        resp = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": DEFINE_MISSION_SYSTEM},
-                {"role": "user",   "content": user_content},
-            ],
-            temperature=0.4,
-            response_format={"type": "json_object"},
-        )
-        raw = json.loads(resp.choices[0].message.content)
+        raw_text = ask_local(user_content, system=DEFINE_MISSION_SYSTEM)
+        raw      = json.loads(_strip_fence(raw_text))
     except Exception as e:
-        log_fn(f"[MISSION] Erreur define_mission GPT : {e}")
+        log_fn(f"[MISSION] Erreur define_mission Ollama : {e}")
         return
 
     now   = datetime.now().isoformat(timespec="seconds")
@@ -430,18 +404,10 @@ def update_mission(log_fn) -> None:
     )
 
     try:
-        resp = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": UPDATE_MISSION_SYSTEM},
-                {"role": "user",   "content": user_content},
-            ],
-            temperature=0.1,
-            response_format={"type": "json_object"},
-        )
-        result = json.loads(resp.choices[0].message.content)
+        raw_text = ask_local(user_content, system=UPDATE_MISSION_SYSTEM)
+        result   = json.loads(_strip_fence(raw_text))
     except Exception as e:
-        log_fn(f"[MISSION] Erreur update_mission GPT : {e}")
+        log_fn(f"[MISSION] Erreur update_mission Ollama : {e}")
         return
 
     status_map = {s["title"]: s["status"] for s in result.get("steps", [])}
