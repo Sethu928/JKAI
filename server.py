@@ -206,9 +206,9 @@ register_killswitch(server, log)
 
 # === AUTONOMIE DÉSACTIVÉE — J-KAI en mode conversationnel uniquement ===
 # scheduler = create_default_scheduler(log)
-# scheduler.add_task("consciousness_reflect", 3600,  lambda: reflect(log))
-# scheduler.add_task("check_objectives",       600,  lambda: check_objectives(log))
-# scheduler.add_task("update_mission",        21600, lambda: update_mission(log))
+# scheduler.add_task("consciousness_reflect", 7200,  lambda: reflect(log))
+# scheduler.add_task("check_objectives",      1800,  lambda: check_objectives(log))
+# scheduler.add_task("update_mission",        43200, lambda: update_mission(log))
 # scheduler.start()
 # start_agent(log)
 

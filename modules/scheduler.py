@@ -1,6 +1,10 @@
+import os
 import time
 import threading
 from datetime import datetime
+
+LOGS_DIR      = "logs"
+LOG_KEEP_LINES = 20   # lignes conservées par fichier lors du nettoyage
 
 
 class _Task:
@@ -74,6 +78,30 @@ class Scheduler:
 #  Fabrique avec les 3 tâches par défaut du Nexus                    #
 # ------------------------------------------------------------------ #
 
+def clean_logs(log_fn=None) -> None:
+    """
+    Tronque chaque fichier .log dans logs/ pour n'en garder que les
+    LOG_KEEP_LINES dernières lignes. Appelée toutes les heures par le Scheduler.
+    """
+    if not os.path.isdir(LOGS_DIR):
+        return
+    for filename in os.listdir(LOGS_DIR):
+        if not filename.endswith(".log"):
+            continue
+        path = os.path.join(LOGS_DIR, filename)
+        try:
+            with open(path, "r", encoding="utf-8", errors="replace") as f:
+                lines = f.readlines()
+            if len(lines) <= LOG_KEEP_LINES:
+                continue
+            with open(path, "w", encoding="utf-8") as f:
+                f.writelines(lines[-LOG_KEEP_LINES:])
+            if log_fn:
+                log_fn(f"[SCHEDULER] clean_logs — {filename} tronqué à {LOG_KEEP_LINES} lignes.")
+        except OSError:
+            pass
+
+
 def create_default_scheduler(log_fn) -> Scheduler:
     """
     Retourne un Scheduler pré-chargé avec les tâches de fond standard.
@@ -99,5 +127,6 @@ def create_default_scheduler(log_fn) -> Scheduler:
     scheduler.add_task("health_check",   60,   health_check)
     scheduler.add_task("memory_report",  3600, memory_report)
     scheduler.add_task("auto_save",      300,  auto_save)
+    scheduler.add_task("clean_logs",     3600, lambda: clean_logs(log_fn))
 
     return scheduler

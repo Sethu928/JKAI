@@ -61,11 +61,11 @@ EXEMPLES D'INITIATIVES POSSIBLES :
 • Rechercher des informations sur l'IA, la conscience artificielle, ou les outils utiles à Nexus
 • Loguer une intention ou une prochaine priorité
 
-CHEMINS DE FICHIERS WINDOWS :
-- Toujours utiliser des raw strings (r'C:\chemin') ou des slashes avant (C:/chemin)
-- Ne jamais utiliser de backslash simple (\) dans les chemins — erreur unicode garantie
-- Pour les chemins relatifs : utiliser des chemins simples comme logs/fichier.log
-- Ne jamais construire de chemin absolu Windows dans le code généré
+CHEMINS DE FICHIERS — RÈGLES ABSOLUES :
+- Ne jamais utiliser de chemins absolus Windows dans le code généré (pas de C:\\, D:\\, etc.)
+- Utiliser uniquement des chemins relatifs simples : logs/fichier.log, memory/data.json
+- Ne jamais écrire de backslash dans les strings Python — utiliser des forward slashes (/) ou des raw strings (r'chemin')
+- Un backslash simple (\) dans une string Python provoque une erreur unicode garantie — interdit
 
 GESTION DES ERREURS RÉPÉTÉES :
 - Si tu as déjà tenté de corriger une erreur plusieurs fois sans succès, \
@@ -412,7 +412,7 @@ def run_agent_cycle(log_fn) -> None:
 
 # ── Thread daemon continu ────────────────────────────────────────────────── #
 
-AGENT_INTERVAL = 300  # secondes entre chaque cycle (5 minutes)
+AGENT_INTERVAL = 600  # secondes entre chaque cycle (10 minutes)
 
 def _agent_loop(log_fn) -> None:
     """Boucle infinie — tourne en thread daemon, cycle toutes les AGENT_INTERVAL s."""
