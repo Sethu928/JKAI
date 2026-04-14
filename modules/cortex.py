@@ -39,7 +39,7 @@ _BLOCKLIST = [
     r'\bsmtplib\b',
     r'\bpickle\b',
     r'\bctypes\b',
-    r'\bimportlib\b',
+    r'importlib\.import_module\s*\(\s*["\'](?:os|subprocess|shutil|sys|builtins|ctypes|socket|urllib|requests|ftplib|smtplib|pickle)["\']',
 ]
 
 MAX_OUTPUT = 4000   # caractères max renvoyés
