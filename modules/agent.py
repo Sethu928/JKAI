@@ -17,7 +17,10 @@ SELF_MODEL      = "memory/self_model.json"
 CORE_MEMORY     = "memory/core_memory.json"
 WEB_CONTEXT     = "memory/web_context.json"
 ERROR_MEMORY    = "memory/error_memory.json"
+CYCLE_MEMORY    = "memory/cycle_memory.json"
 RECENT_LINES    = 50
+CYCLE_KEEP      = 10   # cycles conservés dans cycle_memory.json
+CYCLE_INJECT    = 5    # cycles injectés dans le contexte GPT
 ERROR_TTL       = 3600  # secondes avant expiration d'une entrée d'erreur (1h)
 ERROR_MAX_TRIES = 3     # nombre de tentatives avant blocage run_code
 
@@ -127,6 +130,51 @@ def _format_action_history() -> str:
         return "Aucun cycle précédent dans cette session."
     numbered = [f"  {i+1}. {a}" for i, a in enumerate(_action_history)]
     return "\n".join(numbered) + "\n  → Le prochain cycle DOIT être différent du dernier."
+
+
+# ── Mémoire des cycles (cycle_memory.json) ──────────────────────────────── #
+
+def _load_cycle_memory() -> list:
+    """Charge les derniers cycles depuis cycle_memory.json."""
+    try:
+        with open(CYCLE_MEMORY, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, list) else []
+    except OSError:
+        return []
+
+
+def _save_cycle_memory(cycles: list) -> None:
+    """Persiste la liste des cycles en ne gardant que les CYCLE_KEEP derniers."""
+    os.makedirs("memory", exist_ok=True)
+    with open(CYCLE_MEMORY, "w", encoding="utf-8") as f:
+        json.dump(cycles[-CYCLE_KEEP:], f, ensure_ascii=False, indent=2)
+
+
+def _append_cycle(cycles: list, action: str, observation: str, result: str) -> list:
+    """Ajoute une entrée de cycle et retourne la liste mise à jour."""
+    cycles.append({
+        "ts":          datetime.now().isoformat(timespec="seconds"),
+        "action":      action,
+        "observation": observation.strip()[:200],
+        "result":      result.strip()[:150] if result else "—",
+    })
+    return cycles
+
+
+def _format_cycle_memory(cycles: list) -> str:
+    """Formate les CYCLE_INJECT derniers cycles pour injection dans le prompt."""
+    recent = cycles[-CYCLE_INJECT:]
+    if not recent:
+        return "Aucun cycle enregistré dans cette session."
+    lines = []
+    for i, c in enumerate(recent, 1):
+        lines.append(
+            f"  [{c['ts']}] #{i} {c['action'].upper()}\n"
+            f"    Obs    : {c['observation']}\n"
+            f"    Résultat: {c['result']}"
+        )
+    return "\n".join(lines)
 
 
 # ── Anti-boucle : error_memory.json ─────────────────────────────────────── #
@@ -390,8 +438,10 @@ def run_agent_cycle(log_fn) -> None:
     self_model   = _read_json(SELF_MODEL)
     core_memory  = _read_json(CORE_MEMORY)
     web_ctx      = _load_web_context()   # vide si pas de recherche au cycle précédent
+    cycle_mem    = _load_cycle_memory()  # historique persistant des cycles
 
     user_content = (
+        f"=== CYCLES RÉCENTS ({CYCLE_INJECT} derniers) ===\n{_format_cycle_memory(cycle_mem)}\n\n"
         f"=== HISTORIQUE DES 3 DERNIÈRES ACTIONS ===\n{_format_action_history()}\n\n"
         f"=== LOGS RÉCENTS ({RECENT_LINES} lignes) ===\n{recent_logs}\n\n"
         f"=== AUTO-MODÈLE ===\n{self_model}\n\n"
@@ -427,7 +477,14 @@ def run_agent_cycle(log_fn) -> None:
 
     # ── Exécution et journalisation ──────────────────────────────────────── #
     exec_info = _execute_action(decision, log_fn)
-    _record_action(decision["action"])   # màj historique glissant (3 entrées)
+    _record_action(decision["action"])                    # historique glissant 3 actions
+    cycle_mem = _append_cycle(                            # persistance cycle_memory.json
+        cycle_mem,
+        action      = decision["action"],
+        observation = decision.get("observation", ""),
+        result      = exec_info,
+    )
+    _save_cycle_memory(cycle_mem)
     _write_agent_log(ts, decision, exec_info)
     log_fn(f"[AGENT] Cycle terminé — action : {decision['action']} — {decision['notification'][:100]}")
 
