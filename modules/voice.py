@@ -35,22 +35,32 @@ def record_audio(duration=5, filename="temp_audio.wav"):
     sample_width = p.get_sample_size(FORMAT)  # récupéré avant terminate()
     p.terminate()
     wf = wave.open(filename, "wb")
-    wf.setnchannels(CHANNELS)
-    wf.setsampwidth(sample_width)
-    wf.setframerate(RATE)
-    wf.writeframes(b"".join(frames))
-    wf.close()
+    try:
+        wf.setnchannels(CHANNELS)
+        wf.setsampwidth(sample_width)
+        wf.setframerate(RATE)
+        wf.writeframes(b"".join(frames))
+    finally:
+        wf.close()
     return filename
 
 def listen():
     filename = record_audio(duration=5)
-    with open(filename, "rb") as f:
-        result = client.audio.transcriptions.create(
-            model="whisper-1",
-            file=f,
-            language="fr"
-        )
-    os.remove(filename)
-    text = result.text.strip()
-    print(f"SethU (vocal) > {text}", flush=True)
-    return text
+    try:
+        with open(filename, "rb") as f:
+            result = client.audio.transcriptions.create(
+                model="whisper-1",
+                file=f,
+                language="fr"
+            )
+        text = result.text.strip()
+        print(f"SethU (vocal) > {text}", flush=True)
+        return text
+    except Exception as e:
+        print(f"[VOICE] Erreur transcription : {e}", flush=True)
+        return ""
+    finally:
+        try:
+            os.remove(filename)
+        except OSError:
+            pass

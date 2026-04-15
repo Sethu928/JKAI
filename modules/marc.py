@@ -22,8 +22,11 @@ def ask_marc(user_input, history=None):
     messages = [{"role": "system", "content": MARC_SYSTEM_PROMPT}]
     messages += history
     messages.append({"role": "user", "content": user_input})
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=messages
-    )
-    return response.choices[0].message.content
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=messages,
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"Erreur de communication avec GPT-4o (Marc) : {e}"

@@ -122,8 +122,13 @@ def _load() -> dict:
     with _lock:
         if not os.path.exists(SELF_MODEL_FILE):
             _init_file()
-        with open(SELF_MODEL_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+        try:
+            with open(SELF_MODEL_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, OSError):
+            # Fichier corrompu ou illisible — réinitialise proprement
+            _init_file()
+            return dict(_DEFAULT_MODEL)
 
 
 def _save(model: dict) -> None:

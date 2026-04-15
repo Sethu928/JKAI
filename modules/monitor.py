@@ -137,7 +137,10 @@ class Monitor:
                     continue
 
                 if len(recent) > THRESHOLD and key not in self._alerted:
-                    self._write_alert(key, len(recent))
+                    try:
+                        self._write_alert(key, len(recent))
+                    except OSError:
+                        pass
                     self._alerted.add(key)
                 elif len(recent) <= THRESHOLD:
                     # L'erreur s'est calmée — on réarme l'alerte

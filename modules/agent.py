@@ -114,21 +114,25 @@ VALID_ACTIONS = {
 
 # ── Historique des actions récentes (3 dernières, mémoire courte) ────────── #
 
-_action_history: list[str] = []   # rempli au fil des cycles, max 3 entrées
+_action_history: list[str] = []           # rempli au fil des cycles, max 3 entrées
+_action_history_lock = threading.Lock()   # protège contre les accès concurrents
 
 
 def _record_action(action: str) -> None:
-    """Ajoute l'action au journal glissant de 3 entrées."""
-    _action_history.append(action)
-    if len(_action_history) > 3:
-        _action_history.pop(0)
+    """Ajoute l'action au journal glissant de 3 entrées (thread-safe)."""
+    with _action_history_lock:
+        _action_history.append(action)
+        if len(_action_history) > 3:
+            _action_history.pop(0)
 
 
 def _format_action_history() -> str:
-    """Retourne un résumé lisible des 3 dernières actions pour le prompt."""
-    if not _action_history:
+    """Retourne un résumé lisible des 3 dernières actions pour le prompt (thread-safe)."""
+    with _action_history_lock:
+        snapshot = list(_action_history)
+    if not snapshot:
         return "Aucun cycle précédent dans cette session."
-    numbered = [f"  {i+1}. {a}" for i, a in enumerate(_action_history)]
+    numbered = [f"  {i+1}. {a}" for i, a in enumerate(snapshot)]
     return "\n".join(numbered) + "\n  → Le prochain cycle DOIT être différent du dernier."
 
 
@@ -140,7 +144,7 @@ def _load_cycle_memory() -> list:
         with open(CYCLE_MEMORY, "r", encoding="utf-8") as f:
             data = json.load(f)
         return data if isinstance(data, list) else []
-    except OSError:
+    except (OSError, json.JSONDecodeError):
         return []
 
 
@@ -189,7 +193,7 @@ def _load_error_memory() -> dict:
     try:
         with open(ERROR_MEMORY, "r", encoding="utf-8") as f:
             data = json.load(f)
-    except OSError:
+    except (OSError, json.JSONDecodeError):
         return {}
     now = datetime.now().timestamp()
     return {k: v for k, v in data.items()

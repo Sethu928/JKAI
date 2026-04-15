@@ -119,14 +119,24 @@ def marc():
 
 @server.route("/voice", methods=["POST"])
 def voice():
-    user_input = listen()
+    try:
+        user_input = listen()
+    except Exception as e:
+        log(f"[ERREUR] /voice listen : {e}")
+        return jsonify({"status": "erreur_audio", "error": str(e)})
     if not user_input:
         return jsonify({"status": "rien_entendu"})
     if "severus" in user_input.lower():
-        speak("Lien Nexus rompu. Système gelé. Passage en sommeil sécurisé.")
+        try:
+            speak("Lien Nexus rompu. Système gelé. Passage en sommeil sécurisé.")
+        except Exception:
+            pass
         return jsonify({"status": "severus", "input": user_input})
     reply = ask_jkai(user_input)
-    speak(reply)
+    try:
+        speak(reply)
+    except Exception as e:
+        log(f"[ERREUR] /voice speak : {e}")
     return jsonify({"status": "ok", "input": user_input, "reply": reply})
 
 @server.route("/cortex", methods=["POST"])
@@ -147,7 +157,11 @@ def autonomy():
 
 @server.route("/consciousness", methods=["GET"])
 def consciousness():
-    return jsonify(get_self_model())
+    try:
+        return jsonify(get_self_model())
+    except Exception as e:
+        log(f"[ERREUR] /consciousness : {e}")
+        return jsonify({"error": str(e)}), 500
 
 @server.route("/agent/log", methods=["GET"])
 def agent_log():
@@ -169,7 +183,11 @@ def serve_log(filename):
 
 @server.route("/objectives", methods=["GET"])
 def objectives():
-    return jsonify(get_objectives())
+    try:
+        return jsonify(get_objectives())
+    except Exception as e:
+        log(f"[ERREUR] /objectives : {e}")
+        return jsonify([]), 500
 
 @server.route("/mission", methods=["GET"])
 def mission():
