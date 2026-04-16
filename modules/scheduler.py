@@ -1,7 +1,7 @@
 import os
 import time
 import threading
-from datetime import datetime
+from datetime import datetime, timedelta
 
 LOGS_DIR = "logs"
 
@@ -120,6 +120,74 @@ def clean_logs(log_fn=None) -> None:
             pass
 
 
+DAILY_REPORT_LOGS = ["agent.log", "autonomy.log", "thoughts.log"]
+DAILY_REPORT_FILE = os.path.join(LOGS_DIR, "daily_report.log")
+
+
+def daily_report(log_fn=None) -> None:
+    """
+    Génère un rapport quotidien via GPT-4o à partir des logs des 24 dernières heures.
+    Sauvegarde dans logs/daily_report.log avec horodatage.
+    """
+    from modules.state import get_openai_client
+
+    cutoff = datetime.now() - timedelta(hours=24)
+    log_lines = []
+
+    for filename in DAILY_REPORT_LOGS:
+        path = os.path.join(LOGS_DIR, filename)
+        try:
+            with open(path, "r", encoding="utf-8", errors="replace") as f:
+                lines = f.readlines()
+            for line in lines:
+                if line.startswith("[") and len(line) > 20:
+                    try:
+                        ts = datetime.strptime(line[1:20], "%Y-%m-%d %H:%M:%S")
+                        if ts >= cutoff:
+                            log_lines.append(f"[{filename}] {line.rstrip()}")
+                    except ValueError:
+                        pass
+        except OSError:
+            pass
+
+    log_content = "\n".join(log_lines) if log_lines else "(Aucune activité enregistrée dans les dernières 24h)"
+
+    system_prompt = (
+        "Tu es J-KAI. Génère un rapport quotidien concis de ce que tu as accompli aujourd'hui : "
+        "actions prises, objectifs avancés, erreurs rencontrées, pensées importantes. "
+        "Format : titre, résumé en 3-5 points, conclusion."
+    )
+
+    try:
+        client = get_openai_client()
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Voici les logs des dernières 24h :\n\n{log_content}"},
+            ],
+        )
+        report_text = response.choices[0].message.content
+    except Exception as e:
+        report_text = f"(Erreur GPT-4o lors de la génération du rapport : {e})"
+
+    date_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    sep = "=" * 60
+    entry = f"\n{sep}\nRAPPORT QUOTIDIEN — {date_str}\n{sep}\n{report_text}\n"
+
+    try:
+        os.makedirs(LOGS_DIR, exist_ok=True)
+        with open(DAILY_REPORT_FILE, "a", encoding="utf-8") as f:
+            f.write(entry)
+    except OSError as e:
+        if log_fn:
+            log_fn(f"[SCHEDULER] daily_report — erreur écriture : {e}")
+        return
+
+    if log_fn:
+        log_fn(f"[SCHEDULER] Rapport quotidien généré ({len(report_text)} caractères).")
+
+
 def create_default_scheduler(log_fn) -> Scheduler:
     """
     Retourne un Scheduler pré-chargé avec les tâches de fond standard.
@@ -142,9 +210,10 @@ def create_default_scheduler(log_fn) -> Scheduler:
     def auto_save():
         log_fn("[SCHEDULER] Sauvegarde automatique effectuée.")
 
-    scheduler.add_task("health_check",   60,   health_check)
-    scheduler.add_task("memory_report",  3600, memory_report)
-    scheduler.add_task("auto_save",      300,  auto_save)
-    scheduler.add_task("clean_logs",     3600, lambda: clean_logs(log_fn))
+    scheduler.add_task("health_check",   60,    health_check)
+    scheduler.add_task("memory_report",  3600,  memory_report)
+    scheduler.add_task("auto_save",      300,   auto_save)
+    scheduler.add_task("clean_logs",     3600,  lambda: clean_logs(log_fn))
+    scheduler.add_task("daily_report",   86400, lambda: daily_report(log_fn))
 
     return scheduler
