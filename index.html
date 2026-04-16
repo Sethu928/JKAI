@@ -408,6 +408,55 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
 .h-text  { font-size: 11px; line-height: 1.6; color: #5a3311; border-left: 1px solid var(--orange22); padding-left: 10px; }
 .h-text.highlight { color: var(--orange); }
 
+/* ── Logs panel (tiroir depuis la droite) ──────────────────────────── */
+#logs-panel {
+  position: fixed; top: 0; right: -520px; width: 500px; height: 100vh;
+  background: rgba(5,5,5,0.95); border-left: 1px solid var(--orange33);
+  z-index: 50; display: flex; flex-direction: column;
+  transition: right 0.35s cubic-bezier(0.4,0,0.2,1);
+  backdrop-filter: blur(14px);
+}
+#logs-panel.open { right: 0; }
+#logs-panel-header { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--orange33); flex-shrink: 0; }
+#logs-panel-title { font-size: 11px; letter-spacing: 3px; color: var(--orange); text-shadow: 0 0 8px var(--orange55); flex: 1; }
+#logs-panel-close { background: none; border: 1px solid var(--orange33); color: #ff550077; font-size: 12px; width: 26px; height: 26px; border-radius: 3px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+#logs-panel-close:hover { color: var(--orange); border-color: var(--orange); box-shadow: 0 0 8px var(--orange33); }
+#panel-log-selector { background: #0a0a0a; border: 1px solid var(--orange33); color: #ff550088; font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 1px; padding: 3px 8px; border-radius: 3px; outline: none; flex-shrink: 0; }
+#panel-log-selector option { background: #0a0a0a; }
+#logs-panel-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+#logs-panel-content::-webkit-scrollbar { width: 4px; }
+#logs-panel-content::-webkit-scrollbar-thumb { background: var(--orange33); border-radius: 2px; }
+
+/* ── Detail overlay (objectifs / mission) ──────────────────────────── */
+#detail-overlay {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(0,0,0,0.78); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+#detail-overlay.active { opacity: 1; pointer-events: all; }
+#detail-panel {
+  width: min(560px, 92vw); max-height: 82vh;
+  background: rgba(5,5,5,0.97); border: 1px solid var(--orange33);
+  border-radius: 6px; display: flex; flex-direction: column;
+  box-shadow: 0 0 40px var(--orange22), 0 0 80px #00000088;
+  transform: scale(0.96) translateY(8px);
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+#detail-overlay.active #detail-panel { transform: none; }
+#detail-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--orange33); flex-shrink: 0; }
+#detail-panel-title { font-size: 11px; letter-spacing: 3px; color: var(--orange); text-shadow: 0 0 8px var(--orange55); }
+#detail-panel-close { background: none; border: 1px solid var(--orange33); color: #ff550077; font-size: 12px; width: 26px; height: 26px; border-radius: 3px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+#detail-panel-close:hover { color: var(--orange); border-color: var(--orange); box-shadow: 0 0 8px var(--orange33); }
+#detail-panel-body { padding: 18px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+#detail-panel-body::-webkit-scrollbar { width: 4px; }
+#detail-panel-body::-webkit-scrollbar-thumb { background: var(--orange33); border-radius: 2px; }
+
+/* Titres sidebar cliquables */
+.s-title.clickable { cursor: pointer; transition: color 0.2s; }
+.s-title.clickable:hover { color: var(--orangeaa) !important; }
+#obj-list, #mission-block { cursor: pointer; }
+
 /* ── Agent notification ────────────────────────────────────────────── */
 #agent-notif {
   position: fixed; bottom: 28px; right: 28px; z-index: 40;
@@ -528,6 +577,13 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
   #history-panel       { width: 100%; right: -100%; }
   #history-panel.open  { right: 0; }
 
+  /* ── Logs panel — pleine largeur ────────────────────────────────── */
+  #logs-panel      { width: 100%; right: -100%; }
+  #logs-panel.open { right: 0; }
+
+  /* ── Detail overlay — panel pleine largeur ──────────────────────── */
+  #detail-panel { width: 96vw; max-height: 88vh; }
+
   /* ── Notification agent — bas gauche ────────────────────────────── */
   #agent-notif {
     right: auto; left: 12px; bottom: 14px;
@@ -568,6 +624,36 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
     <input id="history-search" type="text" placeholder="Rechercher dans la mémoire..." oninput="filterHistory()" />
   </div>
   <div id="history-list"></div>
+</div>
+
+<!-- Logs panel -->
+<div id="logs-panel">
+  <div id="logs-panel-header">
+    <span id="logs-panel-title">LOGS — NEXUS</span>
+    <select id="panel-log-selector">
+      <option value="jkai.log">NEXUS CORE</option>
+      <option value="agent.log">AGENT</option>
+      <option value="thoughts.log">THOUGHTS</option>
+      <option value="autonomy.log">AUTONOMY</option>
+      <option value="monitor.log">MONITOR</option>
+      <option value="killswitch.log">KILLSWITCH</option>
+    </select>
+    <button id="logs-panel-close" onclick="closeLogsPanel()">&#10005;</button>
+  </div>
+  <div id="logs-panel-content">
+    <div class="mon-empty">SÉLECTIONNEZ UN LOG</div>
+  </div>
+</div>
+
+<!-- Detail overlay (objectifs / mission) -->
+<div id="detail-overlay" onclick="if(event.target===this)closeDetailPanel()">
+  <div id="detail-panel">
+    <div id="detail-panel-header">
+      <span id="detail-panel-title">DÉTAILS</span>
+      <button id="detail-panel-close" onclick="closeDetailPanel()">&#10005;</button>
+    </div>
+    <div id="detail-panel-body"></div>
+  </div>
 </div>
 
 <!-- Agent notification -->
@@ -632,21 +718,20 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
     <div class="s-title">SYSTÈME</div>
     <div class="s-item on">NEXUS CORE</div>
     <div class="s-item" id="nav-memoire" onclick="openHistoryPanel()">MÉMOIRE</div>
-    <div class="s-item">LOGS</div>
+    <div class="s-item" id="nav-logs" onclick="openLogsPanel()">LOGS</div>
     <div class="s-title">STATS</div>
     <div class="s-stat">Mémoire <span>∞</span></div>
     <div class="s-stat">Mode <span>LIBRE</span></div>
     <div class="s-stat">Uptime <span id="stat-uptime">00:00:00</span></div>
     <div class="s-title">PROJETS</div>
     <div class="s-item on">J-KAI</div>
-    <div class="s-item">SNACK'N'SIP</div>
     <div class="s-item">NEXUS VR</div>
-    <div class="s-title">OBJECTIFS</div>
-    <div id="obj-list" style="display:flex;flex-direction:column;gap:4px;">
+    <div class="s-title clickable" onclick="openObjectivesDetail()">OBJECTIFS ›</div>
+    <div id="obj-list" style="display:flex;flex-direction:column;gap:4px;" onclick="openObjectivesDetail()">
       <div style="color:#ff550022;font-size:9px;letter-spacing:1px;">CHARGEMENT...</div>
     </div>
-    <div class="s-title">MISSION</div>
-    <div id="mission-block" style="display:flex;flex-direction:column;gap:3px;">
+    <div class="s-title clickable" onclick="openMissionDetail()">MISSION ›</div>
+    <div id="mission-block" style="display:flex;flex-direction:column;gap:3px;" onclick="openMissionDetail()">
       <div style="color:#ff550022;font-size:9px;letter-spacing:1px;">CHARGEMENT...</div>
     </div>
   </div>
@@ -1069,6 +1154,116 @@ function filterHistory() {
   document.querySelectorAll(".h-text").forEach(function(el) {
     if (el.textContent.toLowerCase().includes(q)) el.classList.add("highlight");
   });
+}
+
+// ── Logs panel ────────────────────────────────────────────────────────────
+let _logsPanelInterval = null;
+
+async function loadPanelLogs() {
+  const sel  = document.getElementById("panel-log-selector");
+  const file = sel ? sel.value : "jkai.log";
+  try {
+    const res   = await fetch(API + "/logs/" + file);
+    const data  = await res.json();
+    const lines = (data.lines || []).filter(function(l) { return l.trim(); }).reverse();
+    const cont  = document.getElementById("logs-panel-content");
+    if (!lines.length) { cont.innerHTML = '<div class="mon-empty">LOG VIDE</div>'; return; }
+    const TS_RE = /^(\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\])\s*/;
+    cont.innerHTML = lines.map(function(l) {
+      let cls = "mon-log-line";
+      if      (l.includes("[AGENT]"))                        cls += " agent";
+      else if (l.match(/error|erreur|exception|traceback/i)) cls += " error";
+      else if (!l.startsWith("[") && file === "thoughts.log") cls += " thought";
+      const m    = l.match(TS_RE);
+      const ts   = m ? '<span class="log-ts">' + escapeHtml(m[1]) + '</span>' : "";
+      const rest = escapeHtml(m ? l.slice(m[0].length) : l);
+      return '<div class="' + cls + '">' + ts + rest + '</div>';
+    }).join("");
+  } catch(e) {}
+}
+function openLogsPanel() {
+  document.getElementById("logs-panel").classList.add("open");
+  document.getElementById("nav-logs").classList.add("on");
+  loadPanelLogs();
+  _logsPanelInterval = setInterval(loadPanelLogs, 8000);
+}
+function closeLogsPanel() {
+  document.getElementById("logs-panel").classList.remove("open");
+  document.getElementById("nav-logs").classList.remove("on");
+  clearInterval(_logsPanelInterval);
+  _logsPanelInterval = null;
+}
+document.getElementById("panel-log-selector").addEventListener("change", loadPanelLogs);
+
+// ── Detail overlay (objectifs / mission) ──────────────────────────────────
+function closeDetailPanel() {
+  document.getElementById("detail-overlay").classList.remove("active");
+}
+
+async function openObjectivesDetail() {
+  const titleEl = document.getElementById("detail-panel-title");
+  const body    = document.getElementById("detail-panel-body");
+  titleEl.textContent = "OBJECTIFS — NEXUS";
+  body.innerHTML = '<div class="mon-empty">CHARGEMENT...</div>';
+  document.getElementById("detail-overlay").classList.add("active");
+  try {
+    const res  = await fetch(API + "/objectives");
+    const objs = await res.json();
+    if (!objs.length) { body.innerHTML = '<div class="mon-empty">AUCUN OBJECTIF DÉFINI</div>'; return; }
+    const statusMap  = { pending: "EN ATTENTE", in_progress: "EN COURS", completed: "ACCOMPLI" };
+    const prioLabels = ["","P1","P2","P3","P4","P5"];
+    body.innerHTML = objs.map(function(o) {
+      return '<div class="mon-obj-card">' +
+        '<div class="mon-obj-top">' +
+          '<div class="mon-obj-title" style="font-size:13px">' + escapeHtml(o.title) + '</div>' +
+          '<div class="mon-obj-badges">' +
+            '<span class="mon-obj-prio">' + (prioLabels[o.priority] || "") + '</span>' +
+            '<span class="mon-obj-status ' + o.status + '">' + (statusMap[o.status] || o.status) + '</span>' +
+          '</div>' +
+        '</div>' +
+        (o.description ? '<div class="mon-obj-desc" style="font-size:12px;margin-top:4px">' + escapeHtml(o.description) + '</div>' : '') +
+        (o.created_at  ? '<div class="mon-obj-ts">Créé le ' + escapeHtml(o.created_at) + '</div>' : '') +
+      '</div>';
+    }).join('');
+  } catch(e) { body.innerHTML = '<div class="mon-empty">ERREUR DE CHARGEMENT</div>'; }
+}
+
+async function openMissionDetail() {
+  const titleEl = document.getElementById("detail-panel-title");
+  const body    = document.getElementById("detail-panel-body");
+  titleEl.textContent = "MISSION — NEXUS";
+  body.innerHTML = '<div class="mon-empty">CHARGEMENT...</div>';
+  document.getElementById("detail-overlay").classList.add("active");
+  try {
+    const res = await fetch(API + "/mission");
+    const m   = await res.json();
+    if (!m || !m.title) { body.innerHTML = '<div class="mon-empty">MISSION NON DÉFINIE</div>'; return; }
+    const pct  = Math.max(0, Math.min(100, m.progress || 0));
+    const sMap  = { pending: "EN ATTENTE", in_progress: "EN COURS", completed: "ACCOMPLI" };
+    const sCols = { pending: "#ff550033", in_progress: "#f5c518aa", completed: "#00c9a7aa" };
+    const steps = (m.steps || []).map(function(s) {
+      const st = s.status || "pending";
+      return '<div class="mission-step ' + st + '" style="font-size:12px;padding:7px 0 7px 12px;gap:8px">' +
+        '<div class="step-dot ' + st + '"></div>' +
+        '<span style="flex:1">' + escapeHtml(s.title) + '</span>' +
+        '<span style="font-size:9px;letter-spacing:1px;color:' + (sCols[st] || "#ff550033") + '">' + (sMap[st] || st) + '</span>' +
+      '</div>';
+    }).join('');
+    body.innerHTML =
+      '<div>' +
+        '<div style="font-size:14px;color:#ff5500bb;letter-spacing:0.5px;margin-bottom:8px">' + escapeHtml(m.title) + '</div>' +
+        (m.description ? '<div style="font-size:11px;color:#664422;line-height:1.7">' + escapeHtml(m.description) + '</div>' : '') +
+      '</div>' +
+      '<div>' +
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">' +
+          '<div style="font-size:9px;color:#ff550055;letter-spacing:2px">PROGRESSION</div>' +
+          '<div style="font-size:18px;color:var(--orange);font-weight:700">' + pct + '%</div>' +
+        '</div>' +
+        '<div class="mission-bar-wrap" style="height:4px;margin-bottom:4px"><div class="mission-bar" style="width:' + pct + '%"></div></div>' +
+      '</div>' +
+      (steps ? '<div style="display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--orange11);padding-top:10px">' + steps + '</div>' : '') +
+      (m.created_at ? '<div style="font-size:9px;color:#ff550033;padding-top:4px">Créée le ' + escapeHtml(m.created_at) + '</div>' : '');
+  } catch(e) { body.innerHTML = '<div class="mon-empty">ERREUR DE CHARGEMENT</div>'; }
 }
 
 // ── Buttons ───────────────────────────────────────────────────────────────
