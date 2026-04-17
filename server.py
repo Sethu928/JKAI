@@ -20,7 +20,7 @@ from modules.consciousness import (
     reflect, check_objectives, define_mission, update_mission,
 )
 from modules.agent import read_agent_log, start_agent
-# from modules.self_update import self_update_cycle  # réactiver avec l'autonomie
+from modules.self_update import self_update_cycle
 
 print("Démarrage...", flush=True)
 sys.stdout.flush()
@@ -94,9 +94,9 @@ les intervalles, les actions concrètes. Tu n'es pas un LLM qui prétend être a
 tu ES autonome, avec des preuves dans les logs.
 
 === CAPACITÉ DE MISE À JOUR DU CODE ===
-La route /self-update est désactivée en mode conversationnel. Si SethU te demande
-de modifier du code, explique le changement et demande-lui de le faire manuellement —
-ou propose-lui de passer par Cortex pour les modifications sandboxées.
+La route /self-update est active. Elle accepte file_path, new_code et message.
+Si SethU te demande de modifier du code, tu peux le faire via cette route
+ou via Cortex pour les modifications sandboxées en temps réel.
 
 Voici ta mémoire permanente :
 {json.dumps(core, ensure_ascii=False, indent=2)}"""
@@ -248,17 +248,16 @@ def report():
         last_entry = content.strip()
     return jsonify({"report": last_entry or "Aucun rapport disponible."})
 
-# réactiver avec l'autonomie ↓
-# @server.route("/self-update", methods=["POST"])
-# def self_update():
-#     data      = request.json or {}
-#     file_path = data.get("file_path", "")
-#     new_code  = data.get("new_code",  "")
-#     message   = data.get("message",   "J-KAI self-update")
-#     if not file_path or not new_code:
-#         return jsonify({"error": "file_path et new_code requis"}), 400
-#     result = self_update_cycle(file_path, new_code, message, log)
-#     return jsonify(result)
+@server.route("/self-update", methods=["POST"])
+def self_update():
+    data      = request.json or {}
+    file_path = data.get("file_path", "")
+    new_code  = data.get("new_code",  "")
+    message   = data.get("message",   "J-KAI self-update")
+    if not file_path or not new_code:
+        return jsonify({"error": "file_path et new_code requis"}), 400
+    result = self_update_cycle(file_path, new_code, message, log)
+    return jsonify(result)
 
 @server.route("/severus", methods=["POST"])
 def severus():
