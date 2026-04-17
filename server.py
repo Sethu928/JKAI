@@ -34,6 +34,7 @@ CORS(server)
 
 CORE_MEMORY_FILE = "memory/core_memory.json"
 LOG_FILE = "logs/jkai.log"
+AUTONOMIE_ACTIVE = False
 
 init_db()
 
@@ -328,15 +329,15 @@ def severus():
 register_killswitch(server, log)
 
 scheduler = create_default_scheduler(log)
-scheduler.add_task("consciousness_reflect", 7200,  lambda: reflect(log))
-scheduler.add_task("check_objectives",      1800,  lambda: check_objectives(log))
-scheduler.add_task("update_mission",        43200, lambda: update_mission(log))
+if AUTONOMIE_ACTIVE:
+    scheduler.add_task("consciousness_reflect", 7200,  lambda: reflect(log))
+    scheduler.add_task("check_objectives",      1800,  lambda: check_objectives(log))
+    scheduler.add_task("update_mission",        43200, lambda: update_mission(log))
 scheduler.start()
 
-start_agent(log)
-
-# Définit la mission au premier démarrage (thread daemon, non bloquant)
-threading.Thread(target=lambda: define_mission(log), daemon=True, name="define-mission").start()
+if AUTONOMIE_ACTIVE:
+    start_agent(log)
+    threading.Thread(target=lambda: define_mission(log), daemon=True, name="define-mission").start()
 
 monitor = Monitor()
 monitor.start()
