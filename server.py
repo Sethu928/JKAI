@@ -1,6 +1,7 @@
 import sys
 import os
 import json
+import re
 import threading
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
@@ -118,6 +119,35 @@ def ask_jkai(user_input):
     log(f"J-KAI: {reply}")
     return reply
 
+# ── Détection auto-update dans les réponses chat ──────────────────────────
+_CODE_BLOCK_RE = re.compile(r'```(?:python)?\n(.*?)```', re.DOTALL)
+_FILEPATH_RE   = re.compile(r'\b((?:modules|memory|logs|tests)/[\w/._-]+\.py|[\w._-]+\.py)\b')
+
+def _try_auto_update(reply: str) -> None:
+    """
+    Détecte si la réponse contient un bloc de code Python ET un chemin .py.
+    Si oui, lance self_update_cycle en thread daemon (non bloquant).
+    """
+    code_match = _CODE_BLOCK_RE.search(reply)
+    if not code_match:
+        return
+    path_match = _FILEPATH_RE.search(reply)
+    if not path_match:
+        return
+    code      = code_match.group(1).strip()
+    file_path = path_match.group(1)
+
+    def _run():
+        try:
+            result = self_update_cycle(file_path, code, "J-KAI auto-update via /chat", log)
+            status = "OK" if result.get("write_ok") else f"ÉCHEC — {result.get('error', '?')}"
+            log(f"[AUTO-UPDATE] {file_path} — {status}")
+        except Exception as e:
+            log(f"[AUTO-UPDATE] Erreur : {e}")
+
+    log(f"[AUTO-UPDATE] Détecté : {file_path} — lancement en arrière-plan")
+    threading.Thread(target=_run, daemon=True, name="auto-update").start()
+
 @server.route("/")
 def index():
     return send_from_directory(".", "index.html")
@@ -127,6 +157,7 @@ def chat():
     data = request.get_json(silent=True) or {}
     user_input = data.get("message", "")
     reply = ask_jkai(user_input)
+    _try_auto_update(reply)
     return jsonify({"reply": reply})
 
 @server.route("/history", methods=["GET"])
