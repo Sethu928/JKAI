@@ -1,1 +1,0 @@
-print("Module test OK")
