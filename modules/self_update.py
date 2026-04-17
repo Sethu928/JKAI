@@ -179,6 +179,11 @@ def deploy_to_pi(log_fn) -> bool:
     Authentification par clé SSH (~/.ssh/jkai_key).
     Retourne True si succès.
     """
+    key_path = os.path.expanduser("~/.ssh/jkai_key")
+    if not os.path.exists(key_path):
+        log_fn(f"[SELF_UPDATE] Clé SSH introuvable ({key_path}) — déploiement Pi ignoré, git pull à déclencher manuellement.")
+        return False
+
     try:
         import paramiko
     except ImportError:
@@ -191,7 +196,7 @@ def deploy_to_pi(log_fn) -> bool:
         ssh.connect(
             PI_HOST,
             username=PI_USER,
-            key_filename=os.path.expanduser("~/.ssh/jkai_key"),
+            key_filename=key_path,
             timeout=15,
         )
         log_fn(f"[SELF_UPDATE] SSH connecté à {PI_HOST} ({PI_USER})")
