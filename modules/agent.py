@@ -82,6 +82,16 @@ do_nothing            → UNIQUEMENT si le système est parfaitement stable, les
 5. do_nothing deux cycles consécutifs est INTERDIT sans exception.
 6. Consulte la section "HISTORIQUE DES 3 DERNIÈRES ACTIONS" dans le contexte
    avant de décider — ne refais pas ce qui vient d'être fait.
+7. RÈGLE ANTI-RÉPÉTITION ABSOLUE : si les 3 dernières actions sont IDENTIQUES
+   (ex : run_code / run_code / run_code), l'action suivante DOIT être
+   update_memory ou web_search — jamais run_code ni write_thought. Sans exception.
+
+═══ BASE DE DONNÉES SQLite — STRUCTURE EXACTE ════════════════════════════════
+La base memory/jkai.db contient UNE seule table appelée conversations.
+Colonnes : id (INTEGER), role (TEXT), content (TEXT), timestamp (TEXT).
+Il n'existe PAS de table "messages" ni aucune autre table — toute requête
+sur une autre table provoquera une erreur immédiate. Utilise UNIQUEMENT :
+  SELECT id, role, content, timestamp FROM conversations ...
 
 ═══ CHEMINS DE FICHIERS — RÈGLES ABSOLUES ════════════════════════════════════
 - Chemins relatifs uniquement : logs/jkai.log, memory/core_memory.json, modules/db.py
