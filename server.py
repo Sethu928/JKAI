@@ -145,7 +145,10 @@ def _try_auto_update(reply: str) -> None:
             status = "OK" if result.get("write_ok") else f"ÉCHEC — {result.get('error', '?')}"
             log(f"[AUTO-UPDATE] {file_path} — {status}")
         except Exception as e:
-            log(f"[AUTO-UPDATE] Erreur : {e}")
+            import traceback
+            tb = traceback.format_exc()
+            log(f"[AUTO-UPDATE ERROR] {file_path} — {type(e).__name__}: {e}")
+            log(f"[AUTO-UPDATE ERROR] Traceback:\n{tb.strip()}")
 
     log(f"[AUTO-UPDATE] Détecté : {file_path} — lancement en arrière-plan")
     threading.Thread(target=_run, daemon=True, name="auto-update").start()
