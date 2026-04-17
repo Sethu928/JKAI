@@ -128,10 +128,12 @@ def _try_auto_update(reply: str) -> None:
     Détecte si la réponse contient un bloc de code Python ET un chemin .py.
     Si oui, lance self_update_cycle en thread daemon (non bloquant).
     """
+    print(f"[DEBUG AUTO-UPDATE] reply={reply[:200]!r}", flush=True)
     code_match = _CODE_BLOCK_RE.search(reply)
+    path_match = _FILEPATH_RE.search(reply)
+    print(f"[DEBUG AUTO-UPDATE] code_match={bool(code_match)} filepath_match={bool(path_match)}", flush=True)
     if not code_match:
         return
-    path_match = _FILEPATH_RE.search(reply)
     if not path_match:
         return
     code      = code_match.group(1).strip()
