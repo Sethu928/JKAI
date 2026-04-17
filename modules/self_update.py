@@ -134,6 +134,9 @@ def git_commit_and_push(file_path: str, message: str, log_fn) -> bool:
     if not ok:
         return False
 
+    _run_git(["config", "user.email", "jordan.rostaing28@icloud.com"], log_fn)
+    _run_git(["config", "user.name", "Sethu928"], log_fn)
+
     ok, out = _run_git(["commit", "-m", message], log_fn)
     log_fn(f"[SELF_UPDATE] git commit → {'OK' if ok else 'ERREUR'} | {out[:200]}")
     if not ok and "nothing to commit" not in out:
