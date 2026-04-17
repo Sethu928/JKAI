@@ -21,7 +21,7 @@ from modules.consciousness import (
     reflect, check_objectives, define_mission, update_mission,
 )
 from modules.agent import read_agent_log, start_agent
-from modules.self_update import self_update_cycle
+from modules.self_update import self_update_cycle, delete_file
 
 print("Démarrage...", flush=True)
 sys.stdout.flush()
@@ -122,20 +122,38 @@ def ask_jkai(user_input):
 # ── Détection auto-update dans les réponses chat ──────────────────────────
 _CODE_BLOCK_RE = re.compile(r'```(?:python)?\n(.*?)```', re.DOTALL)
 _FILEPATH_RE   = re.compile(r'\b((?:modules|memory|logs|tests)/[\w/._-]+\.py|[\w._-]+\.py)\b')
+_DELETE_RE     = re.compile(r'\b(supprimer|supprime|delete|git\s+rm|effacer)\b', re.IGNORECASE)
 
 def _try_auto_update(reply: str) -> None:
     """
-    Détecte si la réponse contient un bloc de code Python ET un chemin .py.
-    Si oui, lance self_update_cycle en thread daemon (non bloquant).
+    Détecte dans la réponse :
+    - suppression (mot-clé delete/supprimer + chemin .py) → delete_file en background
+    - mise à jour (bloc ```python + chemin .py) → self_update_cycle en background
     """
-    code_match = _CODE_BLOCK_RE.search(reply)
     path_match = _FILEPATH_RE.search(reply)
-    if not code_match:
-        return
     if not path_match:
         return
-    code      = code_match.group(1).strip()
     file_path = path_match.group(1)
+
+    if _DELETE_RE.search(reply):
+        def _run_delete():
+            try:
+                result = delete_file(file_path, "J-KAI auto-delete via /chat", log)
+                status = "OK" if result.get("delete_ok") else f"ÉCHEC — {result.get('error', '?')}"
+                log(f"[AUTO-DELETE] {file_path} — {status}")
+            except Exception as e:
+                import traceback
+                tb = traceback.format_exc()
+                log(f"[AUTO-DELETE ERROR] {file_path} — {type(e).__name__}: {e}")
+                log(f"[AUTO-DELETE ERROR] Traceback:\n{tb.strip()}")
+        log(f"[AUTO-DELETE] Détecté : {file_path} — lancement en arrière-plan")
+        threading.Thread(target=_run_delete, daemon=True, name="auto-delete").start()
+        return
+
+    code_match = _CODE_BLOCK_RE.search(reply)
+    if not code_match:
+        return
+    code = code_match.group(1).strip()
 
     def _run():
         try:
@@ -291,6 +309,16 @@ def self_update():
     if not file_path or not new_code:
         return jsonify({"error": "file_path et new_code requis"}), 400
     result = self_update_cycle(file_path, new_code, message, log)
+    return jsonify(result)
+
+@server.route("/self-delete", methods=["POST"])
+def self_delete():
+    data      = request.json or {}
+    file_path = data.get("file_path", "")
+    message   = data.get("message",   "J-KAI self-delete")
+    if not file_path:
+        return jsonify({"error": "file_path requis"}), 400
+    result = delete_file(file_path, message, log)
     return jsonify(result)
 
 @server.route("/severus", methods=["POST"])

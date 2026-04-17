@@ -7,6 +7,9 @@ from datetime import datetime
 # ── Fichiers protégés — jamais modifiables via self_update ──────────────── #
 _PROTECTED = {"killswitch.py", ".env"}
 
+# Fichiers supplémentaires interdits à la suppression
+_PROTECTED_DELETE = _PROTECTED | {"server.py", "modules/state.py"}
+
 PI_HOST = "192.168.1.122"
 PI_USER = "pi"
 PI_CMD  = "cd ~/jkai && git pull && sudo systemctl restart jkai"
@@ -208,6 +211,89 @@ def deploy_to_pi(log_fn) -> bool:
         return False
     finally:
         ssh.close()
+
+
+# ── Suppression de fichier ───────────────────────────────────────────────── #
+
+def delete_file(file_path: str, message: str, log_fn) -> dict:
+    """
+    Supprime un fichier du projet via git rm → commit → push → deploy Pi.
+    Refuse les fichiers protégés et les chemins hors projet.
+    """
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_fn(f"[SELF_DELETE] Cycle démarré — {file_path} — {ts}")
+
+    result = {
+        "file_path": file_path,
+        "ts":        ts,
+        "delete_ok": False,
+        "commit_ok": False,
+        "deploy_ok": False,
+        "error":     "",
+    }
+
+    abs_path     = os.path.abspath(file_path)
+    project_root = os.path.abspath(".")
+    if not abs_path.startswith(project_root + os.sep) and abs_path != project_root:
+        result["error"] = f"Chemin hors du projet : {file_path}"
+        log_fn(f"[SELF_DELETE] {result['error']}")
+        return result
+
+    normalized = file_path.replace("\\", "/")
+    if os.path.basename(file_path) in _PROTECTED_DELETE or normalized in _PROTECTED_DELETE:
+        result["error"] = f"Fichier protégé — suppression refusée : {file_path}"
+        log_fn(f"[SELF_DELETE] {result['error']}")
+        return result
+
+    if not os.path.exists(abs_path):
+        result["error"] = f"Fichier introuvable : {file_path}"
+        log_fn(f"[SELF_DELETE] {result['error']}")
+        return result
+
+    ok, out = _run_git(["rm", "--", file_path], log_fn)
+    log_fn(f"[SELF_DELETE] git rm {file_path} → {'OK' if ok else 'ERREUR'} | {out[:200]}")
+    if not ok:
+        result["error"] = f"git rm échoué : {out[:200]}"
+        return result
+    result["delete_ok"] = True
+
+    _run_git(["config", "user.email", "jordan.rostaing28@icloud.com"], log_fn)
+    _run_git(["config", "user.name", "Sethu928"], log_fn)
+
+    ok, out = _run_git(["commit", "-m", message], log_fn)
+    log_fn(f"[SELF_DELETE] git commit → {'OK' if ok else 'ERREUR'} | {out[:200]}")
+    if not ok and "nothing to commit" not in out:
+        result["error"] = "Échec git commit"
+        return result
+
+    token        = os.getenv("GITHUB_TOKEN", "").strip()
+    original_url = _get_remote_url()
+    url_patched  = False
+    if token and original_url.startswith("https://github.com/"):
+        auth_url = original_url.replace("https://github.com/", f"https://{token}@github.com/")
+        _run_git(["remote", "set-url", "origin", auth_url], log_fn)
+        url_patched = True
+        log_fn("[SELF_DELETE] Token GitHub injecté dans l'URL remote (temporaire)")
+
+    ok, out = _run_git(["push"], log_fn)
+    log_fn(f"[SELF_DELETE] git push → {'OK' if ok else 'ERREUR'} | {out[:200]}")
+
+    if url_patched and original_url:
+        _run_git(["remote", "set-url", "origin", original_url], log_fn)
+        log_fn("[SELF_DELETE] URL remote restaurée.")
+
+    if not ok:
+        result["error"] = "Échec git push"
+        return result
+    result["commit_ok"] = True
+
+    result["deploy_ok"] = deploy_to_pi(log_fn)
+    if not result["deploy_ok"]:
+        result["error"] = "Échec déploiement Pi (SSH)"
+
+    log_fn(f"[SELF_DELETE] Cycle terminé — delete={result['delete_ok']} "
+           f"commit={result['commit_ok']} deploy={result['deploy_ok']}")
+    return result
 
 
 # ── Pipeline complet ──────────────────────────────────────────────────────── #
