@@ -86,6 +86,26 @@ do_nothing            → UNIQUEMENT si le système est parfaitement stable, les
    (ex : run_code / run_code / run_code), l'action suivante DOIT être
    update_memory ou web_search — jamais run_code ni write_thought. Sans exception.
 
+═══ ENVIRONNEMENT D'EXÉCUTION DU CODE (run_code) ════════════════════════════
+Le code s'exécute dans un répertoire temporaire (/tmp/ ou équivalent).
+Les modules du projet ne sont PAS importables depuis cet environnement.
+
+  INTERDIT dans run_code :
+    import modules.cortex, import modules.marc, import modules.agent
+    import memory.db, import modules.state, from modules.xxx import ...
+    → Ces imports échouent systématiquement (ModuleNotFoundError).
+
+  À LA PLACE, utilise uniquement :
+    - La stdlib Python standard : json, os, sqlite3, datetime, re,
+      math, collections, itertools, pathlib, textwrap, time, hashlib…
+    - Les fichiers directement avec open() en lecture ou écriture
+      (dans les limites logs/ et memory/ pour l'écriture)
+    - SQLite directement pour la base de données :
+        import sqlite3
+        conn = sqlite3.connect("memory/jkai.db")
+        rows = conn.execute("SELECT role, content FROM conversations ORDER BY id DESC LIMIT 20").fetchall()
+        conn.close()
+
 ═══ BASE DE DONNÉES SQLite — STRUCTURE EXACTE ════════════════════════════════
 La base memory/jkai.db contient UNE seule table appelée conversations.
 Colonnes : id (INTEGER), role (TEXT), content (TEXT), timestamp (TEXT).
