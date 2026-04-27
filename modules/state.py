@@ -12,9 +12,29 @@ load_dotenv()
 _openai_client: OpenAI | None = None
 _client_init_lock = threading.Lock()
 
+_local_client: OpenAI | None = None
+_local_client_lock = threading.Lock()
+
+LOCAL_MODEL = os.getenv("LM_STUDIO_MODEL", "local-model")
+
+
+def get_local_client() -> OpenAI:
+    """Retourne le client LM Studio (singleton thread-safe, base_url 127.0.0.1:1234)."""
+    global _local_client
+    if _local_client is None:
+        with _local_client_lock:
+            if _local_client is None:
+                _local_client = OpenAI(
+                    base_url="http://127.0.0.1:1234/v1",
+                    api_key="local",
+                )
+    return _local_client
+
 
 def get_openai_client() -> OpenAI:
-    """Retourne le client OpenAI partagé (singleton thread-safe, double-check locking)."""
+    """Retourne le client OpenAI. Si LM_STUDIO=true dans .env, redirige vers LM Studio."""
+    if os.getenv("LM_STUDIO", "").lower() == "true":
+        return get_local_client()
     global _openai_client
     if _openai_client is None:
         with _client_init_lock:

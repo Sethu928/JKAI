@@ -34,7 +34,7 @@ CORS(server)
 
 CORE_MEMORY_FILE = "memory/core_memory.json"
 LOG_FILE = "logs/jkai.log"
-AUTONOMIE_ACTIVE = False
+AUTONOMIE_ACTIVE = True
 
 init_db()
 

@@ -5,10 +5,10 @@ import time
 import threading
 import requests
 from datetime import datetime
-from modules.state import self_model_lock, get_openai_client, tail_file, parse_json_fence
+from modules.state import self_model_lock, get_local_client, LOCAL_MODEL, tail_file, parse_json_fence
 from modules.cortex import execute_code
 
-client = get_openai_client()
+client = get_local_client()
 
 LOG_FILE        = "logs/jkai.log"
 AGENT_LOG       = "logs/agent.log"
@@ -514,7 +514,7 @@ def run_agent_cycle(log_fn) -> None:
     # ── Appel GPT-4o ─────────────────────────────────────────────────────── #
     try:
         resp     = client.chat.completions.create(
-            model="gpt-4o",
+            model=LOCAL_MODEL,
             messages=[
                 {"role": "system", "content": AGENT_SYSTEM_PROMPT},
                 {"role": "user",   "content": user_content},

@@ -2,9 +2,9 @@ import os
 import json
 import threading
 from datetime import datetime
-from modules.state import self_model_lock as _lock, get_openai_client, tail_file
+from modules.state import self_model_lock as _lock, get_local_client, LOCAL_MODEL, tail_file
 
-client = get_openai_client()
+client = get_local_client()
 
 SELF_MODEL_FILE  = "memory/self_model.json"
 MISSION_FILE     = "memory/mission.json"
@@ -182,7 +182,7 @@ def reflect(log_fn) -> None:
     # ── Appel GPT-4o ─────────────────────────────────────────────────────── #
     try:
         resp    = client.chat.completions.create(
-            model="gpt-4o",
+            model=LOCAL_MODEL,
             messages=[
                 {"role": "system", "content": CONSCIOUSNESS_PROMPT},
                 {"role": "user",   "content": user_content},
@@ -261,7 +261,7 @@ def check_objectives(log_fn) -> None:
     # ── 1. Évaluation du statut ──────────────────────────────────────────── #
     try:
         resp    = client.chat.completions.create(
-            model="gpt-4o",
+            model=LOCAL_MODEL,
             messages=[
                 {"role": "system", "content": CHECK_OBJECTIVES_SYSTEM},
                 {"role": "user",   "content": user_content},
@@ -294,7 +294,7 @@ def check_objectives(log_fn) -> None:
         existing_titles = [o["title"] for o in remaining]
         try:
             resp2   = client.chat.completions.create(
-                model="gpt-4o",
+                model=LOCAL_MODEL,
                 messages=[
                     {"role": "system", "content": NEW_OBJECTIVE_SYSTEM},
                     {"role": "user",   "content": f"Objectifs existants : {json.dumps(existing_titles, ensure_ascii=False)}"},
@@ -377,7 +377,7 @@ def define_mission(log_fn) -> None:
 
     try:
         resp = client.chat.completions.create(
-            model="gpt-4o",
+            model=LOCAL_MODEL,
             messages=[
                 {"role": "system", "content": DEFINE_MISSION_SYSTEM},
                 {"role": "user",   "content": user_content},
@@ -430,7 +430,7 @@ def update_mission(log_fn) -> None:
 
     try:
         resp   = client.chat.completions.create(
-            model="gpt-4o",
+            model=LOCAL_MODEL,
             messages=[
                 {"role": "system", "content": UPDATE_MISSION_SYSTEM},
                 {"role": "user",   "content": user_content},
