@@ -2,7 +2,7 @@ import os
 import json
 import threading
 from datetime import datetime
-from modules.state import self_model_lock as _lock, get_local_client, LOCAL_MODEL, tail_file
+from modules.state import self_model_lock as _lock, get_local_client, LOCAL_MODEL, format_messages_for_local, tail_file
 
 client = get_local_client()
 
@@ -183,10 +183,10 @@ def reflect(log_fn) -> None:
     try:
         resp    = client.chat.completions.create(
             model=LOCAL_MODEL,
-            messages=[
+            messages=format_messages_for_local([
                 {"role": "system", "content": CONSCIOUSNESS_PROMPT},
                 {"role": "user",   "content": user_content},
-            ],
+            ]),
             response_format={"type": "json_object"},
         )
         updates = json.loads(resp.choices[0].message.content)
@@ -262,10 +262,10 @@ def check_objectives(log_fn) -> None:
     try:
         resp    = client.chat.completions.create(
             model=LOCAL_MODEL,
-            messages=[
+            messages=format_messages_for_local([
                 {"role": "system", "content": CHECK_OBJECTIVES_SYSTEM},
                 {"role": "user",   "content": user_content},
-            ],
+            ]),
             response_format={"type": "json_object"},
         )
         results = json.loads(resp.choices[0].message.content).get("results", [])
@@ -295,10 +295,10 @@ def check_objectives(log_fn) -> None:
         try:
             resp2   = client.chat.completions.create(
                 model=LOCAL_MODEL,
-                messages=[
+                messages=format_messages_for_local([
                     {"role": "system", "content": NEW_OBJECTIVE_SYSTEM},
                     {"role": "user",   "content": f"Objectifs existants : {json.dumps(existing_titles, ensure_ascii=False)}"},
-                ],
+                ]),
                 response_format={"type": "json_object"},
             )
             raw_obj = json.loads(resp2.choices[0].message.content)
@@ -378,10 +378,10 @@ def define_mission(log_fn) -> None:
     try:
         resp = client.chat.completions.create(
             model=LOCAL_MODEL,
-            messages=[
+            messages=format_messages_for_local([
                 {"role": "system", "content": DEFINE_MISSION_SYSTEM},
                 {"role": "user",   "content": user_content},
-            ],
+            ]),
             response_format={"type": "json_object"},
         )
         raw  = json.loads(resp.choices[0].message.content)
@@ -431,10 +431,10 @@ def update_mission(log_fn) -> None:
     try:
         resp   = client.chat.completions.create(
             model=LOCAL_MODEL,
-            messages=[
+            messages=format_messages_for_local([
                 {"role": "system", "content": UPDATE_MISSION_SYSTEM},
                 {"role": "user",   "content": user_content},
-            ],
+            ]),
             response_format={"type": "json_object"},
         )
         result = json.loads(resp.choices[0].message.content)

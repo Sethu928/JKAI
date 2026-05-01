@@ -43,6 +43,31 @@ def get_openai_client() -> OpenAI:
     return _openai_client
 
 
+def format_messages_for_local(messages: list) -> list:
+    """
+    Adapte les messages pour Phi-3 et modèles locaux sans support du rôle 'system'.
+    Fusionne le system prompt avec le premier message user suivant :
+      [INST] <system> [/INST]\\n<user>
+    Si pas de message system en tête, retourne la liste inchangée.
+    """
+    if not messages or messages[0].get("role") != "system":
+        return messages
+    system_content = messages[0]["content"]
+    rest = list(messages[1:])
+    for i, msg in enumerate(rest):
+        if msg.get("role") == "user":
+            rest[i] = {
+                "role":    "user",
+                "content": (
+                    f"<|system|>\n{system_content}<|end|>\n"
+                    f"<|user|>\n{msg['content']}<|end|>\n"
+                    f"<|assistant|>"
+                ),
+            }
+            break
+    return rest
+
+
 # ── Locks partagés entre modules ─────────────────────────────────────────── #
 # Protège memory/self_model.json — utilisé par agent.py ET consciousness.py
 # qui tournent dans des threads séparés quand l'autonomie est active.

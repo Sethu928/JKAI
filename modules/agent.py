@@ -5,7 +5,7 @@ import time
 import threading
 import requests
 from datetime import datetime
-from modules.state import self_model_lock, get_local_client, LOCAL_MODEL, tail_file, parse_json_fence
+from modules.state import self_model_lock, get_local_client, LOCAL_MODEL, format_messages_for_local, tail_file, parse_json_fence
 from modules.cortex import execute_code
 
 client = get_local_client()
@@ -515,10 +515,10 @@ def run_agent_cycle(log_fn) -> None:
     try:
         resp     = client.chat.completions.create(
             model=LOCAL_MODEL,
-            messages=[
+            messages=format_messages_for_local([
                 {"role": "system", "content": AGENT_SYSTEM_PROMPT},
                 {"role": "user",   "content": user_content},
-            ],
+            ]),
             response_format={"type": "json_object"},
         )
         raw      = resp.choices[0].message.content
