@@ -519,7 +519,6 @@ def run_agent_cycle(log_fn) -> None:
                 {"role": "system", "content": AGENT_SYSTEM_PROMPT},
                 {"role": "user",   "content": user_content},
             ]),
-            response_format={"type": "json_object"},
         )
         raw      = resp.choices[0].message.content
         decision = _parse(raw)
