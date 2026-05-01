@@ -553,7 +553,7 @@ def run_agent_cycle(log_fn) -> None:
 
 # ── Thread daemon continu ────────────────────────────────────────────────── #
 
-AGENT_INTERVAL = 600  # secondes entre chaque cycle (10 minutes)
+AGENT_INTERVAL = 60  # secondes entre chaque cycle (1 minute)
 
 def _agent_loop(log_fn) -> None:
     """Boucle infinie — tourne en thread daemon, cycle toutes les AGENT_INTERVAL s."""
