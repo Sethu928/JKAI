@@ -9,6 +9,10 @@
     {
       "ts": "2026-05-09T14:23:46",
       "note": "Analyse de l'environnement et des objectifs pour déterminer la prochaine action."
+    },
+    {
+      "ts": "2026-05-09T14:40:40",
+      "note": "Cycles récents : [1] web_search, [2] run_code, [3] write_thought"
     }
   ],
   "recent_failures": []

@@ -137,8 +137,8 @@ def ask_jkai(user_input):
     return reply
 
 # ── Détection auto-update dans les réponses chat ──────────────────────────
-_CODE_BLOCK_RE = re.compile(r'```(?:python)?\n(.*?)```', re.DOTALL)
-_FILEPATH_RE   = re.compile(r'\b((?:modules|memory|logs|tests)/[\w/._-]+\.py|[\w._-]+\.py)\b')
+_CODE_BLOCK_RE = re.compile(r'```(?:python|json)?\n(.*?)```', re.DOTALL)
+_FILEPATH_RE   = re.compile(r'\b((?:modules|memory|logs|tests)/[\w/._-]+\.py|memory/[\w/._-]+\.json|[\w._-]+\.py)\b')
 _DELETE_RE     = re.compile(r'\b(supprimer|supprime|delete|git\s+rm|effacer)\b', re.IGNORECASE)
 
 def _try_auto_update(reply: str) -> None:

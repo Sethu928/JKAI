@@ -22,5 +22,11 @@
     "snippet": "[CORTEX] Exécution bloquée — opération interdite détectée : `\\brequests\\b`",
     "last_seen_ts": 1778329493.167504,
     "last_seen": "2026-05-09T14:24:53"
+  },
+  "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpavi6uhvn.py\", line 1 import os; import json; with open": {
+    "count": 1,
+    "snippet": "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpavi6uhvn.py\", line 1 import os; import json; with open",
+    "last_seen_ts": 1778330126.004284,
+    "last_seen": "2026-05-09T14:35:26"
   }
 }
