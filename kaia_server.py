@@ -1,7 +1,10 @@
+from flask import Flask, jsonify, request
 import json
 import sqlite3
 from sqlite3 import Error
 import random
+
+app = Flask(__name__)
 
 class Kaia:
     def __init__(self):
@@ -37,20 +40,26 @@ class Kaia:
                 return random.choice(responses)
         return "Je suis désolé, je ne comprends pas."
 
-    def learn(self):
-        for conversation in self.conversations:
-            self.add_rule(conversation['message'], ['Réponse 1', 'Réponse 2'])
+    def learn(self, conversation):
+        message = conversation['message']
+        self.add_rule(message, ['Réponse 1', 'Réponse 2'])
 
     def add_rule(self, message, responses):
-        self.rules[message] = responses
+        if message not in self.rules:
+            self.rules[message] = responses
 
 def main():
     kaia = Kaia()
-    while True:
-        user_message = input("User: ")
+    @app.route('/chat', methods=['POST'])
+    def chat():
+        user_message = request.get_json()['message']
+        conversation = {'user': 'User', 'message': user_message}
         response = kaia.get_response(user_message)
         print(f"Kaïa: {response}")
-        kaia.learn()
+        kaia.learn(conversation)
+        return jsonify({'response': response})
+
+    app.run(port=5001, debug=True)
 
 if __name__ == '__main__':
     main()
