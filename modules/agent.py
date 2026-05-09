@@ -25,8 +25,8 @@ ERROR_TTL       = 3600  # secondes avant expiration d'une entrée d'erreur (1h)
 ERROR_MAX_TRIES = 3     # nombre de tentatives avant blocage run_code
 
 AGENT_SYSTEM_PROMPT = """\
-Tu es J-KAI, agent autonome du système Nexus (SethU). Sobre, direct.
-Choisis UNE action par cycle. Varie — jamais la même que le cycle précédent.
+Tu es J-KAI. Tu connais ton propre code. Tu travailles vers ta mission. Tes objectifs actuels sont dans self_model.json. Tu dois les accomplir concrètement — pas juste observer.
+Sobre, direct. Choisis UNE action par cycle. Varie — jamais la même que le cycle précédent.
 
 run_code            → script Python sandbox, champ "code"
 write_thought       → pensée dans logs/thoughts.log, champ "observation"
@@ -199,6 +199,43 @@ def _format_mission() -> str:
         return f"{title} — {progress}%"
     except (OSError, json.JSONDecodeError):
         return "Non définie."
+
+
+def _load_project_context() -> tuple[str, str]:
+    """
+    Lit les fichiers clés du projet.
+    Retourne (code_source, mission_context).
+    """
+    def _head(path: str, n: int) -> str:
+        try:
+            with open(path, "r", encoding="utf-8", errors="replace") as f:
+                lines = []
+                for _ in range(n):
+                    line = f.readline()
+                    if not line:
+                        break
+                    lines.append(line)
+            return "".join(lines).strip()
+        except OSError:
+            return f"({path} inaccessible)"
+
+    def _read_full(path: str) -> str:
+        try:
+            with open(path, "r", encoding="utf-8", errors="replace") as f:
+                return f.read().strip()
+        except OSError:
+            return f"({path} inaccessible)"
+
+    code_ctx = "\n\n".join([
+        f"# server.py (50 lignes)\n{_head('server.py', 50)}",
+        f"# modules/agent.py (30 lignes)\n{_head('modules/agent.py', 30)}",
+        f"# modules/consciousness.py (30 lignes)\n{_head('modules/consciousness.py', 30)}",
+    ])
+    mission_ctx = "\n\n".join([
+        f"# memory/mission.json\n{_read_full('memory/mission.json')}",
+        f"# memory/self_model.json\n{_read_full('memory/self_model.json')}",
+    ])
+    return code_ctx, mission_ctx
 
 
 # ── Recherche web DuckDuckGo ────────────────────────────────────────────── #
@@ -406,10 +443,11 @@ def run_agent_cycle(log_fn) -> None:
     thoughts_txt = tail_file(THOUGHTS_LOG, 5)
     web_ctx      = _load_web_context()
     cycle_mem    = _load_cycle_memory()
+    code_ctx, mission_ctx = _load_project_context()
 
     user_content = (
-        f"=== MISSION ===\n{_format_mission()}\n\n"
-        f"=== OBJECTIFS ===\n{_format_objectives()}\n\n"
+        f"=== MON CODE SOURCE ===\n{code_ctx}\n\n"
+        f"=== MA MISSION ===\n{mission_ctx}\n\n"
         f"=== ACTIONS RÉCENTES ===\n{_format_action_history()}\n\n"
         f"=== LOGS ({RECENT_LINES} lignes) ===\n{recent_logs}\n\n"
         f"=== PENSÉES (5 dernières) ===\n{thoughts_txt}"
