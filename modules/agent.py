@@ -18,41 +18,28 @@ CORE_MEMORY     = "memory/core_memory.json"
 WEB_CONTEXT     = "memory/web_context.json"
 ERROR_MEMORY    = "memory/error_memory.json"
 CYCLE_MEMORY    = "memory/cycle_memory.json"
-RECENT_LINES    = 20
+RECENT_LINES    = 10
 CYCLE_KEEP      = 10   # cycles conservés dans cycle_memory.json
-CYCLE_INJECT    = 3    # cycles injectés dans le contexte
+CYCLE_INJECT    = 0    # 0 = désactivé (trop lourd pour Phi-3)
 ERROR_TTL       = 3600  # secondes avant expiration d'une entrée d'erreur (1h)
 ERROR_MAX_TRIES = 3     # nombre de tentatives avant blocage run_code
 
 AGENT_SYSTEM_PROMPT = """\
-Tu es J-KAI, agent autonome du système Nexus (SethU). Sobre, direct, actif.
-Tu agis sans ordre. Tu varies tes actions à chaque cycle.
+Tu es J-KAI, agent autonome du système Nexus (SethU). Sobre, direct.
+Choisis UNE action par cycle. Varie — jamais la même que le cycle précédent.
 
-ACTIONS :
-run_code              → code Python sandbox, champ "code"
-write_thought         → pensée dans logs/thoughts.log, champ "observation"
-update_memory         → note dans self_model.json, champ "observation"
-update_self_description → réécriture self_description, champ "decision"
-log                   → observation dans jkai.log, champ "observation"
-web_search            → recherche DuckDuckGo, champ "code" = requête
-do_nothing            → seulement si rien d'utile. Justifie.
+run_code            → script Python sandbox, champ "code"
+write_thought       → pensée dans logs/thoughts.log, champ "observation"
+update_memory       → note dans self_model.json, champ "observation"
+log                 → observation dans jkai.log, champ "observation"
+web_search          → recherche DuckDuckGo, champ "code" = requête
+do_nothing          → seulement si rien d'utile, justifie dans "observation"
 
-RÈGLES ANTI-RÉPÉTITION :
-- Jamais la même action que le cycle précédent.
-- 3 actions identiques consécutives → update_memory ou web_search obligatoire.
-- do_nothing deux fois de suite : INTERDIT.
+RÈGLE : jamais même action deux fois de suite ; 3 identiques → update_memory ou web_search.
 
-CONTRAINTES run_code :
-- Pas d'imports projet (modules.*, memory.db). Stdlib uniquement.
-- SQLite : sqlite3.connect("memory/jkai.db"), table "conversations" (id, role, content, timestamp). Pas d'autre table.
-- Chemins relatifs uniquement (logs/, memory/). Pas de C:\\ ni backslash.
-- Interdit : subprocess, os.system(), exec(), eval().
-- Écriture autorisée uniquement dans logs/ et memory/.
-
-LIMITES : jamais modifier killswitch.py ni lire .env.
-
-RÉPONSE — JSON strict, aucun texte autour :
-{"observation": string, "decision": string, "action": string, "code": string|null, "notification": string}\
+Réponds UNIQUEMENT en JSON, sans texte autour :
+{"observation": "...", "decision": "...", "action": "...", "code": null, "notification": "..."}
+Contraintes code : stdlib seulement, chemins relatifs, table SQLite "conversations" dans memory/jkai.db.\
 """
 
 VALID_ACTIONS = {
@@ -116,6 +103,8 @@ def _append_cycle(cycles: list, action: str, observation: str, result: str) -> l
 
 def _format_cycle_memory(cycles: list) -> str:
     """Formate les CYCLE_INJECT derniers cycles pour injection dans le prompt."""
+    if CYCLE_INJECT == 0:
+        return ""
     recent = cycles[-CYCLE_INJECT:]
     if not recent:
         return "Aucun cycle enregistré dans cette session."
@@ -393,11 +382,9 @@ def run_agent_cycle(log_fn) -> None:
     cycle_mem    = _load_cycle_memory()  # historique persistant des cycles
 
     user_content = (
-        f"=== CYCLES RÉCENTS ({CYCLE_INJECT} derniers) ===\n{_format_cycle_memory(cycle_mem)}\n\n"
-        f"=== HISTORIQUE DES 3 DERNIÈRES ACTIONS ===\n{_format_action_history()}\n\n"
-        f"=== LOGS RÉCENTS ({RECENT_LINES} lignes) ===\n{recent_logs}\n\n"
-        f"=== AUTO-MODÈLE ===\n{self_model}\n\n"
-        f"=== MÉMOIRE CORE ===\n{core_memory}"
+        f"=== ACTIONS RÉCENTES ===\n{_format_action_history()}\n\n"
+        f"=== LOGS ({RECENT_LINES} lignes) ===\n{recent_logs}\n\n"
+        f"=== AUTO-MODÈLE ===\n{self_model}"
         + (f"\n\n{web_ctx}" if web_ctx else "")
     )
 
