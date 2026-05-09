@@ -16,32 +16,34 @@ class Kaia:
             'goodbye': ['Au revoir, à bientôt!', 'À demain!']
         }
         self.conversations = []
-        self.responses_db = sqlite3.connect('memory/responses.db')
-        c = self.responses_db.cursor()
-        c.execute("""CREATE TABLE IF NOT EXISTS responses (
-                    id INTEGER PRIMARY KEY,
-                    message TEXT,
-                    response TEXT
-                )""")
         self.model = MultinomialNB()
+        self.create_database()
+
+    def _get_db(self):
+        return sqlite3.connect('memory/kaia.db', check_same_thread=False)
 
     def create_database(self):
         try:
-            conn = sqlite3.connect('memory/conversations.db')
-            c = conn.cursor()
-            c.execute("""CREATE TABLE IF NOT EXISTS conversations (
+            conn = self._get_db()
+            conn.execute("""CREATE TABLE IF NOT EXISTS responses (
+                        id INTEGER PRIMARY KEY,
+                        message TEXT,
+                        response TEXT
+                    )""")
+            conn.execute("""CREATE TABLE IF NOT EXISTS conversations (
                         id INTEGER PRIMARY KEY,
                         user TEXT,
                         message TEXT
                     )""")
             conn.commit()
+            conn.close()
         except Error as e:
             print(e)
 
     def add_conversation(self, user, message):
         self.conversations.append({'user': user, 'message': message})
         try:
-            conn = sqlite3.connect('memory/conversations.db')
+            conn = self._get_db()
             conn.execute(
                 "INSERT INTO conversations (user, message) VALUES (?, ?)",
                 (user, message)
@@ -60,19 +62,20 @@ class Kaia:
 
     def get_features(self, message):
         words = message.split()
-        features = []
-        for word in words:
-            features.append(1)
-        return np.array(features)
+        return np.array([1] * len(words))
 
     def learn(self, conversation, response):
         message = conversation['message']
-        cursor = self.responses_db.cursor()
-        cursor.execute(
-            "INSERT INTO responses (message, response) VALUES (?, ?)",
-            (message, response)
-        )
-        self.responses_db.commit()
+        try:
+            conn = self._get_db()
+            conn.execute(
+                "INSERT INTO responses (message, response) VALUES (?, ?)",
+                (message, response)
+            )
+            conn.commit()
+            conn.close()
+        except Error as e:
+            print(e)
         self.model.fit(self.get_features(message), [1])
 
     def add_rule(self, message, responses):
