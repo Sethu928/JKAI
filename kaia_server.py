@@ -56,9 +56,8 @@ class Kaia:
             features.append(1)
         return np.array(features)
 
-    def learn(self, conversation):
+    def learn(self, conversation, response):
         message = conversation['message']
-        response = conversation['response']
         c.execute("INSERT INTO responses (message, response) VALUES (?, ?)", (message, response))
         self.responses_db.commit()
         self.model.fit(self.get_features(message), [1])
@@ -75,7 +74,7 @@ def main():
         conversation = {'user': 'User', 'message': user_message}
         response = kaia.get_response(user_message)
         print(f"Kaïa: {response}")
-        kaia.learn(conversation)
+        kaia.learn(conversation, response)
         return jsonify({'response': response})
 
     app.run(port=5001, debug=True)
