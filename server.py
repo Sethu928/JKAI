@@ -7,7 +7,7 @@ from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
-from modules.state import get_openai_client
+from modules.state import get_openai_client, get_local_client, LOCAL_MODEL
 from memory.db import init_db, save_message, load_history, clear_history, search_history
 from modules.voice import speak, listen
 from modules.marc import ask_marc
@@ -22,6 +22,9 @@ from modules.consciousness import (
 )
 from modules.agent import read_agent_log, start_agent
 from modules.self_update import self_update_cycle, delete_file
+import modules.marc as _marc_mod
+import modules.cortex as _cortex_mod
+import modules.autonomy as _autonomy_mod
 
 print("Démarrage...", flush=True)
 sys.stdout.flush()
@@ -35,6 +38,7 @@ CORS(server)
 CORE_MEMORY_FILE = "memory/core_memory.json"
 LOG_FILE = "logs/jkai.log"
 AUTONOMIE_ACTIVE = True
+USE_OPENAI       = True
 
 init_db()
 
@@ -51,6 +55,16 @@ def log(text):
     os.makedirs("logs", exist_ok=True)
     with open(LOG_FILE, "a", encoding="utf-8") as f:
         f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {text}\n")
+
+def _get_active_client():
+    return get_openai_client() if USE_OPENAI else get_local_client()
+
+def _sync_module_clients():
+    """Propage le client actif aux modules marc, cortex et autonomy."""
+    c = _get_active_client()
+    _marc_mod.client    = c
+    _cortex_mod.client  = c
+    _autonomy_mod.client = c
 
 core = load_core_memory()
 SYSTEM_PROMPT = f"""Tu es J-KAI, intelligence autonome du système Nexus, créé par et pour Jordan (alias SethU).
@@ -106,15 +120,17 @@ Voici ta mémoire permanente :
 def ask_jkai(user_input):
     history = load_history(limit=100)
     save_message("user", user_input)
+    active_client = _get_active_client()
+    model = "gpt-4o" if USE_OPENAI else LOCAL_MODEL
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o",
+        response = active_client.chat.completions.create(
+            model=model,
             messages=[{"role": "system", "content": SYSTEM_PROMPT}] + history + [{"role": "user", "content": user_input}]
         )
         reply = response.choices[0].message.content
     except Exception as e:
-        log(f"[ERREUR] ask_jkai GPT-4o : {e}")
-        return f"Erreur de communication avec GPT-4o : {e}"
+        log(f"[ERREUR] ask_jkai {model} : {e}")
+        return f"Erreur de communication avec {model} : {e}"
     save_message("assistant", reply)
     log(f"SethU: {user_input}")
     log(f"J-KAI: {reply}")
@@ -321,6 +337,25 @@ def self_delete():
         return jsonify({"error": "file_path requis"}), 400
     result = delete_file(file_path, message, log)
     return jsonify(result)
+
+@server.route("/config", methods=["GET"])
+def config_get():
+    return jsonify({"AUTONOMIE_ACTIVE": AUTONOMIE_ACTIVE, "USE_OPENAI": USE_OPENAI})
+
+@server.route("/config", methods=["POST"])
+def config_post():
+    global USE_OPENAI, AUTONOMIE_ACTIVE
+    data    = request.get_json(silent=True) or {}
+    changed = []
+    if "USE_OPENAI" in data:
+        USE_OPENAI = bool(data["USE_OPENAI"])
+        _sync_module_clients()
+        changed.append(f"USE_OPENAI={USE_OPENAI}")
+    if "AUTONOMIE_ACTIVE" in data:
+        AUTONOMIE_ACTIVE = bool(data["AUTONOMIE_ACTIVE"])
+        changed.append(f"AUTONOMIE_ACTIVE={AUTONOMIE_ACTIVE}")
+    log(f"[CONFIG] {', '.join(changed) if changed else 'aucun changement'}")
+    return jsonify({"AUTONOMIE_ACTIVE": AUTONOMIE_ACTIVE, "USE_OPENAI": USE_OPENAI})
 
 @server.route("/severus", methods=["POST"])
 def severus():

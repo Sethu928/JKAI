@@ -1,20 +1,8 @@
 {
-  "Traceback (most recent call last): File \"/tmp/tmp26puryah.py\", line 3, in <module> from modules.cort": {
+  "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpx16vfj1i.py\", line 1 python -c 'import sys; print(sys.": {
     "count": 1,
-    "snippet": "Traceback (most recent call last): File \"/tmp/tmp26puryah.py\", line 3, in <module> from modules.cort",
-    "last_seen_ts": 1776421867.399118,
-    "last_seen": "2026-04-17T12:31:07"
-  },
-  "Traceback (most recent call last): File \"/tmp/tmpv1v88du6.py\", line 2, in <module> from modules.cort": {
-    "count": 1,
-    "snippet": "Traceback (most recent call last): File \"/tmp/tmpv1v88du6.py\", line 2, in <module> from modules.cort",
-    "last_seen_ts": 1776423076.210411,
-    "last_seen": "2026-04-17T12:51:16"
-  },
-  "Traceback (most recent call last): File \"/tmp/tmphvufb_pn.py\", line 3, in <module> from modules impo": {
-    "count": 1,
-    "snippet": "Traceback (most recent call last): File \"/tmp/tmphvufb_pn.py\", line 3, in <module> from modules impo",
-    "last_seen_ts": 1776423969.168356,
-    "last_seen": "2026-04-17T13:06:09"
+    "snippet": "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpx16vfj1i.py\", line 1 python -c 'import sys; print(sys.",
+    "last_seen_ts": 1778327397.649121,
+    "last_seen": "2026-05-09T13:49:57"
   }
 }

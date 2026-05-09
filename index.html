@@ -457,6 +457,34 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
 .s-title.clickable:hover { color: var(--orangeaa) !important; }
 #obj-list, #mission-block { cursor: pointer; }
 
+/* ── Config toggles ────────────────────────────────────────── */
+.cfg-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 2px 0; margin: 3px 0;
+}
+.cfg-label { font-size: 9px; letter-spacing: 2px; color: var(--orange33); }
+.cfg-switch { position: relative; width: 30px; height: 15px; flex-shrink: 0; }
+.cfg-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.cfg-slider {
+  position: absolute; inset: 0; border-radius: 15px;
+  background: #1a0000; border: 1px solid #cc220044;
+  transition: background 0.25s, border-color 0.25s; cursor: pointer;
+}
+.cfg-slider::before {
+  content: ''; position: absolute;
+  width: 11px; height: 11px; border-radius: 50%;
+  left: 1px; top: 1px;
+  background: #cc2200; box-shadow: 0 0 4px #cc220088;
+  transition: transform 0.25s, background 0.25s, box-shadow 0.25s;
+}
+.cfg-switch input:checked + .cfg-slider {
+  background: #002200; border-color: #00cc4466;
+}
+.cfg-switch input:checked + .cfg-slider::before {
+  transform: translateX(15px);
+  background: #00cc44; box-shadow: 0 0 6px #00cc4499;
+}
+
 /* ── Agent notification ────────────────────────────────────────────── */
 #agent-notif {
   position: fixed; bottom: 28px; right: 28px; z-index: 40;
@@ -719,6 +747,20 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
     <div class="s-item on">NEXUS CORE</div>
     <div class="s-item" id="nav-memoire" onclick="openHistoryPanel()">MÉMOIRE</div>
     <div class="s-item" id="nav-logs" onclick="openLogsPanel()">LOGS</div>
+    <div class="cfg-row">
+      <span class="cfg-label">OPENAI</span>
+      <label class="cfg-switch">
+        <input type="checkbox" id="toggle-openai" onchange="setConfig('USE_OPENAI', this.checked)">
+        <span class="cfg-slider"></span>
+      </label>
+    </div>
+    <div class="cfg-row">
+      <span class="cfg-label">AUTONOMIE</span>
+      <label class="cfg-switch">
+        <input type="checkbox" id="toggle-autonomie" onchange="setConfig('AUTONOMIE_ACTIVE', this.checked)">
+        <span class="cfg-slider"></span>
+      </label>
+    </div>
     <div class="s-title">STATS</div>
     <div class="s-stat">Mémoire <span>∞</span></div>
     <div class="s-stat">Mode <span>LIBRE</span></div>
@@ -797,12 +839,32 @@ function closeSidebar() {
   document.getElementById("sidebar-overlay").classList.remove("active");
 }
 // Ferme la sidebar si on clique un s-item sur mobile
+// ── Config toggles ─────────────────────────────────────────────────────────
+async function loadConfig() {
+  try {
+    const r = await fetch(API + "/config");
+    const d = await r.json();
+    document.getElementById("toggle-openai").checked    = !!d.USE_OPENAI;
+    document.getElementById("toggle-autonomie").checked = !!d.AUTONOMIE_ACTIVE;
+  } catch(e) { console.warn("loadConfig:", e); }
+}
+async function setConfig(key, value) {
+  try {
+    await fetch(API + "/config", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({[key]: value})
+    });
+  } catch(e) { console.warn("setConfig:", e); }
+}
+
 document.addEventListener("DOMContentLoaded", function() {
   document.querySelectorAll("#sidebar .s-item").forEach(function(el) {
     el.addEventListener("click", function() {
       if (window.innerWidth < 768) closeSidebar();
     });
   });
+  loadConfig();
 });
 
 // ── Hex grid background ───────────────────────────────────────────────────
