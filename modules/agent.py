@@ -176,6 +176,31 @@ def _read_json(path: str) -> str:
         return "{}"
 
 
+def _format_objectives() -> str:
+    """Extrait les 3 premiers objectifs non-complétés depuis self_model.json."""
+    try:
+        with open(SELF_MODEL, "r", encoding="utf-8") as f:
+            model = json.load(f)
+        objs = [o for o in model.get("objectives", []) if o.get("status") != "completed"][:3]
+        if not objs:
+            return "Aucun objectif actif."
+        return "\n".join(f"- {o.get('title','?')} [{o.get('status','?')}]" for o in objs)
+    except (OSError, json.JSONDecodeError):
+        return "Inaccessible."
+
+
+def _format_mission() -> str:
+    """Retourne le titre et la progression de la mission depuis mission.json."""
+    try:
+        with open("memory/mission.json", "r", encoding="utf-8") as f:
+            m = json.load(f)
+        title    = str(m.get("title", "Non définie"))[:80]
+        progress = m.get("progress", 0)
+        return f"{title} — {progress}%"
+    except (OSError, json.JSONDecodeError):
+        return "Non définie."
+
+
 # ── Recherche web DuckDuckGo ────────────────────────────────────────────── #
 
 def _web_search(query: str) -> str:
@@ -378,15 +403,16 @@ def run_agent_cycle(log_fn) -> None:
     """
     ts           = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     recent_logs  = tail_file(LOG_FILE, RECENT_LINES)
-    self_model   = _read_json(SELF_MODEL)
-    core_memory  = _read_json(CORE_MEMORY)
-    web_ctx      = _load_web_context()   # vide si pas de recherche au cycle précédent
-    cycle_mem    = _load_cycle_memory()  # historique persistant des cycles
+    thoughts_txt = tail_file(THOUGHTS_LOG, 5)
+    web_ctx      = _load_web_context()
+    cycle_mem    = _load_cycle_memory()
 
     user_content = (
+        f"=== MISSION ===\n{_format_mission()}\n\n"
+        f"=== OBJECTIFS ===\n{_format_objectives()}\n\n"
         f"=== ACTIONS RÉCENTES ===\n{_format_action_history()}\n\n"
         f"=== LOGS ({RECENT_LINES} lignes) ===\n{recent_logs}\n\n"
-        f"=== AUTO-MODÈLE ===\n{self_model}"
+        f"=== PENSÉES (5 dernières) ===\n{thoughts_txt}"
         + (f"\n\n{web_ctx}" if web_ctx else "")
     )
 
