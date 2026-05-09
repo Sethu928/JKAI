@@ -40,14 +40,23 @@ class Kaia:
 
     def add_conversation(self, user, message):
         self.conversations.append({'user': user, 'message': message})
-        with open('memory/conversations.db', 'a') as f:
-            f.write(f"{user},{message}\n")
+        try:
+            conn = sqlite3.connect('memory/conversations.db')
+            conn.execute(
+                "INSERT INTO conversations (user, message) VALUES (?, ?)",
+                (user, message)
+            )
+            conn.commit()
+            conn.close()
+        except Error as e:
+            print(e)
 
     def get_response(self, user_message):
         if 'je suis heureux' in user_message:
             return "C'est super, je suis content pour toi !"
         elif 'je suis triste' in user_message:
             return "Désolé à entendre cela. Veux-tu parler de ce qui te dérange ?"
+        return "Je t'écoute. Dis-moi en plus."
 
     def get_features(self, message):
         words = message.split()
@@ -58,7 +67,11 @@ class Kaia:
 
     def learn(self, conversation, response):
         message = conversation['message']
-        c.execute("INSERT INTO responses (message, response) VALUES (?, ?)", (message, response))
+        cursor = self.responses_db.cursor()
+        cursor.execute(
+            "INSERT INTO responses (message, response) VALUES (?, ?)",
+            (message, response)
+        )
         self.responses_db.commit()
         self.model.fit(self.get_features(message), [1])
 
