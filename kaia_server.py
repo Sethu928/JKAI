@@ -205,7 +205,7 @@ class Kaia:
         self._load_rules()
 
     def _get_db(self):
-        return sqlite3.connect('memory/kaia.db', check_same_thread=False)
+        return sqlite3.connect('memory/kaia.db')
 
     def create_database(self):
         try:
@@ -714,7 +714,10 @@ def main():
 
     @app.route('/chat', methods=['POST'])
     def chat():
-        user_message = request.get_json()['message']
+        data = request.get_json(silent=True) or {}
+        user_message = data.get("message", "").strip()
+        if not user_message:
+            return jsonify({"response": "Je n'ai rien reçu."}), 400
         llm_reply = ask_llm(user_message, kaia.knowledge)
         if llm_reply:
             response = llm_reply

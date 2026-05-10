@@ -79,9 +79,11 @@ class Monitor:
             return []
 
         try:
-            with open(LOG_FILE, "r", encoding="utf-8", errors="replace") as f:
+            # Mode binaire pour que seek/tell opèrent sur des positions d'octets
+            # cohérentes avec os.path.getsize(). Le décodage se fait ensuite.
+            with open(LOG_FILE, "rb") as f:
                 f.seek(self._file_pos)
-                content = f.read()
+                content = f.read().decode("utf-8", errors="replace")
                 self._file_pos = f.tell()
             return [l for l in content.splitlines() if l.strip()]
         except OSError:

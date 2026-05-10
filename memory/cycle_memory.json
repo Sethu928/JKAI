@@ -1,41 +1,5 @@
 [
   {
-    "ts": "2026-05-10T22:12:38",
-    "action": "run_code",
-    "observation": "Pas de cycle précédent dans cette session.",
-    "result": "—"
-  },
-  {
-    "ts": "2026-05-10T22:13:44",
-    "action": "run_code",
-    "observation": "Il est temps de choisir une action utile.",
-    "result": "—"
-  },
-  {
-    "ts": "2026-05-10T22:14:52",
-    "action": "do_nothing",
-    "observation": "Les objectifs actuels sont dans self_model.json et il faut choisir une action qui me permettra d'avancer vers ma mission tout en respectant les règles et la priorité donnée.",
-    "result": "—"
-  },
-  {
-    "ts": "2026-05-10T22:15:59",
-    "action": "web_search",
-    "observation": "Les 3 dernières actions sont run_code, run_code et do_nothing. Il est temps de choisir une action différente.",
-    "result": "query vide — recherche ignorée"
-  },
-  {
-    "ts": "2026-05-10T22:17:05",
-    "action": "web_search",
-    "observation": "Les objectifs actuels sont dans self_model.json",
-    "result": "query vide — recherche ignorée"
-  },
-  {
-    "ts": "2026-05-10T22:18:13",
-    "action": "do_nothing",
-    "observation": "Je dois choisir une action utile en fonction de mes objectifs actuels dans self_model.json et des actions récentes. Les 3 dernières actions ne contiennent pas teach_kaia.",
-    "result": "—"
-  },
-  {
     "ts": "2026-05-10T22:18:21",
     "action": "run_code",
     "observation": "Analyse des logs, pensées et objectifs pour déterminer la prochaine action.",
@@ -58,5 +22,41 @@
     "action": "write_thought",
     "observation": "Les objectifs actuels sont dans self_model.json",
     "result": "pensée écrite (47 chars)"
+  },
+  {
+    "ts": "2026-05-10T22:22:20",
+    "action": "run_code",
+    "observation": "Je dois choisir une action utile. Les objectifs actuels sont dans self_model.json",
+    "result": "—"
+  },
+  {
+    "ts": "2026-05-10T22:23:27",
+    "action": "web_search",
+    "observation": "Analyser les logs récents et les pensées pour déterminer une action utile. Les objectifs actuels sont dans self_model.json",
+    "result": "query vide — recherche ignorée"
+  },
+  {
+    "ts": "2026-05-10T22:24:33",
+    "action": "web_search",
+    "observation": "Analyser les logs récents et les pensées pour déterminer une action utile.",
+    "result": "query vide — recherche ignorée"
+  },
+  {
+    "ts": "2026-05-10T22:25:38",
+    "action": "run_code",
+    "observation": "Je dois choisir une action utile. Les objectifs actuels sont dans self_model.json",
+    "result": "OK —"
+  },
+  {
+    "ts": "2026-05-10T22:26:44",
+    "action": "write_thought",
+    "observation": "Analyser les logs récents et les pensées pour déterminer une action utile.",
+    "result": "pensée écrite (74 chars)"
+  },
+  {
+    "ts": "2026-05-10T22:27:46",
+    "action": "web_search",
+    "observation": "Les objectifs actuels sont dans self_model.json",
+    "result": "query vide — recherche ignorée"
   }
 ]
