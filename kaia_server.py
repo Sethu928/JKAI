@@ -364,6 +364,29 @@ def main():
     text-decoration: none;
   }}
   a:hover {{ color: var(--c); }}
+  #timer-section {{
+    max-width: 860px; margin: 0 auto 32px; text-align: center;
+  }}
+  #timer-label {{
+    font-size: 9px; letter-spacing: 3px; color: #d946a855; margin-bottom: 10px;
+  }}
+  #countdown {{
+    font-size: 32px; letter-spacing: 6px;
+    color: var(--c); text-shadow: 0 0 20px #d946a866;
+    margin-bottom: 14px;
+  }}
+  #progress-track {{
+    height: 3px; background: #d946a811;
+    border-radius: 2px; overflow: hidden;
+    max-width: 320px; margin: 0 auto;
+  }}
+  #progress-bar {{
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #d946a844, #d946a8);
+    box-shadow: 0 0 8px #d946a888;
+    transition: width 1s linear;
+    border-radius: 2px;
+  }}
 </style>
 </head>
 <body>
@@ -372,9 +395,39 @@ def main():
   <p>CONNAISSANCES ACQUISES DE FAÇON AUTONOME</p>
   <div class="stat">{count} SUJET{'S' if count != 1 else ''} CONNU{'S' if count != 1 else ''}</div>
 </header>
+<div id="timer-section">
+  <div id="timer-label">PROCHAINE RECHERCHE DANS</div>
+  <div id="countdown">05:00</div>
+  <div id="progress-track"><div id="progress-bar"></div></div>
+</div>
 <div class="grid">{cards}
 </div>
 <a href="/">← RETOUR AU CHAT</a>
+<script>
+  const TOTAL = {_AUTONOMOUS_INTERVAL};
+  let remaining = TOTAL;
+  const countdown = document.getElementById('countdown');
+  const bar       = document.getElementById('progress-bar');
+  const label     = document.getElementById('timer-label');
+
+  function pad(n) {{ return String(n).padStart(2, '0'); }}
+
+  function tick() {{
+    const m = Math.floor(remaining / 60);
+    const s = remaining % 60;
+    countdown.textContent = pad(m) + ':' + pad(s);
+    bar.style.width = (((TOTAL - remaining) / TOTAL) * 100) + '%';
+    if (remaining <= 0) {{
+      label.textContent = 'RECHERCHE EN COURS...';
+      countdown.textContent = '00:00';
+      setTimeout(() => location.reload(), 4000);
+      return;
+    }}
+    remaining--;
+    setTimeout(tick, 1000);
+  }}
+  tick();
+</script>
 </body>
 </html>"""
 
