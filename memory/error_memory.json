@@ -1,32 +1,8 @@
 {
-  "Traceback (most recent call last): File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpj9fulcxl.py\", line ": {
+  "[CORTEX] Exécution bloquée — opération interdite détectée : `os\\.system\\s*\\(`": {
     "count": 1,
-    "snippet": "Traceback (most recent call last): File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpj9fulcxl.py\", line ",
-    "last_seen_ts": 1778328853.476645,
-    "last_seen": "2026-05-09T14:14:13"
-  },
-  "Traceback (most recent call last): File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpmqr2tpsx.py\", line ": {
-    "count": 1,
-    "snippet": "Traceback (most recent call last): File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpmqr2tpsx.py\", line ",
-    "last_seen_ts": 1778328992.19983,
-    "last_seen": "2026-05-09T14:16:32"
-  },
-  "[CORTEX] Exécution bloquée — opération interdite détectée : `\\brequests\\b`": {
-    "count": 2,
-    "snippet": "[CORTEX] Exécution bloquée — opération interdite détectée : `\\brequests\\b`",
-    "last_seen_ts": 1778329493.167504,
-    "last_seen": "2026-05-09T14:24:53"
-  },
-  "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpavi6uhvn.py\", line 1 import os; import json; with open": {
-    "count": 1,
-    "snippet": "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpavi6uhvn.py\", line 1 import os; import json; with open",
-    "last_seen_ts": 1778330126.004284,
-    "last_seen": "2026-05-09T14:35:26"
-  },
-  "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpqjjymsf9.py\", line 1 python -c 'import os; print(os.ge": {
-    "count": 1,
-    "snippet": "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpqjjymsf9.py\", line 1 python -c 'import os; print(os.ge",
-    "last_seen_ts": 1778332123.448157,
-    "last_seen": "2026-05-09T15:08:43"
+    "snippet": "[CORTEX] Exécution bloquée — opération interdite détectée : `os\\.system\\s*\\(`",
+    "last_seen_ts": 1778438382.287756,
+    "last_seen": "2026-05-10T20:39:42"
   }
 }

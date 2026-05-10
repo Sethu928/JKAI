@@ -120,8 +120,9 @@ def _build_kaia_system_prompt(knowledge: dict) -> str:
 
 
 def ask_llm(user_message: str, knowledge: dict) -> str | None:
+    print("[KAÏA LLM] tentative connexion...", flush=True)
     payload = {
-        "model": "local-model",
+        "model": "meta-llama-3.1-8b-instruct",
         "messages": [
             {"role": "system", "content": _build_kaia_system_prompt(knowledge)},
             {"role": "user",   "content": user_message},
@@ -132,7 +133,9 @@ def ask_llm(user_message: str, knowledge: dict) -> str | None:
     try:
         r = requests.post(_LM_STUDIO_CHAT, json=payload, timeout=3)
         r.raise_for_status()
-        return r.json()["choices"][0]["message"]["content"].strip()
+        response = r.json()["choices"][0]["message"]["content"].strip()
+        print(f"[KAÏA LLM] réponse : {response}", flush=True)
+        return response
     except Exception as e:
         print(f"[KAÏA LLM] Indisponible — {e}", flush=True)
         return None

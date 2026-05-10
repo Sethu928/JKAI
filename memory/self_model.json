@@ -7,10 +7,6 @@
   "total_interactions": 0,
   "recent_successes": [
     {
-      "ts": "2026-05-09T14:50:54",
-      "note": "Le dernier cycle a été : [1] write_thought, [2] web_search, [3] run_code."
-    },
-    {
       "ts": "2026-05-09T14:56:10",
       "note": "Dernier cycle : write_thought, web_search, run_code. Il est temps d'alterner l'action."
     },
@@ -85,6 +81,10 @@
     {
       "ts": "2026-05-09T16:13:58",
       "note": "Analyse des logs, pensées et objectifs pour déterminer la prochaine action."
+    },
+    {
+      "ts": "2026-05-10T20:35:28",
+      "note": "Les objectifs actuels sont dans self_model.json et il faut choisir une action qui me permettra d'avancer vers ma mission tout en respectant les règles et la priorité donnée."
     }
   ],
   "recent_failures": []
