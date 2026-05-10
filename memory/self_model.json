@@ -7,14 +7,6 @@
   "total_interactions": 0,
   "recent_successes": [
     {
-      "ts": "2026-05-09T14:56:10",
-      "note": "Dernier cycle : write_thought, web_search, run_code. Il est temps d'alterner l'action."
-    },
-    {
-      "ts": "2026-05-09T15:00:22",
-      "note": "Dernier cycle : write_thought, web_search, run_code. Il est temps d'alterner l'action."
-    },
-    {
       "ts": "2026-05-09T15:01:26",
       "note": "Dernier cycle : write_thought, web_search, run_code. Il est temps d'alterner l'action."
     },
@@ -85,6 +77,14 @@
     {
       "ts": "2026-05-10T20:35:28",
       "note": "Les objectifs actuels sont dans self_model.json et il faut choisir une action qui me permettra d'avancer vers ma mission tout en respectant les règles et la priorité donnée."
+    },
+    {
+      "ts": "2026-05-10T20:40:49",
+      "note": "Je dois choisir une action qui me permettra d'avancer vers ma mission tout en respectant les règles et la priorité donnée."
+    },
+    {
+      "ts": "2026-05-10T20:41:52",
+      "note": "Il est temps d'alterner l'action pour avancer vers ma mission."
     }
   ],
   "recent_failures": []

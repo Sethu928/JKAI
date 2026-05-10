@@ -131,7 +131,7 @@ def ask_llm(user_message: str, knowledge: dict) -> str | None:
         "temperature": 0.8,
     }
     try:
-        r = requests.post(_LM_STUDIO_CHAT, json=payload, timeout=3)
+        r = requests.post(_LM_STUDIO_CHAT, json=payload, timeout=30)
         r.raise_for_status()
         response = r.json()["choices"][0]["message"]["content"].strip()
         print(f"[KAÏA LLM] réponse : {response}", flush=True)
