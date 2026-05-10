@@ -592,21 +592,20 @@ def main():
 
     @app.route('/dialogue')
     def dialogue():
-        log_path = "logs/jkai_kaia_dialogue.log"
         lines = []
         try:
-            with open(log_path, "r", encoding="utf-8", errors="replace") as f:
-                lines = f.readlines()[-100:]
-        except OSError:
-            pass
+            r = requests.get("http://192.168.1.142:5000/dialogue", timeout=5)
+            r.raise_for_status()
+            lines = r.json().get("lines", [])
+        except Exception as e:
+            print(f"[KAÏA /dialogue] Erreur fetch J-KAI : {e}", flush=True)
 
         rows_html = ""
         for line in lines:
-            line = line.rstrip("\n")
             safe = line.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
             if "[J-KAI]" in line:
                 rows_html += f'<div class="line jkai">{safe}</div>\n'
-            elif "[KAÏA]" in line or "[KAÏA]" in line:
+            elif "[KAÏA]" in line:
                 rows_html += f'<div class="line kaia">{safe}</div>\n'
         if not rows_html:
             rows_html = '<div class="empty">Aucun échange encore. J-KAI n\'a pas encore enseigné à Kaïa.</div>'

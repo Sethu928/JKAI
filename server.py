@@ -358,6 +358,16 @@ def config_post():
     log(f"[CONFIG] {', '.join(changed) if changed else 'aucun changement'}")
     return jsonify({"AUTONOMIE_ACTIVE": AUTONOMIE_ACTIVE, "USE_OPENAI": USE_OPENAI})
 
+@server.route("/dialogue", methods=["GET"])
+def dialogue():
+    path = "logs/jkai_kaia_dialogue.log"
+    try:
+        with open(path, "r", encoding="utf-8", errors="replace") as f:
+            lines = f.readlines()
+        return jsonify({"lines": [l.rstrip("\n") for l in lines[-100:]]})
+    except OSError:
+        return jsonify({"lines": []})
+
 @server.route("/severus", methods=["POST"])
 def severus():
     return jsonify({"status": "severus"})
