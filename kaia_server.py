@@ -1,9 +1,86 @@
 import sqlite3
 from sqlite3 import Error
 import random
+import json
+import os
+import threading
+import time
+import requests
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
+
+_KNOWLEDGE_FILE  = "memory/kaia_knowledge.json"
+_KAIA_MODEL_FILE = "memory/kaia_model.json"
+_AUTONOMOUS_INTERVAL = 300  # secondes entre chaque cycle d'apprentissage
+
+
+def web_search(query: str) -> list:
+    """Recherche DuckDuckGo — retourne jusqu'à 3 résultats {title, snippet}."""
+    try:
+        r = requests.get(
+            "https://api.duckduckgo.com/",
+            params={"q": query, "format": "json", "no_html": 1, "skip_disambig": 1},
+            timeout=10,
+        )
+        data = r.json()
+        results = []
+        for item in data.get("RelatedTopics", []):
+            text = item.get("Text", "")
+            if text and "FirstURL" in item:
+                results.append({"title": text[:80], "snippet": text[:200]})
+                if len(results) >= 3:
+                    break
+        return results
+    except Exception as e:
+        print(f"[KAÏA web_search] Erreur : {e}")
+        return []
+
+
+def _load_knowledge() -> dict:
+    try:
+        with open(_KNOWLEDGE_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def _save_knowledge(knowledge: dict) -> None:
+    os.makedirs("memory", exist_ok=True)
+    with open(_KNOWLEDGE_FILE, "w", encoding="utf-8") as f:
+        json.dump(knowledge, f, ensure_ascii=False, indent=2)
+
+
+def _pick_topic() -> str:
+    """Choisit un sujet à explorer depuis kaia_model.json."""
+    try:
+        with open(_KAIA_MODEL_FILE, "r", encoding="utf-8") as f:
+            model = json.load(f)
+        topics = (
+            model.get("valeurs", [])
+            + model.get("conscience", {}).get("valeurs", [])
+            + [model.get("mission", {}).get("objectif", "")]
+        )
+        topics = [t for t in topics if t]
+        if topics:
+            return random.choice(topics)
+    except (OSError, json.JSONDecodeError):
+        pass
+    return random.choice(["conscience artificielle", "émotions humaines", "créativité", "empathie"])
+
+
+def _autonomous_learn_loop(kaia_instance):
+    """Thread daemon — Kaïa choisit un sujet, recherche et mémorise toutes les 5 min."""
+    while True:
+        time.sleep(_AUTONOMOUS_INTERVAL)
+        topic = _pick_topic()
+        print(f"[KAÏA] Recherche autonome : {topic}")
+        results = web_search(topic)
+        if results:
+            kaia_instance.knowledge[topic] = results
+            _save_knowledge(kaia_instance.knowledge)
+            print(f"[KAÏA] Connaissance acquise : {topic} ({len(results)} résultat(s))")
+
 
 class Kaia:
     def __init__(self):
@@ -15,6 +92,7 @@ class Kaia:
             'je suis heureux': ["C'est super, je suis contente pour toi !"],
             'je suis triste':  ["Désolée d'entendre ça. Veux-tu en parler ?"],
         }
+        self.knowledge = _load_knowledge()
         self.create_database()
         self._load_rules()
 
@@ -70,6 +148,11 @@ class Kaia:
         for pattern, responses in self.rules.items():
             if pattern in msg:
                 return random.choice(responses)
+        for topic, entries in self.knowledge.items():
+            if topic.lower() in msg and entries:
+                snippet = entries[0].get("snippet", "")[:180]
+                if snippet:
+                    return f"J'ai appris quelque chose là-dessus : {snippet}"
         return "Je t'écoute. Dis-moi en plus."
 
     def learn(self, message, response):
@@ -190,6 +273,13 @@ _HTML = """<!DOCTYPE html>
 
 def main():
     kaia = Kaia()
+
+    threading.Thread(
+        target=_autonomous_learn_loop,
+        args=(kaia,),
+        daemon=True,
+        name="kaia-learn",
+    ).start()
 
     @app.route('/')
     def index():
