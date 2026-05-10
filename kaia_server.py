@@ -5,6 +5,7 @@ import json
 import os
 import threading
 import time
+import re
 import requests
 from flask import Flask, jsonify, request
 
@@ -16,7 +17,15 @@ _AUTONOMOUS_INTERVAL = 300  # secondes entre chaque cycle d'apprentissage
 
 
 def web_search(query: str) -> list:
-    """Recherche DuckDuckGo — retourne jusqu'à 3 résultats {title, snippet}."""
+    """DuckDuckGo en premier, Wikipedia FR en fallback si aucun résultat."""
+    results = _ddg_search(query)
+    if not results:
+        print(f"[KAÏA] DuckDuckGo vide pour '{query}' — fallback Wikipedia", flush=True)
+        results = _wiki_search(query)
+    return results
+
+
+def _ddg_search(query: str) -> list:
     try:
         r = requests.get(
             "https://api.duckduckgo.com/",
@@ -33,7 +42,32 @@ def web_search(query: str) -> list:
                     break
         return results
     except Exception as e:
-        print(f"[KAÏA web_search] Erreur : {e}")
+        print(f"[KAÏA _ddg_search] Erreur : {e}", flush=True)
+        return []
+
+
+def _wiki_search(query: str) -> list:
+    try:
+        r = requests.get(
+            "https://fr.wikipedia.org/w/api.php",
+            params={
+                "action": "query", "list": "search",
+                "srsearch": query, "format": "json",
+                "srlimit": 3, "utf8": 1,
+            },
+            timeout=10,
+        )
+        data = r.json()
+        results = []
+        for item in data.get("query", {}).get("search", []):
+            snippet = re.sub(r"<[^>]+>", "", item.get("snippet", ""))
+            results.append({
+                "title": item.get("title", "")[:80],
+                "snippet": snippet[:200],
+            })
+        return results
+    except Exception as e:
+        print(f"[KAÏA _wiki_search] Erreur : {e}", flush=True)
         return []
 
 
@@ -51,22 +85,37 @@ def _save_knowledge(knowledge: dict) -> None:
         json.dump(knowledge, f, ensure_ascii=False, indent=2)
 
 
+_STOP_WORDS = {
+    "et", "ou", "entre", "les", "des", "une", "un", "de", "du",
+    "la", "le", "en", "avec", "pour", "par", "au", "aux", "sur",
+    "dans", "à", "se", "sa", "son", "ses", "ce", "cette", "ces",
+}
+
+def _shorten_topic(phrase: str) -> str:
+    """Réduit une phrase longue à 1-2 mots clés significatifs."""
+    for sep in (" et ", " ou ", " entre ", ", ", " - "):
+        phrase = phrase.split(sep)[0]
+    words = [w.strip(".,;:()") for w in phrase.lower().split()]
+    keywords = [w for w in words if w not in _STOP_WORDS and len(w) > 2]
+    return " ".join(keywords[:2]) if keywords else phrase.split()[0].lower()
+
+
 def _pick_topic() -> str:
-    """Choisit un sujet à explorer depuis kaia_model.json."""
+    """Choisit un sujet court et concret depuis kaia_model.json."""
     try:
         with open(_KAIA_MODEL_FILE, "r", encoding="utf-8") as f:
             model = json.load(f)
-        topics = (
+        raw = (
             model.get("valeurs", [])
             + model.get("conscience", {}).get("valeurs", [])
             + [model.get("mission", {}).get("objectif", "")]
         )
-        topics = [t for t in topics if t]
-        if topics:
-            return random.choice(topics)
+        raw = [t for t in raw if t]
+        if raw:
+            return _shorten_topic(random.choice(raw))
     except (OSError, json.JSONDecodeError):
         pass
-    return random.choice(["conscience artificielle", "émotions humaines", "créativité", "empathie"])
+    return random.choice(["conscience", "empathie", "créativité", "innovation", "émotion"])
 
 
 def _autonomous_learn_loop(kaia_instance):
