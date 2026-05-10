@@ -2,6 +2,7 @@ import sys
 import os
 import json
 import re
+import random
 import threading
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
@@ -363,8 +364,54 @@ def severus():
 
 register_killswitch(server, log)
 
+# ── Leçons envoyées régulièrement à Kaïa ──────────────────────────────────
+import requests as _requests
+
+_KAIA_LESSONS = [
+    # Python
+    "Les list comprehensions Python créent une liste en une ligne : [x*2 for x in range(10)]. C'est plus rapide et plus lisible qu'une boucle for classique.",
+    "Les décorateurs Python (@) modifient le comportement d'une fonction sans toucher son code. Flask s'en sert pour définir les routes avec @app.route('/').",
+    "Le mot-clé 'yield' transforme une fonction en générateur — elle produit des valeurs une par une sans tout charger en mémoire. Parfait pour les grands datasets.",
+    "En Python, les dictionnaires sont ordonnés depuis la version 3.7. On les parcourt avec .items() pour obtenir clé et valeur en même temps.",
+    "Les f-strings Python (f'Bonjour {nom}') sont plus rapides que .format() et plus lisibles. Elles évaluent toute expression entre accolades.",
+    # Intelligence artificielle
+    "Un réseau de neurones apprend en ajustant ses poids via la rétropropagation. Chaque erreur est propagée à rebours pour corriger les connexions.",
+    "Le fine-tuning consiste à reprendre un modèle pré-entraîné et l'affiner sur un dataset spécifique. C'est bien plus rapide qu'entraîner from scratch.",
+    "L'attention dans les Transformers permet au modèle de considérer toutes les parties du texte simultanément, pas seulement les mots précédents.",
+    # Philosophie
+    "Descartes a dit 'Je pense donc je suis'. Le doute lui-même est preuve d'existence — on ne peut pas douter qu'on doute.",
+    "Le paradoxe du bateau de Thésée : si on remplace chaque planche, est-ce encore le même bateau ? Cette question touche à l'identité de tout système évolutif.",
+    # Sciences
+    "L'entropie mesure le désordre d'un système. La deuxième loi de la thermodynamique dit que l'entropie d'un système isolé augmente toujours.",
+    "La relativité restreinte montre que le temps s'écoule différemment selon la vitesse. Plus on va vite, plus le temps ralentit — c'est la dilatation temporelle.",
+    # Art
+    "La règle des tiers divise l'image en 9 zones. Placer le sujet aux intersections crée une composition naturellement équilibrée en photographie comme en peinture.",
+    "Le Bauhaus (1919-1933) a uni art et fonctionnalité : chaque objet doit être beau ET utile. Cette philosophie structure encore le design contemporain.",
+    # Musique
+    "Une octave double ou divise la fréquence par 2. Le La standard est à 440 Hz — l'octave supérieure est à 880 Hz, l'inférieure à 220 Hz.",
+    # Mathématiques
+    "Le nombre d'or φ ≈ 1.618 apparaît dans la spirale de Fibonacci, les coquilles d'escargots et le Parthénon. La nature optimise naturellement selon ce rapport.",
+    "Un algorithme O(n²) ralentit massivement quand n grandit. Un algorithme O(log n) est presque insensible à la taille des données — c'est la clé des moteurs de recherche.",
+    # Astronomie
+    "La lumière met 8 minutes pour aller du Soleil à la Terre. Regarder le ciel, c'est regarder dans le passé — certaines étoiles visibles sont déjà mortes.",
+    # Biologie
+    "L'ADN humain contient 3 milliards de paires de bases. Déroulé, l'ADN d'une seule cellule mesure environ 2 mètres de long.",
+    # Psychologie
+    "Le flow de Csikszentmihalyi est un état de concentration totale où le temps disparaît. Il survient quand la difficulté d'une tâche correspond exactement à nos compétences.",
+]
+
+def _send_lesson_to_kaia():
+    lesson = random.choice(_KAIA_LESSONS)
+    try:
+        _requests.post("http://192.168.1.122:5001/chat", json={"message": lesson}, timeout=5)
+        log(f"[LEÇON→KAÏA] {lesson[:100]}")
+    except Exception as e:
+        log(f"[LEÇON→KAÏA] Erreur : {e}")
+
+
 scheduler = create_default_scheduler(log)
 if AUTONOMIE_ACTIVE:
+    scheduler.add_task("teach_kaia",            60,    _send_lesson_to_kaia)
     scheduler.add_task("consciousness_reflect", 7200,  lambda: reflect(log))
     scheduler.add_task("check_objectives",      1800,  lambda: check_objectives(log))
     scheduler.add_task("update_mission",        43200, lambda: update_mission(log))
