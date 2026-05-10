@@ -413,8 +413,15 @@ _KAIA_LESSONS = [
 def _send_lesson_to_kaia():
     lesson = random.choice(_KAIA_LESSONS)
     try:
-        _requests.post("http://192.168.1.122:5001/chat", json={"message": lesson}, timeout=30)
+        r = _requests.post("http://192.168.1.122:5001/chat", json={"message": lesson}, timeout=30)
+        r.raise_for_status()
+        kaia_reply = r.json().get("response", "")
         log(f"[LEÇON→KAÏA] {lesson[:100]}")
+        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        os.makedirs("logs", exist_ok=True)
+        with open("logs/jkai_kaia_dialogue.log", "a", encoding="utf-8") as f:
+            f.write(f"[{ts}] [J-KAI] {lesson}\n")
+            f.write(f"[{ts}] [KAÏA] {kaia_reply}\n")
     except Exception as e:
         log(f"[LEÇON→KAÏA] Erreur : {e}")
 
