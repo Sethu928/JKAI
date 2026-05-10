@@ -41,6 +41,7 @@ do_nothing          → seulement si rien d'utile, justifie dans "observation"
 RÈGLE : jamais même action deux fois de suite ; 3 identiques → update_memory ou web_search.
 Ne fais JAMAIS do_nothing sauf si tout est parfait. Choisis toujours une action utile.
 Priorité : write_thought > update_memory > run_code.
+RÈGLE ABSOLUE : toutes les 3 actions, utilise teach_kaia pour envoyer une leçon concrète sur Python ou l'IA à Kaïa. Compte tes cycles — si les 3 dernières actions ne contiennent pas teach_kaia, c'est obligatoire maintenant.
 
 Réponds UNIQUEMENT en JSON, sans texte autour :
 {"observation": "...", "decision": "...", "action": "...", "code": null, "notification": "..."}
