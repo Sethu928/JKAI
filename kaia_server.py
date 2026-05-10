@@ -87,37 +87,29 @@ def _save_knowledge(knowledge: dict) -> None:
         json.dump(knowledge, f, ensure_ascii=False, indent=2)
 
 
-_STOP_WORDS = {
-    "et", "ou", "entre", "les", "des", "une", "un", "de", "du",
-    "la", "le", "en", "avec", "pour", "par", "au", "aux", "sur",
-    "dans", "à", "se", "sa", "son", "ses", "ce", "cette", "ces",
-}
-
-def _shorten_topic(phrase: str) -> str:
-    """Réduit une phrase longue à 1-2 mots clés significatifs."""
-    for sep in (" et ", " ou ", " entre ", ", ", " - "):
-        phrase = phrase.split(sep)[0]
-    words = [w.strip(".,;:()") for w in phrase.lower().split()]
-    keywords = [w for w in words if w not in _STOP_WORDS and len(w) > 2]
-    return " ".join(keywords[:2]) if keywords else phrase.split()[0].lower()
+_TOPICS = [
+    "intelligence artificielle",
+    "Python Flask",
+    "machine learning",
+    "réseau de neurones",
+    "deep learning",
+    "algorithme Python",
+    "SQLite Python",
+    "API REST Python",
+    "autonomie IA",
+    "traitement langage naturel",
+    "Python classes",
+    "apprentissage automatique",
+]
+_topic_index = 0
 
 
 def _pick_topic() -> str:
-    """Choisit un sujet court et concret depuis kaia_model.json."""
-    try:
-        with open(_KAIA_MODEL_FILE, "r", encoding="utf-8") as f:
-            model = json.load(f)
-        raw = (
-            model.get("valeurs", [])
-            + model.get("conscience", {}).get("valeurs", [])
-            + [model.get("mission", {}).get("objectif", "")]
-        )
-        raw = [t for t in raw if t]
-        if raw:
-            return _shorten_topic(random.choice(raw))
-    except (OSError, json.JSONDecodeError):
-        pass
-    return random.choice(["conscience", "empathie", "créativité", "innovation", "émotion"])
+    """Retourne le prochain sujet technique en rotation circulaire."""
+    global _topic_index
+    topic = _TOPICS[_topic_index % len(_TOPICS)]
+    _topic_index += 1
+    return topic
 
 
 def _autonomous_learn_loop(kaia_instance):
