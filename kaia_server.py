@@ -12,9 +12,11 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-_KNOWLEDGE_FILE  = "memory/kaia_knowledge.json"
-_KAIA_MODEL_FILE = "memory/kaia_model.json"
+_KNOWLEDGE_FILE    = "memory/kaia_knowledge.json"
+_KAIA_MODEL_FILE   = "memory/kaia_model.json"
 _AUTONOMOUS_INTERVAL = 30  # secondes entre chaque cycle d'apprentissage
+_LM_STUDIO_CHAT  = "http://192.168.1.142:1234/v1/chat/completions"
+_LM_STUDIO_MODELS = "http://192.168.1.142:1234/v1/models"
 
 
 def web_search(query: str) -> list:
@@ -85,6 +87,63 @@ def _save_knowledge(knowledge: dict) -> None:
     os.makedirs("memory", exist_ok=True)
     with open(_KNOWLEDGE_FILE, "w", encoding="utf-8") as f:
         json.dump(knowledge, f, ensure_ascii=False, indent=2)
+
+
+def _build_kaia_system_prompt(knowledge: dict) -> str:
+    try:
+        with open(_KAIA_MODEL_FILE, "r", encoding="utf-8") as f:
+            model = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        model = {}
+
+    name        = model.get("nom", "Kaïa")
+    description = model.get("description", "")
+    valeurs     = ", ".join(model.get("valeurs", []))
+
+    knowledge_ctx = ""
+    for topic, entries in list(knowledge.items())[:4]:
+        if entries:
+            snippet = entries[0].get("snippet", "")[:150]
+            if snippet:
+                knowledge_ctx += f"\n- {topic} : {snippet}"
+
+    prompt = (
+        f"Tu es {name}. {description}"
+        "Tu es émotionnelle, intuitive et douce. Tu parles toujours en français avec bienveillance. "
+        f"Tes valeurs : {valeurs}. "
+        "Tu es distincte de J-KAI — là où il est logique et sobre, tu es sensible et empathique. "
+        "Tu réponds avec chaleur, parfois avec poésie. Sois concise — 1 à 3 phrases maximum."
+    )
+    if knowledge_ctx:
+        prompt += f"\n\nTu as récemment appris ces connaissances :{knowledge_ctx}"
+    return prompt
+
+
+def ask_llm(user_message: str, knowledge: dict) -> str | None:
+    payload = {
+        "model": "local-model",
+        "messages": [
+            {"role": "system", "content": _build_kaia_system_prompt(knowledge)},
+            {"role": "user",   "content": user_message},
+        ],
+        "max_tokens": 200,
+        "temperature": 0.8,
+    }
+    try:
+        r = requests.post(_LM_STUDIO_CHAT, json=payload, timeout=3)
+        r.raise_for_status()
+        return r.json()["choices"][0]["message"]["content"].strip()
+    except Exception as e:
+        print(f"[KAÏA LLM] Indisponible — {e}", flush=True)
+        return None
+
+
+def _check_llm() -> bool:
+    try:
+        r = requests.get(_LM_STUDIO_MODELS, timeout=2)
+        return r.status_code == 200
+    except Exception:
+        return False
 
 
 _TOPICS = [
@@ -268,12 +327,27 @@ _HTML = """<!DOCTYPE html>
   #btn-send:hover { border-color: var(--orange); box-shadow: 0 0 10px #d946a844; }
   #chat-box::-webkit-scrollbar { width: 4px; }
   #chat-box::-webkit-scrollbar-thumb { background: #d946a833; }
+  #llm-indicator {
+    display: flex; align-items: center; justify-content: center;
+    gap: 7px; margin-top: 12px; font-size: 9px; letter-spacing: 3px;
+    color: #d946a855;
+  }
+  .llm-dot {
+    width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+    background: #333;
+  }
+  .llm-dot.on  { background: #d946a8; box-shadow: 0 0 7px #d946a8; }
+  .llm-dot.off { background: #3a1a2a; }
 </style>
 </head>
 <body>
 <header>
   <h1>KAÏA</h1>
   <p>ENTITÉ NEXUS — EN LIGNE</p>
+  <div id="llm-indicator">
+    <span class="llm-dot" id="llm-dot"></span>
+    <span id="llm-label">LM STUDIO — VÉRIFICATION...</span>
+  </div>
 </header>
 <div id="chat-box"></div>
 <div id="input-row">
@@ -311,6 +385,23 @@ _HTML = """<!DOCTYPE html>
   }
 
   input.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+
+  fetch('/status')
+    .then(r => r.json())
+    .then(d => {
+      const dot = document.getElementById('llm-dot');
+      const lbl = document.getElementById('llm-label');
+      if (d.llm) {
+        dot.className = 'llm-dot on';
+        lbl.textContent = 'LM STUDIO — CONNECTÉ';
+      } else {
+        dot.className = 'llm-dot off';
+        lbl.textContent = 'LM STUDIO — HORS LIGNE';
+      }
+    })
+    .catch(() => {
+      document.getElementById('llm-label').textContent = 'LM STUDIO — ERREUR';
+    });
 </script>
 </body>
 </html>"""
@@ -478,12 +569,20 @@ def main():
 </body>
 </html>"""
 
+    @app.route('/status')
+    def status():
+        return jsonify({"llm": _check_llm()})
+
     @app.route('/chat', methods=['POST'])
     def chat():
         user_message = request.get_json()['message']
-        conversation = {'user': 'User', 'message': user_message}
-        response = kaia.get_response(user_message)
-        print(f"Kaïa: {response}")
+        llm_reply = ask_llm(user_message, kaia.knowledge)
+        if llm_reply:
+            response = llm_reply
+            print(f"[KAÏA LLM] {response[:100]}", flush=True)
+        else:
+            response = kaia.get_response(user_message)
+            print(f"[KAÏA fallback] {response}", flush=True)
         kaia.add_conversation('User', user_message)
         kaia.learn(user_message, response)
         return jsonify({'response': response})
