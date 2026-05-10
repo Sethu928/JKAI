@@ -1,14 +1,8 @@
 {
-  "[CORTEX] Exécution bloquée — opération interdite détectée : `os\\.system\\s*\\(`": {
+  "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpxdcy2rt8.py\", line 1 python -c 'print(open(\"memory/sel": {
     "count": 1,
-    "snippet": "[CORTEX] Exécution bloquée — opération interdite détectée : `os\\.system\\s*\\(`",
-    "last_seen_ts": 1778438382.287756,
-    "last_seen": "2026-05-10T20:39:42"
-  },
-  "Traceback (most recent call last): File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpq5k9na4b.py\", line ": {
-    "count": 1,
-    "snippet": "Traceback (most recent call last): File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpq5k9na4b.py\", line ",
-    "last_seen_ts": 1778439081.777627,
-    "last_seen": "2026-05-10T20:51:21"
+    "snippet": "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpxdcy2rt8.py\", line 1 python -c 'print(open(\"memory/sel",
+    "last_seen_ts": 1778444301.131829,
+    "last_seen": "2026-05-10T22:18:21"
   }
 }
