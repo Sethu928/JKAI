@@ -285,6 +285,99 @@ def main():
     def index():
         return _HTML
 
+    @app.route('/knowledge')
+    def knowledge():
+        data = _load_knowledge()
+        count = len(data)
+        cards = ""
+        for topic, entries in data.items():
+            results_html = ""
+            for e in entries:
+                results_html += f"""
+          <div class="result">
+            <div class="result-title">{e.get('title','')}</div>
+            <div class="result-snippet">{e.get('snippet','')}</div>
+          </div>"""
+            cards += f"""
+      <div class="card">
+        <div class="card-topic">{topic}</div>
+        <div class="card-results">{results_html}
+        </div>
+      </div>"""
+        if not cards:
+            cards = '<div class="empty">Aucune connaissance acquise pour le moment. Reviens dans 5 minutes.</div>'
+        return f"""<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KAÏA — MÉMOIRE</title>
+<style>
+  :root {{ --c: #d946a8; --bg: #080510; }}
+  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+  body {{
+    background: var(--bg); color: var(--c);
+    font-family: 'Courier New', monospace;
+    padding: 40px 24px; min-height: 100vh;
+  }}
+  header {{ text-align: center; margin-bottom: 40px; }}
+  header h1 {{ font-size: 24px; letter-spacing: 8px; text-shadow: 0 0 18px #d946a888; }}
+  header p  {{ font-size: 10px; letter-spacing: 3px; color: #d946a855; margin-top: 6px; }}
+  .stat {{
+    display: inline-block; border: 1px solid #d946a833;
+    padding: 4px 14px; font-size: 10px; letter-spacing: 2px;
+    color: #d946a877; margin-top: 12px;
+  }}
+  .grid {{
+    max-width: 860px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 20px;
+  }}
+  .card {{
+    border: 1px solid #d946a822; border-radius: 4px;
+    background: #0d0818; padding: 18px;
+    transition: border-color .2s;
+  }}
+  .card:hover {{ border-color: #d946a844; }}
+  .card-topic {{
+    font-size: 11px; letter-spacing: 3px; color: var(--c);
+    padding-bottom: 10px; margin-bottom: 12px;
+    border-bottom: 1px solid #d946a822;
+    text-transform: uppercase;
+  }}
+  .result {{ margin-bottom: 12px; }}
+  .result:last-child {{ margin-bottom: 0; }}
+  .result-title {{
+    font-size: 11px; color: #d946a8cc; letter-spacing: 1px;
+    margin-bottom: 4px;
+  }}
+  .result-snippet {{
+    font-size: 11px; color: #d946a866; line-height: 1.6;
+  }}
+  .empty {{
+    text-align: center; color: #d946a833; font-size: 12px;
+    letter-spacing: 2px; padding: 60px; grid-column: 1/-1;
+  }}
+  a {{
+    display: block; text-align: center; margin: 40px auto 0;
+    color: #d946a855; font-size: 10px; letter-spacing: 3px;
+    text-decoration: none;
+  }}
+  a:hover {{ color: var(--c); }}
+</style>
+</head>
+<body>
+<header>
+  <h1>MÉMOIRE DE KAÏA</h1>
+  <p>CONNAISSANCES ACQUISES DE FAÇON AUTONOME</p>
+  <div class="stat">{count} SUJET{'S' if count != 1 else ''} CONNU{'S' if count != 1 else ''}</div>
+</header>
+<div class="grid">{cards}
+</div>
+<a href="/">← RETOUR AU CHAT</a>
+</body>
+</html>"""
+
     @app.route('/chat', methods=['POST'])
     def chat():
         user_message = request.get_json()['message']
