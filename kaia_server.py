@@ -6,6 +6,7 @@ import os
 import threading
 import time
 import re
+import urllib.parse
 import requests
 from flask import Flask, jsonify, request
 
@@ -48,14 +49,15 @@ def _ddg_search(query: str) -> list:
 
 def _wiki_search(query: str) -> list:
     try:
+        url = (
+            "https://fr.wikipedia.org/w/api.php"
+            f"?action=query&list=search&srsearch={urllib.parse.quote(query)}"
+            "&format=json&srlimit=3"
+        )
         r = requests.get(
-            "https://fr.wikipedia.org/w/api.php",
-            params={
-                "action": "query", "list": "search",
-                "srsearch": query, "format": "json",
-                "srlimit": 3, "utf8": 1,
-            },
-            timeout=10,
+            url,
+            timeout=5,
+            headers={"User-Agent": "KaiaBot/1.0 (Nexus project; contact@nexus.local)"},
         )
         data = r.json()
         results = []
