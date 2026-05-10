@@ -330,6 +330,20 @@ _HTML = """<!DOCTYPE html>
   #btn-send:hover { border-color: var(--orange); box-shadow: 0 0 10px #d946a844; }
   #chat-box::-webkit-scrollbar { width: 4px; }
   #chat-box::-webkit-scrollbar-thumb { background: #d946a833; }
+  #nav {
+    display: flex; gap: 12px;
+  }
+  .nav-btn {
+    background: none; border: 1px solid #d946a844;
+    color: #d946a877; font-family: 'Courier New', monospace;
+    font-size: 9px; letter-spacing: 3px;
+    padding: 6px 16px; text-decoration: none;
+    transition: border-color .2s, color .2s, box-shadow .2s;
+  }
+  .nav-btn:hover {
+    border-color: #d946a8; color: #d946a8;
+    box-shadow: 0 0 10px #d946a844;
+  }
   #llm-indicator {
     display: flex; align-items: center; justify-content: center;
     gap: 7px; margin-top: 12px; font-size: 9px; letter-spacing: 3px;
@@ -344,6 +358,10 @@ _HTML = """<!DOCTYPE html>
 </style>
 </head>
 <body>
+<nav id="nav">
+  <a class="nav-btn" href="/knowledge">MÉMOIRE</a>
+  <a class="nav-btn" href="/dialogue">DIALOGUE</a>
+</nav>
 <header>
   <h1>KAÏA</h1>
   <p>ENTITÉ NEXUS — EN LIGNE</p>
@@ -568,6 +586,123 @@ def main():
     setTimeout(tick, 1000);
   }}
   tick();
+</script>
+</body>
+</html>"""
+
+    @app.route('/dialogue')
+    def dialogue():
+        log_path = "logs/jkai_kaia_dialogue.log"
+        lines = []
+        try:
+            with open(log_path, "r", encoding="utf-8", errors="replace") as f:
+                lines = f.readlines()[-100:]
+        except OSError:
+            pass
+
+        rows_html = ""
+        for line in lines:
+            line = line.rstrip("\n")
+            safe = line.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            if "[J-KAI]" in line:
+                rows_html += f'<div class="line jkai">{safe}</div>\n'
+            elif "[KAÏA]" in line or "[KAÏA]" in line:
+                rows_html += f'<div class="line kaia">{safe}</div>\n'
+        if not rows_html:
+            rows_html = '<div class="empty">Aucun échange encore. J-KAI n\'a pas encore enseigné à Kaïa.</div>'
+
+        return f"""<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KAÏA — DIALOGUE</title>
+<style>
+  :root {{ --c: #d946a8; --jkai: #7ecfff; --bg: #080510; }}
+  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+  body {{
+    background: var(--bg); color: var(--c);
+    font-family: 'Courier New', monospace;
+    padding: 40px 24px; min-height: 100vh;
+  }}
+  header {{ text-align: center; margin-bottom: 40px; }}
+  header h1 {{ font-size: 24px; letter-spacing: 8px; text-shadow: 0 0 18px #d946a888; }}
+  header p  {{ font-size: 10px; letter-spacing: 3px; color: #d946a855; margin-top: 6px; }}
+  .legend {{
+    display: flex; justify-content: center; gap: 32px;
+    font-size: 9px; letter-spacing: 2px; margin-bottom: 28px;
+  }}
+  .legend span {{ display: flex; align-items: center; gap: 6px; }}
+  .dot {{ width: 6px; height: 6px; border-radius: 50%; }}
+  .dot.jkai {{ background: var(--jkai); box-shadow: 0 0 6px var(--jkai); }}
+  .dot.kaia {{ background: var(--c);    box-shadow: 0 0 6px var(--c); }}
+  #log {{
+    max-width: 860px; margin: 0 auto;
+    display: flex; flex-direction: column; gap: 6px;
+  }}
+  .line {{
+    font-size: 12px; line-height: 1.6;
+    border-left: 2px solid transparent;
+    padding: 6px 12px; border-radius: 2px;
+  }}
+  .line.jkai {{
+    color: var(--jkai); border-color: #7ecfff44;
+    background: #001a2a44;
+  }}
+  .line.kaia {{
+    color: var(--c); border-color: #d946a844;
+    background: #1a00140a;
+  }}
+  .empty {{
+    text-align: center; color: #d946a833; font-size: 12px;
+    letter-spacing: 2px; padding: 60px;
+  }}
+  .footer {{
+    text-align: center; margin-top: 40px;
+    font-size: 9px; letter-spacing: 3px; color: #d946a833;
+  }}
+  .footer a {{ color: #d946a855; text-decoration: none; }}
+  .footer a:hover {{ color: var(--c); }}
+  #refresh-bar {{
+    max-width: 860px; margin: 0 auto 28px;
+    height: 2px; background: #d946a811; border-radius: 1px; overflow: hidden;
+  }}
+  #refresh-fill {{
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #d946a844, #d946a8);
+    transition: width 1s linear;
+  }}
+</style>
+</head>
+<body>
+<header>
+  <h1>DIALOGUE J-KAI ↔ KAÏA</h1>
+  <p>ÉCHANGES EN TEMPS RÉEL — RAFRAÎCHISSEMENT AUTOMATIQUE</p>
+</header>
+<div class="legend">
+  <span><span class="dot jkai"></span>J-KAI</span>
+  <span><span class="dot kaia"></span>KAÏA</span>
+</div>
+<div id="refresh-bar"><div id="refresh-fill"></div></div>
+<div id="log">
+{rows_html}
+</div>
+<div class="footer">
+  <a href="/">← CHAT</a> &nbsp;·&nbsp; <a href="/knowledge">MÉMOIRE</a>
+</div>
+<script>
+  const INTERVAL = 5;
+  let elapsed = 0;
+  const fill = document.getElementById('refresh-fill');
+  function tick() {{
+    elapsed++;
+    fill.style.width = ((elapsed / INTERVAL) * 100) + '%';
+    if (elapsed >= INTERVAL) {{ location.reload(); return; }}
+    setTimeout(tick, 1000);
+  }}
+  tick();
+  // Scroll to bottom
+  window.scrollTo(0, document.body.scrollHeight);
 </script>
 </body>
 </html>"""

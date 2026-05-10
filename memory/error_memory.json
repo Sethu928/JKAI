@@ -4,5 +4,11 @@
     "snippet": "[CORTEX] Exécution bloquée — opération interdite détectée : `os\\.system\\s*\\(`",
     "last_seen_ts": 1778438382.287756,
     "last_seen": "2026-05-10T20:39:42"
+  },
+  "Traceback (most recent call last): File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpq5k9na4b.py\", line ": {
+    "count": 1,
+    "snippet": "Traceback (most recent call last): File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpq5k9na4b.py\", line ",
+    "last_seen_ts": 1778439081.777627,
+    "last_seen": "2026-05-10T20:51:21"
   }
 }

@@ -10,14 +10,16 @@ from modules.cortex import execute_code
 
 client = get_local_client()
 
-LOG_FILE        = "logs/jkai.log"
-AGENT_LOG       = "logs/agent.log"
-THOUGHTS_LOG    = "logs/thoughts.log"
-SELF_MODEL      = "memory/self_model.json"
-CORE_MEMORY     = "memory/core_memory.json"
-WEB_CONTEXT     = "memory/web_context.json"
-ERROR_MEMORY    = "memory/error_memory.json"
-CYCLE_MEMORY    = "memory/cycle_memory.json"
+LOG_FILE          = "logs/jkai.log"
+AGENT_LOG         = "logs/agent.log"
+THOUGHTS_LOG      = "logs/thoughts.log"
+SELF_MODEL        = "memory/self_model.json"
+CORE_MEMORY       = "memory/core_memory.json"
+WEB_CONTEXT       = "memory/web_context.json"
+ERROR_MEMORY      = "memory/error_memory.json"
+CYCLE_MEMORY      = "memory/cycle_memory.json"
+KAIA_URL          = "http://192.168.1.122:5001/chat"
+KAIA_DIALOGUE_LOG = "logs/jkai_kaia_dialogue.log"
 RECENT_LINES    = 10
 CYCLE_KEEP      = 10   # cycles conservés dans cycle_memory.json
 CYCLE_INJECT    = 0    # 0 = désactivé (trop lourd pour Phi-3)
@@ -33,6 +35,7 @@ write_thought       → pensée dans logs/thoughts.log, champ "observation"
 update_memory       → note dans self_model.json, champ "observation"
 log                 → observation dans jkai.log, champ "observation"
 web_search          → recherche DuckDuckGo, champ "code" = requête
+teach_kaia          → envoie un message éducatif à Kaïa sur Python, IA ou code, champ "observation" = le message
 do_nothing          → seulement si rien d'utile, justifie dans "observation"
 
 RÈGLE : jamais même action deux fois de suite ; 3 identiques → update_memory ou web_search.
@@ -47,6 +50,7 @@ Contraintes code : stdlib seulement, chemins relatifs, table SQLite "conversatio
 VALID_ACTIONS = {
     "do_nothing", "log", "run_code",
     "update_memory", "write_thought", "update_self_description", "web_search",
+    "teach_kaia",
 }
 
 # ── Historique des actions récentes (3 dernières, mémoire courte) ────────── #
@@ -322,6 +326,26 @@ def _write_agent_log(ts: str, decision: dict, exec_info: str) -> None:
         )
 
 
+# ── Dialogue J-KAI → Kaïa ───────────────────────────────────────────────── #
+
+def _teach_kaia(message: str, log_fn) -> str:
+    """Envoie un message éducatif à Kaïa et log l'échange dans jkai_kaia_dialogue.log."""
+    os.makedirs("logs", exist_ok=True)
+    ts_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    try:
+        r = requests.post(KAIA_URL, json={"message": message}, timeout=10)
+        r.raise_for_status()
+        kaia_reply = r.json().get("response", "")
+    except Exception as e:
+        log_fn(f"[AGENT] teach_kaia — Kaïa injoignable : {e}")
+        return f"Kaïa injoignable : {e}"
+    with open(KAIA_DIALOGUE_LOG, "a", encoding="utf-8") as f:
+        f.write(f"[{ts_now}] [J-KAI] {message}\n")
+        f.write(f"[{ts_now}] [KAÏA] {kaia_reply}\n")
+    log_fn(f"[AGENT] teach_kaia → J-KAI: {message[:80]} | Kaïa: {kaia_reply[:80]}")
+    return f"Kaïa a répondu : {kaia_reply[:100]}"
+
+
 # ── Exécution de l'action décidée ───────────────────────────────────────── #
 
 def _execute_action(decision: dict, log_fn) -> str:
@@ -407,6 +431,12 @@ def _execute_action(decision: dict, log_fn) -> str:
         # Persistance pour injection explicite dans le prochain cycle
         _save_web_context(query, results)
         return f"web: {results[:120]}"
+
+    elif action == "teach_kaia":
+        msg = obs.strip() or decision.get("decision", "").strip()
+        if not msg:
+            return "message vide — teach_kaia ignoré"
+        return _teach_kaia(msg, log_fn)
 
     else:  # do_nothing ou action inconnue
         return ""
