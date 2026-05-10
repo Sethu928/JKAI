@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 _KNOWLEDGE_FILE  = "memory/kaia_knowledge.json"
 _KAIA_MODEL_FILE = "memory/kaia_model.json"
-_AUTONOMOUS_INTERVAL = 300  # secondes entre chaque cycle d'apprentissage
+_AUTONOMOUS_INTERVAL = 30  # secondes entre chaque cycle d'apprentissage
 
 
 def web_search(query: str) -> list:
