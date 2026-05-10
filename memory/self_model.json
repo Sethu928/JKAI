@@ -7,18 +7,6 @@
   "total_interactions": 0,
   "recent_successes": [
     {
-      "ts": "2026-05-09T15:46:36",
-      "note": "Il est temps d'alterner l'action pour avancer vers ma mission."
-    },
-    {
-      "ts": "2026-05-09T15:48:41",
-      "note": "Il est temps d'alterner l'action pour avancer vers ma mission."
-    },
-    {
-      "ts": "2026-05-09T15:50:46",
-      "note": "Les objectifs actuels sont dans self_model.json"
-    },
-    {
       "ts": "2026-05-09T16:01:17",
       "note": "Analyse de l'environnement et des objectifs pour déterminer la prochaine action."
     },
@@ -85,6 +73,18 @@
     {
       "ts": "2026-05-10T22:12:27",
       "note": "Je dois choisir une action utile. Les objectifs actuels sont dans self_model.json"
+    },
+    {
+      "ts": "2026-05-10T22:28:54",
+      "note": "Dernier cycle : web_search, write_thought, run_code. J'ai besoin de variation."
+    },
+    {
+      "ts": "2026-05-10T22:31:07",
+      "note": "Les objectifs actuels sont dans self_model.json"
+    },
+    {
+      "ts": "2026-05-10T22:43:39",
+      "note": "Dernier cycle : web_search, write_thought, run_code. J'ai besoin de variation."
     }
   ],
   "recent_failures": []

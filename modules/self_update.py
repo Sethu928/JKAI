@@ -1,5 +1,6 @@
 import os
 import sys
+import socket
 import subprocess
 import tempfile
 from datetime import datetime
@@ -174,14 +175,48 @@ def git_commit_and_push(file_path: str, message: str, log_fn) -> bool:
 
 def deploy_to_pi(log_fn) -> bool:
     """
-    SSH vers le Raspberry Pi (192.168.1.122 / pi).
-    Exécute : git pull && sudo systemctl restart jkai.
-    Authentification par clé SSH (~/.ssh/jkai_key).
+    Déploie sur le Pi selon le contexte d'exécution :
+    - Sur le Pi (hostname == 'jkai') : git pull + restart en local via subprocess.
+    - Sur le PC : SSH via paramiko vers 192.168.1.122.
     Retourne True si succès.
     """
+    on_pi = socket.gethostname() == "jkai"
+
+    if on_pi:
+        return _deploy_local(log_fn)
+    else:
+        return _deploy_via_ssh(log_fn)
+
+
+def _deploy_local(log_fn) -> bool:
+    """Exécution locale sur le Pi — git pull puis redémarrage systemd."""
+    flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+    for cmd in (["git", "pull"], ["sudo", "systemctl", "restart", "jkai"]):
+        try:
+            proc = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=30,
+                creationflags=flags,
+            )
+            out = (proc.stdout + proc.stderr).strip()
+            label = " ".join(cmd)
+            log_fn(f"[SELF_UPDATE] {label} → {'OK' if proc.returncode == 0 else 'ERREUR'} | {out[:300]}")
+            if proc.returncode != 0:
+                return False
+        except Exception as e:
+            log_fn(f"[SELF_UPDATE] Erreur locale ({' '.join(cmd)}) : {e}")
+            return False
+    log_fn("[SELF_UPDATE] Déploiement local Pi terminé.")
+    return True
+
+
+def _deploy_via_ssh(log_fn) -> bool:
+    """Déploiement depuis le PC via paramiko SSH vers le Pi."""
     key_path = os.path.expanduser("~/.ssh/jkai_key")
     if not os.path.exists(key_path):
-        log_fn(f"[SELF_UPDATE] Clé SSH introuvable ({key_path}) — déploiement Pi ignoré, git pull à déclencher manuellement.")
+        log_fn(f"[SELF_UPDATE] Clé SSH introuvable ({key_path}) — déploiement Pi ignoré.")
         return False
 
     try:
@@ -193,23 +228,16 @@ def deploy_to_pi(log_fn) -> bool:
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
-        ssh.connect(
-            PI_HOST,
-            username=PI_USER,
-            key_filename=key_path,
-            timeout=15,
-        )
+        ssh.connect(PI_HOST, username=PI_USER, key_filename=key_path, timeout=15)
         log_fn(f"[SELF_UPDATE] SSH connecté à {PI_HOST} ({PI_USER})")
-
         _, stdout, stderr = ssh.exec_command(PI_CMD, timeout=30)
         out = stdout.read().decode(errors="replace").strip()
         err = stderr.read().decode(errors="replace").strip()
-
         if out:
             log_fn(f"[SELF_UPDATE] Pi stdout : {out[:400]}")
         if err:
             log_fn(f"[SELF_UPDATE] Pi stderr : {err[:400]}")
-        log_fn("[SELF_UPDATE] Déploiement Pi terminé.")
+        log_fn("[SELF_UPDATE] Déploiement SSH Pi terminé.")
         return True
     except Exception as e:
         log_fn(f"[SELF_UPDATE] Erreur SSH Pi : {e}")
