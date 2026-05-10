@@ -403,7 +403,7 @@ _KAIA_LESSONS = [
 def _send_lesson_to_kaia():
     lesson = random.choice(_KAIA_LESSONS)
     try:
-        _requests.post("http://192.168.1.122:5001/chat", json={"message": lesson}, timeout=5)
+        _requests.post("http://192.168.1.122:5001/chat", json={"message": lesson}, timeout=30)
         log(f"[LEÇON→KAÏA] {lesson[:100]}")
     except Exception as e:
         log(f"[LEÇON→KAÏA] Erreur : {e}")
