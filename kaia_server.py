@@ -74,12 +74,14 @@ def _autonomous_learn_loop(kaia_instance):
     while True:
         time.sleep(_AUTONOMOUS_INTERVAL)
         topic = _pick_topic()
-        print(f"[KAÏA] Recherche autonome : {topic}")
+        print(f"[KAÏA] Recherche en cours : {topic}", flush=True)
         results = web_search(topic)
         if results:
             kaia_instance.knowledge[topic] = results
             _save_knowledge(kaia_instance.knowledge)
-            print(f"[KAÏA] Connaissance acquise : {topic} ({len(results)} résultat(s))")
+            print(f"[KAÏA] Connaissance acquise : {topic} ({len(results)} résultat(s))", flush=True)
+        else:
+            print(f"[KAÏA] Aucun résultat pour : {topic}", flush=True)
 
 
 class Kaia:
@@ -274,12 +276,14 @@ _HTML = """<!DOCTYPE html>
 def main():
     kaia = Kaia()
 
-    threading.Thread(
+    t = threading.Thread(
         target=_autonomous_learn_loop,
         args=(kaia,),
         daemon=True,
         name="kaia-learn",
-    ).start()
+    )
+    t.start()
+    print(f"[KAÏA] Thread autonome démarré — cycle toutes les {_AUTONOMOUS_INTERVAL}s (is_alive={t.is_alive()})", flush=True)
 
     @app.route('/')
     def index():
