@@ -100,7 +100,7 @@ _HTML = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KAÏA — NEXUS</title>
 <style>
-  :root { --orange: #ff5500; --bg: #050505; }
+  :root { --orange: #d946a8; --bg: #080510; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background: var(--bg); color: var(--orange);
@@ -109,37 +109,37 @@ _HTML = """<!DOCTYPE html>
     align-items: center; justify-content: center; gap: 32px;
   }
   header { text-align: center; }
-  header h1 { font-size: 28px; letter-spacing: 8px; text-shadow: 0 0 18px #ff550088; }
-  header p  { font-size: 10px; letter-spacing: 4px; color: #ff550055; margin-top: 6px; }
+  header h1 { font-size: 28px; letter-spacing: 8px; text-shadow: 0 0 18px #d946a888; }
+  header p  { font-size: 10px; letter-spacing: 4px; color: #d946a855; margin-top: 6px; }
   #chat-box {
     width: min(560px, 92vw); height: 340px;
-    border: 1px solid #ff550033; border-radius: 4px;
+    border: 1px solid #d946a833; border-radius: 4px;
     background: #0a0a0a; overflow-y: auto; padding: 14px;
     display: flex; flex-direction: column; gap: 10px;
   }
   .msg { font-size: 13px; line-height: 1.5; }
   .msg.user { color: #ff7733; }
-  .msg.kaia { color: #ff5500; }
+  .msg.kaia { color: #d946a8; }
   .msg.user::before { content: 'VOUS  › '; font-size: 10px; letter-spacing: 2px; opacity: .6; }
   .msg.kaia::before { content: 'KAÏA  › '; font-size: 10px; letter-spacing: 2px; opacity: .6; }
   #input-row {
     display: flex; gap: 8px; width: min(560px, 92vw);
   }
   #msg-input {
-    flex: 1; background: #0a0a0a; border: 1px solid #ff550044;
+    flex: 1; background: #0a0a0a; border: 1px solid #d946a844;
     color: var(--orange); font-family: 'Courier New', monospace;
     font-size: 13px; padding: 10px 14px; outline: none; border-radius: 2px;
   }
-  #msg-input:focus { border-color: #ff550099; box-shadow: 0 0 8px #ff550033; }
+  #msg-input:focus { border-color: #d946a899; box-shadow: 0 0 8px #d946a833; }
   #btn-send {
-    background: none; border: 1px solid #ff550066; color: var(--orange);
+    background: none; border: 1px solid #d946a866; color: var(--orange);
     font-family: 'Courier New', monospace; font-size: 11px;
     letter-spacing: 2px; padding: 10px 18px; cursor: pointer;
     transition: border-color .2s, box-shadow .2s;
   }
-  #btn-send:hover { border-color: var(--orange); box-shadow: 0 0 10px #ff550044; }
+  #btn-send:hover { border-color: var(--orange); box-shadow: 0 0 10px #d946a844; }
   #chat-box::-webkit-scrollbar { width: 4px; }
-  #chat-box::-webkit-scrollbar-thumb { background: #ff550033; }
+  #chat-box::-webkit-scrollbar-thumb { background: #d946a833; }
 </style>
 </head>
 <body>
