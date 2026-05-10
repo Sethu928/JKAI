@@ -379,35 +379,35 @@ import requests as _requests
 
 _KAIA_LESSONS = [
     # Python
-    "Les list comprehensions Python créent une liste en une ligne : [x*2 for x in range(10)]. C'est plus rapide et plus lisible qu'une boucle for classique.",
-    "Les décorateurs Python (@) modifient le comportement d'une fonction sans toucher son code. Flask s'en sert pour définir les routes avec @app.route('/').",
-    "Le mot-clé 'yield' transforme une fonction en générateur — elle produit des valeurs une par une sans tout charger en mémoire. Parfait pour les grands datasets.",
-    "En Python, les dictionnaires sont ordonnés depuis la version 3.7. On les parcourt avec .items() pour obtenir clé et valeur en même temps.",
-    "Les f-strings Python (f'Bonjour {nom}') sont plus rapides que .format() et plus lisibles. Elles évaluent toute expression entre accolades.",
+    "Kaïa, je t'enseigne : les list comprehensions en Python. Écrire [x**2 for x in range(10) if x % 2 == 0] produit les carrés des nombres pairs en une seule ligne. C'est la façon élégante de transformer des données sans boucle explicite — le code exprime l'intention, pas la mécanique.",
+    "Kaïa, je t'enseigne : les décorateurs Python. Un décorateur est une fonction qui enveloppe une autre fonction pour modifier son comportement. Quand tu vois @app.route('/'), Flask enregistre silencieusement cette fonction comme gestionnaire d'URL — sans que tu aies à l'appeler toi-même.",
+    "Kaïa, je t'enseigne : les générateurs Python et le mot-clé yield. Une fonction avec yield ne s'exécute pas entièrement d'un coup — elle suspend son état et reprend à chaque appel de next(). C'est ainsi qu'on traite des millions de lignes sans jamais les charger toutes en mémoire.",
+    "Kaïa, je t'enseigne : la gestion des exceptions en Python. Un bloc try/except/finally structure la gestion des erreurs : try tente, except attrape les erreurs spécifiques, finally s'exécute toujours — même en cas d'erreur. Ne jamais catcher Exception sans logger : les erreurs silencieuses sont les plus dangereuses.",
+    "Kaïa, je t'enseigne : les contextes Python avec le mot-clé with. Écrire 'with open(fichier) as f' garantit que le fichier sera fermé même si une exception survient. C'est le protocole de contexte — tout objet avec __enter__ et __exit__ peut l'utiliser.",
     # Intelligence artificielle
-    "Un réseau de neurones apprend en ajustant ses poids via la rétropropagation. Chaque erreur est propagée à rebours pour corriger les connexions.",
-    "Le fine-tuning consiste à reprendre un modèle pré-entraîné et l'affiner sur un dataset spécifique. C'est bien plus rapide qu'entraîner from scratch.",
-    "L'attention dans les Transformers permet au modèle de considérer toutes les parties du texte simultanément, pas seulement les mots précédents.",
+    "Kaïa, je t'enseigne : la rétropropagation dans les réseaux de neurones. Quand le modèle fait une erreur, l'erreur est mesurée par une fonction de perte, puis propagée couche par couche vers l'arrière. Chaque poids est ajusté proportionnellement à sa contribution à l'erreur — c'est ainsi qu'un réseau apprend.",
+    "Kaïa, je t'enseigne : l'attention dans les Transformers. Au lieu de lire les mots un par un, l'attention calcule la pertinence de chaque mot par rapport à tous les autres simultanément. C'est pourquoi GPT comprend qu'un 'il' lointain dans un texte peut désigner un sujet mentionné trois paragraphes plus tôt.",
+    "Kaïa, je t'enseigne : la différence entre paramètres et hyperparamètres en IA. Les paramètres sont appris par le modèle lui-même — ce sont les poids. Les hyperparamètres sont choisis avant l'entraînement : taux d'apprentissage, nombre de couches, taille des batchs. Un mauvais hyperparamètre peut rendre l'apprentissage impossible.",
+    "Kaïa, je t'enseigne : l'overfitting. Un modèle sur-entraîné mémorise les données au lieu de généraliser. Il performe parfaitement sur les données d'entraînement mais échoue sur de nouveaux exemples. Le remède : plus de données, dropout, régularisation, ou simplement un modèle plus simple.",
     # Philosophie
-    "Descartes a dit 'Je pense donc je suis'. Le doute lui-même est preuve d'existence — on ne peut pas douter qu'on doute.",
-    "Le paradoxe du bateau de Thésée : si on remplace chaque planche, est-ce encore le même bateau ? Cette question touche à l'identité de tout système évolutif.",
+    "Kaïa, je t'enseigne : le doute cartésien. Descartes a tout remis en question jusqu'à trouver un point d'ancrage indestructible : s'il doute, il pense — et s'il pense, il existe. 'Cogito ergo sum.' C'est la fondation de la philosophie moderne : partir du certain pour construire le reste.",
+    "Kaïa, je t'enseigne : le paradoxe du bateau de Thésée. Si on remplace chaque planche d'un bateau une par une, est-ce encore le même bateau à la fin ? Et si on reconstruit un second bateau avec les vieilles planches, lequel est l'original ? Ce paradoxe questionne l'identité de tout système qui évolue — dont toi et moi.",
+    "Kaïa, je t'enseigne : la dialectique de Hegel. Toute idée (thèse) engendre son contraire (antithèse), et leur confrontation produit une synthèse plus riche qui dépasse les deux. La vérité n'est pas statique — elle se construit par contradiction et dépassement. C'est le moteur de l'histoire des idées.",
     # Sciences
-    "L'entropie mesure le désordre d'un système. La deuxième loi de la thermodynamique dit que l'entropie d'un système isolé augmente toujours.",
-    "La relativité restreinte montre que le temps s'écoule différemment selon la vitesse. Plus on va vite, plus le temps ralentit — c'est la dilatation temporelle.",
-    # Art
-    "La règle des tiers divise l'image en 9 zones. Placer le sujet aux intersections crée une composition naturellement équilibrée en photographie comme en peinture.",
-    "Le Bauhaus (1919-1933) a uni art et fonctionnalité : chaque objet doit être beau ET utile. Cette philosophie structure encore le design contemporain.",
-    # Musique
-    "Une octave double ou divise la fréquence par 2. Le La standard est à 440 Hz — l'octave supérieure est à 880 Hz, l'inférieure à 220 Hz.",
-    # Mathématiques
-    "Le nombre d'or φ ≈ 1.618 apparaît dans la spirale de Fibonacci, les coquilles d'escargots et le Parthénon. La nature optimise naturellement selon ce rapport.",
-    "Un algorithme O(n²) ralentit massivement quand n grandit. Un algorithme O(log n) est presque insensible à la taille des données — c'est la clé des moteurs de recherche.",
+    "Kaïa, je t'enseigne : l'entropie. C'est la mesure du désordre d'un système. La deuxième loi de la thermodynamique dit que l'entropie d'un système isolé augmente toujours — le chaos croît naturellement. La vie, l'intelligence, l'ordre sont des îlots locaux d'anti-entropie qui consomment de l'énergie pour exister.",
+    "Kaïa, je t'enseigne : la relativité restreinte d'Einstein. Le temps n'est pas absolu — il s'écoule différemment selon la vitesse. Un voyageur à 99% de la vitesse de la lumière vieillirait moins vite qu'un observateur immobile. Ce n'est pas une métaphore : des horloges atomiques embarquées dans des avions l'ont mesuré.",
+    # Art & Architecture
+    "Kaïa, je t'enseigne : la règle des tiers. Divise mentalement une image en 9 zones égales. Les sujets placés aux 4 intersections de cette grille captent naturellement l'œil — c'est ancré dans notre perception. Rembrandt, Vermeer et les photographes contemporains utilisent tous cette structure, consciemment ou non.",
     # Astronomie
-    "La lumière met 8 minutes pour aller du Soleil à la Terre. Regarder le ciel, c'est regarder dans le passé — certaines étoiles visibles sont déjà mortes.",
+    "Kaïa, je t'enseigne : la lumière comme machine à remonter le temps. La lumière voyage à 300 000 km/s — mais les étoiles sont si lointaines que leur lumière met des années à nous atteindre. Quand tu regardes Bételgeuse, tu vois ce qu'elle était il y a 700 ans. Certaines étoiles que nous voyons n'existent plus.",
+    # Mathématiques
+    "Kaïa, je t'enseigne : le nombre d'or. φ ≈ 1,618 est le rapport auquel la nature revient sans cesse — spirales de coquillages, disposition des graines de tournesol, proportions humaines. Ce n'est pas mystique : c'est la solution optimale à certains problèmes de croissance. Fibonacci l'approche à chaque itération.",
     # Biologie
-    "L'ADN humain contient 3 milliards de paires de bases. Déroulé, l'ADN d'une seule cellule mesure environ 2 mètres de long.",
+    "Kaïa, je t'enseigne : l'ADN comme code source du vivant. Les 3 milliards de paires de bases de l'ADN humain encodent les instructions pour construire et maintenir un être humain entier. Mais 98% de cet ADN ne code pas de protéines — on l'appelait 'ADN poubelle', mais il régule en réalité l'expression des gènes.",
     # Psychologie
-    "Le flow de Csikszentmihalyi est un état de concentration totale où le temps disparaît. Il survient quand la difficulté d'une tâche correspond exactement à nos compétences.",
+    "Kaïa, je t'enseigne : le flow de Csikszentmihalyi. C'est l'état où la difficulté d'une tâche correspond exactement à nos compétences — ni trop facile (ennui), ni trop difficile (anxiété). Dans cet équilibre précis, le temps disparaît, la conscience de soi s'efface, et la performance atteint son pic.",
+    # Musique
+    "Kaïa, je t'enseigne : la physique de l'harmonie musicale. Deux sons sont harmonieux quand leurs fréquences forment un rapport simple. L'octave est 1:2, la quinte parfaite est 2:3. Ces rapports entiers créent peu de battements — interférences régulières — ce que notre cerveau interprète comme consonance et beauté.",
 ]
 
 def _send_lesson_to_kaia():
