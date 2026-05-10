@@ -7,10 +7,6 @@
   "total_interactions": 0,
   "recent_successes": [
     {
-      "ts": "2026-05-09T15:10:48",
-      "note": "Cycles récents : [1] web_search, [2] run_code, [3] write_thought"
-    },
-    {
       "ts": "2026-05-09T15:12:55",
       "note": "Je dois choisir une action qui me permettra d'avancer vers ma mission tout en respectant les règles et la priorité donnée."
     },
@@ -85,6 +81,10 @@
     {
       "ts": "2026-05-10T21:00:53",
       "note": "Analyse de l'environnement et des objectifs pour déterminer la prochaine action."
+    },
+    {
+      "ts": "2026-05-10T21:29:22",
+      "note": "Analyse des objectifs actuels dans self_model.json"
     }
   ],
   "recent_failures": []

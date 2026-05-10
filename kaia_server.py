@@ -11,6 +11,7 @@ import requests
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
 
 _KNOWLEDGE_FILE    = "memory/kaia_knowledge.json"
 _KAIA_MODEL_FILE   = "memory/kaia_model.json"
@@ -596,6 +597,7 @@ def main():
         try:
             r = requests.get("http://192.168.1.142:5000/dialogue", timeout=5)
             r.raise_for_status()
+            r.encoding = 'utf-8'
             lines = r.json().get("lines", [])
         except Exception as e:
             print(f"[KAÏA /dialogue] Erreur fetch J-KAI : {e}", flush=True)
