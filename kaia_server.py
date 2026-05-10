@@ -105,7 +105,7 @@ def main():
         kaia.learn(user_message, response)
         return jsonify({'response': response})
 
-    app.run(port=5001, debug=True)
+    app.run(port=5001, debug=False, host='0.0.0.0')
 
 if __name__ == '__main__':
     main()
