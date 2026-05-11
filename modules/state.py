@@ -2,11 +2,40 @@ import os
 import re
 import json
 import threading
+from datetime import datetime
 
 from dotenv import load_dotenv
 from openai import OpenAI
 
 load_dotenv()
+
+API_USAGE_FILE  = "memory/api_usage.json"
+_api_usage_lock = threading.Lock()
+
+
+def _track_api_call() -> None:
+    """Incrémente le compteur d'appels OpenAI réels dans memory/api_usage.json."""
+    with _api_usage_lock:
+        usage: dict = {}
+        try:
+            with open(API_USAGE_FILE, "r", encoding="utf-8") as f:
+                usage = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            pass
+        today    = datetime.now().strftime("%Y-%m-%d")
+        day      = usage.get(today, {"calls": 0, "tokens_est": 0})
+        day["calls"]       += 1
+        day["tokens_est"]  += 500   # estimation : ~500 tokens/appel
+        day["last_call"]    = datetime.now().isoformat(timespec="seconds")
+        usage[today] = day
+        keys  = sorted(usage.keys())[-30:]
+        usage = {k: usage[k] for k in keys}
+        try:
+            os.makedirs("memory", exist_ok=True)
+            with open(API_USAGE_FILE, "w", encoding="utf-8") as f:
+                json.dump(usage, f, ensure_ascii=False, indent=2)
+        except OSError:
+            pass
 
 # ── Singleton OpenAI — un seul client partagé par tous les modules ──────── #
 _openai_client: OpenAI | None = None
@@ -35,6 +64,7 @@ def get_openai_client() -> OpenAI:
     """Retourne le client OpenAI. Si LM_STUDIO=true dans .env, redirige vers LM Studio."""
     if os.getenv("LM_STUDIO", "").lower() == "true":
         return get_local_client()
+    _track_api_call()
     global _openai_client
     if _openai_client is None:
         with _client_init_lock:

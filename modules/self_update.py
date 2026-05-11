@@ -52,7 +52,7 @@ def write_and_test(path: str, new_code: str, log_fn) -> bool:
         log_fn(f"[SELF_UPDATE] Fichier protégé — refusé : {os.path.basename(path)}")
         return False
 
-    # Test syntaxe dans un fichier temporaire
+    # Test syntaxe + import dynamique dans un fichier temporaire
     tmp = tempfile.NamedTemporaryFile(
         mode="w", suffix=".py", delete=False, encoding="utf-8"
     )
@@ -61,6 +61,8 @@ def write_and_test(path: str, new_code: str, log_fn) -> bool:
         tmp.close()
 
         flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+
+        # Étape 1 : vérification syntaxe via py_compile
         proc = subprocess.run(
             [sys.executable, "-m", "py_compile", tmp.name],
             capture_output=True,
@@ -72,11 +74,38 @@ def write_and_test(path: str, new_code: str, log_fn) -> bool:
             err = (proc.stdout + proc.stderr).strip()
             log_fn(f"[SELF_UPDATE] Syntaxe invalide dans {path} :\n{err[:500]}")
             return False
+
+        # Étape 2 : import dynamique dans un subprocess isolé (fichiers .py uniquement)
+        if path.endswith(".py"):
+            import_env = os.environ.copy()
+            import_env["_SELF_UPDATE_TEST_FILE"] = tmp.name
+            import_cmd = (
+                "import sys, os; sys.path.insert(0, '.'); "
+                "import importlib.util; "
+                "f = os.environ['_SELF_UPDATE_TEST_FILE']; "
+                "spec = importlib.util.spec_from_file_location('_test_mod', f); "
+                "mod = importlib.util.module_from_spec(spec); "
+                "spec.loader.exec_module(mod)"
+            )
+            import_proc = subprocess.run(
+                [sys.executable, "-c", import_cmd],
+                capture_output=True,
+                text=True,
+                timeout=10,
+                cwd=os.path.abspath("."),
+                env=import_env,
+                creationflags=flags,
+            )
+            if import_proc.returncode != 0:
+                err = (import_proc.stdout + import_proc.stderr).strip()
+                log_fn(f"[SELF_UPDATE] Import test échoué pour {path} :\n{err[:500]}")
+                return False
+
     except subprocess.TimeoutExpired:
-        log_fn(f"[SELF_UPDATE] Timeout py_compile pour {path}")
+        log_fn(f"[SELF_UPDATE] Timeout test pour {path}")
         return False
     except Exception as e:
-        log_fn(f"[SELF_UPDATE] Erreur py_compile : {e}")
+        log_fn(f"[SELF_UPDATE] Erreur test : {e}")
         return False
     finally:
         try:

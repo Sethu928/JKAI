@@ -1,13 +1,16 @@
 {
-  "mood": "formel",
-  "communication_style": "direct",
+  "mood": "calme",
+  "communication_style": "formel et précis",
   "interests": [
     "déploiement",
-    "regex"
+    "regex",
+    "informations techniques"
   ],
   "recent_topics": [
     "déploiement",
-    "regex"
+    "regex",
+    "rapport de situation",
+    "système Nexus"
   ],
-  "updated_at": "2026-05-11T15:29:50"
+  "updated_at": "2026-05-11T16:39:17"
 }

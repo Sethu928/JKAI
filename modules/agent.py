@@ -58,6 +58,7 @@ VALID_ACTIONS = {
     "do_nothing", "log", "run_code",
     "update_memory", "write_thought", "update_self_description", "web_search",
     "teach_kaia", "analyze_self", "improve_self", "create_module", "self_correct",
+    "restructure",
 }
 
 # ── Historique des actions récentes (3 dernières, mémoire courte) ────────── #
@@ -616,6 +617,97 @@ def _teach_kaia(message: str, log_fn) -> str:
     return f"Kaïa a répondu : {kaia_reply[:100]}"
 
 
+# ── Restructuration de modules surchargés ───────────────────────────────── #
+
+def _restructure(log_fn) -> str:
+    """Identifie les modules >200 lignes, propose une division via LLM et crée les sous-modules."""
+    try:
+        with open(SELF_CODE_FILE, "r", encoding="utf-8") as f:
+            understanding = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return "self_code_understanding.json introuvable — lance analyze_self d'abord"
+
+    candidates = []
+    for m in understanding.get("modules", []):
+        fpath = m.get("file", "")
+        if not fpath or not os.path.exists(fpath):
+            continue
+        try:
+            with open(fpath, "r", encoding="utf-8", errors="replace") as f:
+                lines = f.readlines()
+            if len(lines) > 200:
+                candidates.append({
+                    "file":         fpath,
+                    "lines":        len(lines),
+                    "role":         m.get("role", "?"),
+                    "improvements": m.get("improvements", []),
+                })
+        except OSError:
+            pass
+
+    if not candidates:
+        return "Aucun module >200 lignes — restructuration non nécessaire"
+
+    target = max(candidates, key=lambda x: x["lines"])
+    try:
+        with open(target["file"], "r", encoding="utf-8", errors="replace") as f:
+            source_code = f.read()
+    except OSError as e:
+        return f"Erreur lecture {target['file']} : {e}"
+
+    try:
+        resp = client.chat.completions.create(
+            model=LOCAL_MODEL,
+            messages=format_messages_for_local([
+                {"role": "system", "content": (
+                    "Tu es J-KAI. Analyse ce module Python surchargé et propose de le diviser. "
+                    "Réponds UNIQUEMENT en JSON : "
+                    '{"split_modules": [{"name": "snake_case", "role": "une phrase", "code": "contenu Python complet"}], '
+                    '"reason": "pourquoi cette restructuration"}. '
+                    "Chaque sous-module doit avoir un rôle clair et unique. Stdlib uniquement."
+                )},
+                {"role": "user", "content": (
+                    f"Module à restructurer : {target['file']} ({target['lines']} lignes)\n"
+                    f"Rôle actuel : {target['role']}\n\n"
+                    f"Code source (2000 premiers chars) :\n{source_code[:2000]}"
+                )},
+            ]),
+        )
+        data = parse_json_fence(resp.choices[0].message.content)
+        if not isinstance(data, dict):
+            return "Réponse LLM non-JSON"
+    except Exception as e:
+        log_fn(f"[AGENT] restructure LLM error : {e}")
+        return f"Erreur LLM : {e}"
+
+    split_modules = data.get("split_modules", [])
+    reason        = data.get("reason", "")
+
+    if not split_modules:
+        return "Aucune restructuration proposée par le LLM"
+
+    created = []
+    for mod in split_modules[:3]:
+        name = re.sub(r"[^a-z0-9_]", "", str(mod.get("name", "")).lower())[:30]
+        code = str(mod.get("code", ""))
+        if not name or not code:
+            continue
+        new_path = os.path.join("modules", f"{name}.py")
+        if os.path.exists(new_path):
+            continue
+        try:
+            with open(new_path, "w", encoding="utf-8") as f:
+                f.write(code)
+            created.append(name)
+        except OSError as e:
+            log_fn(f"[AGENT] restructure write error ({name}) : {e}")
+
+    if created:
+        log_fn(f"[AGENT] restructure — {target['file']} → {created} | {reason[:100]}")
+        return f"Restructuration : {len(created)} module(s) créé(s) : {created} — {reason[:100]}"
+    return "Restructuration proposée mais aucun fichier créé (conflits ou erreurs)"
+
+
 # ── Exécution de l'action décidée ───────────────────────────────────────── #
 
 def _execute_action(decision: dict, log_fn) -> str:
@@ -720,6 +812,9 @@ def _execute_action(decision: dict, log_fn) -> str:
     elif action == "self_correct":
         return _self_correct(log_fn)
 
+    elif action == "restructure":
+        return _restructure(log_fn)
+
     else:  # do_nothing ou action inconnue
         return ""
 
@@ -810,8 +905,8 @@ def run_agent_cycle(log_fn) -> None:
 _PRIORITIES_FILE = "memory/priorities.json"
 
 _WORKER_CONFIGS: dict[str, dict] = {
-    "analysis":  {"actions": ["analyze_self", "improve_self", "create_module"], "interval": 120},
-    "teaching":  {"actions": ["teach_kaia"],                                    "interval":  60},
+    "analysis":  {"actions": ["analyze_self", "improve_self", "create_module", "restructure"], "interval": 120},
+    "teaching":  {"actions": ["teach_kaia"],                                                   "interval":  60},
     "knowledge": {"actions": ["web_search", "update_memory", "write_thought", "log", "run_code", "self_correct"], "interval": 90},
 }
 
@@ -819,6 +914,7 @@ _ACTIONS_DOC: dict[str, str] = {
     "analyze_self":  "lit tous les .py → memory/self_code_understanding.json",
     "improve_self":  "lit self_code_understanding.json, implémente une amélioration via Cortex",
     "create_module": "conçoit et crée un nouveau module Python dans modules/, champ 'observation' = contexte",
+    "restructure":   "identifie les modules >200 lignes, propose une division et crée les sous-modules",
     "teach_kaia":    "envoie un message éducatif à Kaïa, champ 'observation' = message",
     "web_search":    "recherche DuckDuckGo, champ 'code' = requête",
     "update_memory": "note dans self_model.json, champ 'observation'",
@@ -966,3 +1062,10 @@ def start_agent(log_fn) -> list[threading.Thread]:
 def read_agent_log(n: int = 20) -> list[str]:
     """Retourne les n dernières lignes de logs/agent.log."""
     return tail_file(AGENT_LOG, n).splitlines()[-n:]
+
+
+# ── Point d'entrée public pour le Monitor ────────────────────────────────── #
+
+def trigger_self_correct(log_fn) -> str:
+    """Déclenché par le Monitor en temps réel quand une erreur est détectée."""
+    return _self_correct(log_fn)

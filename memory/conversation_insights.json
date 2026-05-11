@@ -76,5 +76,29 @@
     "value": "print(\"Regex OK\")",
     "category": "fact",
     "updated_at": "2026-05-11T15:29:50"
+  },
+  {
+    "key": "système Nexus",
+    "value": "fichier créé et déployé avec succès",
+    "category": "fact",
+    "updated_at": "2026-05-11T16:39:17"
+  },
+  {
+    "key": "conversations",
+    "value": "aucune conversation significative n'a eu lieu depuis la dernière mise à jour",
+    "category": "fact",
+    "updated_at": "2026-05-11T16:39:17"
+  },
+  {
+    "key": "performances système Nexus",
+    "value": "en cours d'analyse via le module nexus_statistics.py",
+    "category": "fact",
+    "updated_at": "2026-05-11T16:39:17"
+  },
+  {
+    "key": "prochaines étapes",
+    "value": "analyser les résultats des statistiques",
+    "category": "decision",
+    "updated_at": "2026-05-11T16:39:17"
   }
 ]

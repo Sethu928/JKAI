@@ -36,8 +36,11 @@ client = get_openai_client()
 server = Flask(__name__)
 CORS(server)
 
-CORE_MEMORY_FILE = "memory/core_memory.json"
-LOG_FILE = "logs/jkai.log"
+CORE_MEMORY_FILE           = "memory/core_memory.json"
+LOG_FILE                   = "logs/jkai.log"
+API_USAGE_FILE             = "memory/api_usage.json"
+API_COST_PER_1K_TOKENS_EUR = 0.0092   # gpt-4o output ~$10/1M ≈ €9.2/1M
+API_DAILY_BUDGET_EUR       = 0.50
 AUTONOMIE_ACTIVE = True
 USE_OPENAI       = True
 
@@ -56,6 +59,39 @@ def log(text):
     os.makedirs("logs", exist_ok=True)
     with open(LOG_FILE, "a", encoding="utf-8") as f:
         f.write(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {text}\n")
+
+def check_api_budget() -> dict:
+    """
+    Calcule le coût OpenAI estimé du jour depuis memory/api_usage.json.
+    Si > API_DAILY_BUDGET_EUR, bascule USE_OPENAI=False automatiquement.
+    """
+    global USE_OPENAI
+    today = datetime.now().strftime("%Y-%m-%d")
+    usage = {}
+    try:
+        with open(API_USAGE_FILE, "r", encoding="utf-8") as f:
+            usage = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        pass
+    day        = usage.get(today, {"calls": 0, "tokens_est": 0})
+    calls      = day.get("calls", 0)
+    tokens_est = day.get("tokens_est", 0)
+    cost_eur   = (tokens_est / 1000) * API_COST_PER_1K_TOKENS_EUR
+    exceeded   = cost_eur > API_DAILY_BUDGET_EUR
+    if exceeded and USE_OPENAI:
+        USE_OPENAI = False
+        _sync_module_clients()
+        log(f"[BUDGET] Seuil dépassé — coût estimé {cost_eur:.3f}€ (>{API_DAILY_BUDGET_EUR}€) — USE_OPENAI=False")
+    return {
+        "date":            today,
+        "calls":           calls,
+        "tokens_est":      tokens_est,
+        "cost_eur":        round(cost_eur, 4),
+        "budget_eur":      API_DAILY_BUDGET_EUR,
+        "use_openai":      USE_OPENAI,
+        "budget_exceeded": exceeded,
+    }
+
 
 def _get_active_client():
     return get_openai_client() if USE_OPENAI else get_local_client()
@@ -540,6 +576,10 @@ def dialogue():
 def severus():
     return jsonify({"status": "severus"})
 
+@server.route("/budget", methods=["GET"])
+def budget():
+    return jsonify(check_api_budget())
+
 register_killswitch(server, log)
 
 # ── Leçons envoyées régulièrement à Kaïa ──────────────────────────────────
@@ -603,6 +643,7 @@ def _send_lesson_to_kaia():
 
 
 scheduler = create_default_scheduler(log)
+scheduler.add_task("check_api_budget", 300, check_api_budget)
 if AUTONOMIE_ACTIVE:
     scheduler.add_task("teach_kaia",            60,   _send_lesson_to_kaia)
     scheduler.add_task("consciousness_reflect", 300,  lambda: reflect(log))
@@ -616,7 +657,13 @@ if AUTONOMIE_ACTIVE:
     start_agent(log)
     threading.Thread(target=lambda: define_mission(log), daemon=True, name="define-mission").start()
 
-monitor = Monitor()
+def _realtime_error_callback(error_key: str) -> str:
+    """Callback déclenché par Monitor à chaque nouvelle erreur — appelle trigger_self_correct."""
+    from modules.agent import trigger_self_correct
+    log(f"[MONITOR] Erreur détectée en temps réel — correction lancée : {error_key[:120]}")
+    return trigger_self_correct(log)
+
+monitor = Monitor(on_error=_realtime_error_callback)
 monitor.start()
 
 if __name__ == "__main__":

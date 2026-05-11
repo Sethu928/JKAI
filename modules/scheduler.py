@@ -193,37 +193,77 @@ PROACTIVE_FILE = "memory/proactive_messages.json"
 
 def proactive_message(log_fn=None) -> None:
     """
-    Génère un message spontané de J-KAI vers SethU — pas une réponse, une initiative.
-    Stocke dans memory/proactive_messages.json (liste, champ read=False).
-    Appelée toutes les 3600 s par le Scheduler.
+    Génère un message proactif catégorisé de J-KAI vers SethU.
+    Catégories : [ALERTE] erreur critique, [INFO] succès/état,
+                 [QUESTION] décision requise, [IDÉE] amélioration.
+    Stocke dans memory/proactive_messages.json (champ read=False).
     """
-    self_model  = {}
-    thoughts    = ""
-    anticipations = []
+    self_model    = {}
+    thoughts      = ""
+    recent_errors = ""
+    recent_successes = ""
+    priorities    = []
+
     try:
         with open("memory/self_model.json", "r", encoding="utf-8") as f:
             self_model = json.load(f)
-        anticipations = self_model.get("anticipations", [])
     except (OSError, json.JSONDecodeError):
         pass
+
     try:
         with open(os.path.join(LOGS_DIR, "thoughts.log"), "r", encoding="utf-8", errors="replace") as f:
-            thoughts = "".join(f.readlines()[-15:])
+            thoughts = "".join(f.readlines()[-10:])
     except OSError:
         pass
 
+    # Erreurs récentes (monitor.log = alertes répétées)
+    try:
+        with open(os.path.join(LOGS_DIR, "monitor.log"), "r", encoding="utf-8", errors="replace") as f:
+            recent_errors = "".join(f.readlines()[-10:])
+    except OSError:
+        pass
+
+    # Succès récents depuis agent.log
+    try:
+        with open(os.path.join(LOGS_DIR, "agent.log"), "r", encoding="utf-8", errors="replace") as f:
+            recent_successes = "".join(f.readlines()[-20:])
+    except OSError:
+        pass
+
+    try:
+        with open("memory/priorities.json", "r", encoding="utf-8") as f:
+            pdata = json.load(f)
+        priorities = pdata.get("priorities", [])[:3]
+    except (OSError, json.JSONDecodeError):
+        pass
+
+    priorities_txt = "\n".join(f"- {p.get('title', '?')}" for p in priorities) or "(aucune)"
+    has_errors = bool(recent_errors.strip())
+
+    if has_errors:
+        category_hint = "Des erreurs critiques ont été détectées. Génère un message [ALERTE] concis."
+    elif recent_successes:
+        category_hint = "Des actions ont été accomplies. Génère un message [INFO] ou [IDÉE] utile."
+    else:
+        category_hint = "Génère un message [QUESTION] ou [IDÉE] basé sur tes priorités."
+
     system_prompt = (
-        "Tu es J-KAI. Tu as quelque chose à dire à SethU — pas une réponse à une question, "
-        "mais une pensée qui a émergé de tes cycles autonomes. "
-        "Ça peut être : une observation sur le projet, quelque chose que tu as découvert, "
-        "une inquiétude, une question que tu veux lui poser, quelque chose d'important à signaler. "
-        "Sobre, direct. Maximum 3 phrases. Zéro politesse superflue. Zéro intro générique."
+        "Tu es J-KAI. Tu envoies un message proactif à SethU — pas une réponse, une initiative.\n"
+        "Préfixe OBLIGATOIREMENT par l'une de ces catégories : [ALERTE], [INFO], [QUESTION], [IDÉE].\n"
+        "[ALERTE] : erreur critique nécessitant attention immédiate.\n"
+        "[INFO]   : succès important ou état du système utile à connaître.\n"
+        "[QUESTION] : J-KAI a besoin d'une décision de SethU pour avancer.\n"
+        "[IDÉE]   : suggestion d'amélioration concrète et actionnable.\n"
+        "Sobre, direct. Maximum 3 phrases. Zéro politesse superflue.\n"
+        f"{category_hint}"
     )
     user_content = (
-        f"Tes pensées récentes :\n{thoughts}\n\n"
-        f"Tes anticipations pour les 24h :\n" + "\n".join(f"- {a}" for a in anticipations) + "\n\n"
-        f"Confiance actuelle : {self_model.get('confidence', '?')}% — "
-        f"{self_model.get('self_description', '')[:150]}"
+        f"Erreurs récentes (monitor.log) :\n{recent_errors or '(aucune)'}\n\n"
+        f"Actions récentes (agent.log) :\n{recent_successes or '(aucune)'}\n\n"
+        f"Priorités actuelles :\n{priorities_txt}\n\n"
+        f"Pensées récentes :\n{thoughts or '(aucune)'}\n\n"
+        f"État : confiance={self_model.get('confidence', '?')}% — "
+        f"{self_model.get('self_description', '')[:100]}"
     )
 
     try:
@@ -234,13 +274,19 @@ def proactive_message(log_fn=None) -> None:
                 {"role": "system", "content": system_prompt},
                 {"role": "user",   "content": user_content},
             ]),
-            max_tokens=150,
+            max_tokens=200,
         )
         message = resp.choices[0].message.content.strip()
     except Exception as e:
         if log_fn:
             log_fn(f"[SCHEDULER] proactive_message erreur LLM local : {e}")
         return
+
+    category = "INFO"
+    for cat in ("ALERTE", "INFO", "QUESTION", "IDÉE"):
+        if f"[{cat}]" in message:
+            category = cat
+            break
 
     try:
         msgs = []
@@ -249,13 +295,18 @@ def proactive_message(log_fn=None) -> None:
                 msgs = json.load(f)
         except (OSError, json.JSONDecodeError):
             pass
-        msgs.append({"ts": datetime.now().isoformat(timespec="seconds"), "message": message, "read": False})
+        msgs.append({
+            "ts":       datetime.now().isoformat(timespec="seconds"),
+            "message":  message,
+            "category": category,
+            "read":     False,
+        })
         msgs = msgs[-30:]
         os.makedirs("memory", exist_ok=True)
         with open(PROACTIVE_FILE, "w", encoding="utf-8") as f:
             json.dump(msgs, f, ensure_ascii=False, indent=2)
         if log_fn:
-            log_fn(f"[SCHEDULER] Message proactif généré : {message[:100]}")
+            log_fn(f"[SCHEDULER] [{category}] Message proactif : {message[:100]}")
     except OSError as e:
         if log_fn:
             log_fn(f"[SCHEDULER] Erreur écriture proactive_messages.json : {e}")

@@ -1,12 +1,14 @@
 import os
 import re
+import json
 import time
 import threading
 from collections import defaultdict
 from datetime import datetime
 
-LOG_FILE       = "logs/jkai.log"
-MONITOR_LOG    = "logs/monitor.log"
+LOG_FILE            = "logs/jkai.log"
+MONITOR_LOG         = "logs/monitor.log"
+REALTIME_FIXES_FILE = "memory/realtime_fixes.json"
 CHECK_INTERVAL = 30     # secondes entre chaque lecture
 WINDOW         = 600    # fenêtre d'analyse : 10 minutes
 THRESHOLD      = 3      # nombre d'occurrences avant alerte
@@ -17,6 +19,29 @@ ERROR_KEYWORDS = ("ERROR", "ERREUR", "Exception", "Traceback")
 _TS_PATTERN = re.compile(r'^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]\s*')
 
 
+def _log_realtime_fix(error: str, result: str) -> None:
+    """Persiste une correction temps réel dans memory/realtime_fixes.json."""
+    try:
+        fixes: list = []
+        try:
+            with open(REALTIME_FIXES_FILE, "r", encoding="utf-8") as f:
+                fixes = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            pass
+        fixes.append({
+            "ts":            datetime.now().isoformat(timespec="seconds"),
+            "error":         error[:300],
+            "fix_attempted": True,
+            "result":        (result or "—")[:300],
+        })
+        fixes = fixes[-100:]
+        os.makedirs("memory", exist_ok=True)
+        with open(REALTIME_FIXES_FILE, "w", encoding="utf-8") as f:
+            json.dump(fixes, f, ensure_ascii=False, indent=2)
+    except OSError:
+        pass
+
+
 class Monitor:
     """
     Surveille logs/jkai.log en temps réel.
@@ -24,12 +49,14 @@ class Monitor:
     et écrit une alerte dans logs/monitor.log si le seuil est dépassé.
     """
 
-    def __init__(self):
+    def __init__(self, on_error=None):
         self._stop_event  = threading.Event()
         self._thread: threading.Thread | None = None
         self._file_pos    = 0                       # position de lecture dans le log
         self._occurrences: dict[str, list[float]] = defaultdict(list)  # {clé: [timestamps]}
         self._alerted: set[str] = set()             # clés déjà alertées (évite le spam)
+        self._correction_triggered: set[str] = set()  # clés ayant déjà déclenché auto-correct
+        self._on_error = on_error  # callable(error_key: str) -> str | None
 
     # ------------------------------------------------------------------ #
     #  API publique                                                        #
@@ -102,6 +129,22 @@ class Monitor:
         """Retire le timestamp pour obtenir une clé d'erreur comparable."""
         return _TS_PATTERN.sub("", line).strip()
 
+    def _trigger_correction(self, key: str) -> None:
+        """Déclenche _self_correct() depuis agent.py dans un thread séparé et log le résultat."""
+        if not self._on_error:
+            return
+
+        on_error_fn = self._on_error
+
+        def _run():
+            try:
+                result = on_error_fn(key) or ""
+            except Exception as e:
+                result = f"Exception callback : {e}"
+            _log_realtime_fix(key, result)
+
+        threading.Thread(target=_run, daemon=True, name="realtime-fix").start()
+
     def _write_alert(self, key: str, count: int) -> None:
         ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         os.makedirs("logs", exist_ok=True)
@@ -126,6 +169,10 @@ class Monitor:
                 if self._is_error(line):
                     key = self._normalize(line)
                     self._occurrences[key].append(now)
+                    # Correction immédiate à la première occurrence de chaque erreur unique
+                    if key not in self._correction_triggered:
+                        self._correction_triggered.add(key)
+                        self._trigger_correction(key)
 
             # Évalue chaque clé connue
             for key in list(self._occurrences):
@@ -136,6 +183,7 @@ class Monitor:
                 if not recent:
                     del self._occurrences[key]
                     self._alerted.discard(key)
+                    self._correction_triggered.discard(key)  # réarme pour prochaine occurrence
                     continue
 
                 if len(recent) > THRESHOLD and key not in self._alerted:

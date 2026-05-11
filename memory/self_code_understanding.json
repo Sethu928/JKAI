@@ -7,110 +7,186 @@
         "openai"
       ],
       "improvements": [
-        "core memory",
-        "system prompt"
+        "Mise à jour de la mémoire",
+        "Amélioration de l'interface"
       ]
     },
     {
       "file": "jkai_voice.py",
-      "role": "Module vocal",
+      "role": "Assistant vocal",
       "dependencies": [
-        "speech recognition",
-        "text-to-speech"
+        "openai",
+        "modules.voice"
       ],
       "improvements": [
-        "voice assistant capabilities"
+        "Intégration d'un système de reconnaissance vocale",
+        "Amélioration du traitement de la parole"
       ]
     },
     {
       "file": "kaia_server.py",
       "role": "Serveur web",
       "dependencies": [
-        "flask",
         "sqlite3"
       ],
       "improvements": [
-        "web search functionality",
-        "autonomous mode"
+        "Mise en place d'une base de données pour stocker les conversations",
+        "Amélioration de la sécurité"
       ]
     },
     {
       "file": "killswitch.py",
-      "role": "Module de sécurité",
+      "role": "Gestionnaire de killswitch",
       "dependencies": [],
       "improvements": [
-        "shutdown mechanism"
+        "Mise à jour du système de gestion des erreurs"
       ]
     },
     {
       "file": "nexus_statistics.py",
-      "role": "Analyse de données",
+      "role": "Analyse statistique",
       "dependencies": [
-        "sqlite3",
-        "scikit-learn"
+        "sqlite3"
       ],
       "improvements": [
-        "accuracy score calculation"
+        "Création d'une base de données pour stocker les données statistiques",
+        "Amélioration de l'affichage des résultats"
+      ]
+    },
+    {
+      "file": "server.py",
+      "role": "Serveur principal",
+      "dependencies": [
+        "flask",
+        "modules.state"
+      ],
+      "improvements": [
+        "Mise en place d'une architecture RESTful",
+        "Amélioration de la gestion des requêtes"
+      ]
+    },
+    {
+      "file": "test_regex.py",
+      "role": "Test de regex",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "test_teach.py",
+      "role": "Test de l'apprentissage",
+      "dependencies": [
+        "modules.agent"
+      ],
+      "improvements": [
+        "Amélioration du système d'entraînement"
+      ]
+    },
+    {
+      "file": "memory/__init__.py",
+      "role": "Initiliazation de la mémoire",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "memory/db.py",
+      "role": "Gestionnaire de base de données",
+      "dependencies": [
+        "sqlite3"
+      ],
+      "improvements": [
+        "Création d'une base de données pour stocker les conversations",
+        "Amélioration de la sécurité"
       ]
     },
     {
       "file": "modules/agent.py",
-      "role": "Module agent",
+      "role": "Agent d'intelligence artificielle",
       "dependencies": [
         "openai"
       ],
       "improvements": [
-        "thoughts log",
-        "autonomous mode"
+        "Mise à jour du système d'apprentissage",
+        "Amélioration de l'interface"
       ]
     },
     {
       "file": "modules/autonomy.py",
-      "role": "Mode autonome",
-      "dependencies": [],
-      "improvements": [
-        "decision-making functionality"
-      ]
-    },
-    {
-      "file": "modules/cortex.py",
-      "role": "Module Dev AI",
+      "role": "Gestionnaire de mode autonome",
       "dependencies": [
         "openai"
       ],
       "improvements": [
-        "code generation",
-        "cognitive development"
+        "Mise à jour du système d'apprentissage",
+        "Amélioration de l'interface"
       ]
+    },
+    {
+      "file": "modules/consciousness.py",
+      "role": "Gestionnaire de conscience",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "Mise à jour du système d'apprentissage",
+        "Amélioration de l'interface"
+      ]
+    },
+    {
+      "file": "modules/cortex.py",
+      "role": "Module de développement logiciel",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "Mise à jour du système d'apprentissage",
+        "Amélioration de l'interface"
+      ]
+    },
+    {
+      "file": "modules/historique_worker_analysis.py",
+      "role": "Analyse des logs historiques",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "modules/marc.py",
       "role": "Conseiller sceptique",
-      "dependencies": [],
+      "dependencies": [
+        "openai"
+      ],
       "improvements": [
-        "critical thinking functionality"
+        "Mise à jour du système d'apprentissage",
+        "Amélioration de l'interface"
       ]
     },
     {
       "file": "modules/monitor.py",
-      "role": "Module de surveillance",
+      "role": "Gestionnaire de monitoring",
       "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules/nexus_statistics.py",
+      "role": "Analyse statistique",
+      "dependencies": [
+        "sqlite3"
+      ],
       "improvements": [
-        "error detection and alert mechanism"
+        "Création d'une base de données pour stocker les données statistiques",
+        "Amélioration de l'affichage des résultats"
       ]
+    },
+    {
+      "file": "modules/scheduler.py",
+      "role": "Gestionnaire de planning",
+      "dependencies": [],
+      "improvements": []
     }
   ],
   "global_improvements": [
-    "core memory management",
-    "system prompt generation",
-    "voice assistant capabilities",
-    "web search functionality",
-    "autonomous mode development",
-    "thoughts log analysis",
-    "cognitive development",
-    "critical thinking functionality",
-    "error detection and alert mechanism"
+    "Mise à jour du système d'apprentissage",
+    "Amélioration de l'interface"
   ],
-  "analyzed_at": "2026-05-11T15:29:56",
-  "file_count": 23
+  "analyzed_at": "2026-05-11T18:34:37",
+  "file_count": 24
 }
