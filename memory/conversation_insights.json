@@ -37,8 +37,26 @@
   },
   {
     "key": "context",
-    "value": "project deployment",
+    "value": "Déployer le fichier modules/test_regex.py",
     "category": "context",
-    "updated_at": "2026-05-11T15:03:53"
+    "updated_at": "2026-05-11T15:16:26"
+  },
+  {
+    "key": "decision",
+    "value": "Créer et déployer le fichier `modules/test_regex.py`.",
+    "category": "decision",
+    "updated_at": "2026-05-11T15:16:26"
+  },
+  {
+    "key": "preference",
+    "value": "Utiliser Python pour exécuter le code.",
+    "category": "preference",
+    "updated_at": "2026-05-11T15:16:26"
+  },
+  {
+    "key": "fact",
+    "value": "Le fichier est désormais disponible dans le répertoire `modules`.",
+    "category": "fact",
+    "updated_at": "2026-05-11T15:16:26"
   }
 ]

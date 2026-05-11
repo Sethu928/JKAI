@@ -2,211 +2,126 @@
   "modules": [
     {
       "file": "jkai.py",
-      "role": "IA avancée du système Nexus",
-      "dependencies": [
-        "openai"
-      ],
-      "improvements": [
-        "utilisation d'un client OpenAI singleton thread-safe",
-        "stockage des conversations dans un fichier JSON"
-      ]
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "jkai_voice.py",
-      "role": "Assistant vocal de J-KAI",
-      "dependencies": [
-        "openai",
-        "speech"
-      ],
-      "improvements": [
-        "utilisation d'un client OpenAI singleton thread-safe",
-        "stockage des conversations dans un fichier JSON"
-      ]
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "kaia_server.py",
-      "role": "Serveur principal du système Nexus",
-      "dependencies": [
-        "sqlite3",
-        "requests"
-      ],
-      "improvements": [
-        "utilisation d'un serveur Flask pour gérer les requêtes HTTP",
-        "stockage des conversations dans une base de données SQLite"
-      ]
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "killswitch.py",
-      "role": "Système d'arrêt en cas de défaillance",
+      "role": "?",
       "dependencies": [],
-      "improvements": [
-        "utilisation d'un fichier log pour stocker les événements",
-        "définition d'une commande d'arrêt en cas de problème"
-      ]
+      "improvements": []
     },
     {
       "file": "nexus_statistics.py",
-      "role": "Outils statistiques pour le système Nexus",
-      "dependencies": [
-        "sqlite3",
-        "scikit-learn"
-      ],
-      "improvements": [
-        "utilisation d'une base de données SQLite pour stocker les données",
-        "calcul des métriques statistiques (précision, rappel, etc.)"
-      ]
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "server.py",
-      "role": "Serveur principal du système Nexus",
-      "dependencies": [
-        "flask",
-        "requests"
-      ],
-      "improvements": [
-        "utilisation d'un serveur Flask pour gérer les requêtes HTTP",
-        "stockage des conversations dans un fichier JSON"
-      ]
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "test_teach.py",
-      "role": "Test de l'entraînement du modèle J-KAI",
-      "dependencies": [
-        "openai"
-      ],
-      "improvements": [
-        "utilisation d'un client OpenAI singleton thread-safe",
-        "stockage des conversations dans un fichier JSON"
-      ]
-    },
-    {
-      "file": "memory/__init__.py",
-      "role": "Module de stockage des données du système Nexus",
+      "role": "?",
       "dependencies": [],
-      "improvements": [
-        "utilisation d'un module de stockage de données pour le système Nexus"
-      ]
+      "improvements": []
     },
     {
-      "file": "memory/db.py",
-      "role": "Module de stockage des conversations dans une base de données SQLite",
-      "dependencies": [
-        "sqlite3"
-      ],
-      "improvements": [
-        "utilisation d'une base de données SQLite pour stocker les données",
-        "stockage des conversations dans une table dédiée"
-      ]
-    },
-    {
-      "file": "modules/agent.py",
-      "role": "Agent principal du système Nexus",
-      "dependencies": [
-        "openai"
-      ],
-      "improvements": [
-        "utilisation d'un client OpenAI singleton thread-safe",
-        "stockage des conversations dans un fichier JSON"
-      ]
-    },
-    {
-      "file": "modules/autonomy.py",
-      "role": "Module de prise en charge autonome du système Nexus",
-      "dependencies": [
-        "openai"
-      ],
-      "improvements": [
-        "utilisation d'un client OpenAI singleton thread-safe",
-        "stockage des conversations dans un fichier JSON"
-      ]
-    },
-    {
-      "file": "modules/consciousness.py",
-      "role": "Module de prise en charge consciente du système Nexus",
-      "dependencies": [
-        "openai"
-      ],
-      "improvements": [
-        "utilisation d'un client OpenAI singleton thread-safe",
-        "stockage des conversations dans un fichier JSON"
-      ]
-    },
-    {
-      "file": "modules/cortex.py",
-      "role": "Module de développement logiciel du système Nexus",
-      "dependencies": [
-        "openai"
-      ],
-      "improvements": [
-        "utilisation d'un client OpenAI singleton thread-safe",
-        "stockage des conversations dans un fichier JSON"
-      ]
-    },
-    {
-      "file": "modules/marc.py",
-      "role": "Module de conseiller sceptique du système Nexus",
-      "dependencies": [
-        "openai"
-      ],
-      "improvements": [
-        "utilisation d'un client OpenAI singleton thread-safe",
-        "stockage des conversations dans un fichier JSON"
-      ]
-    },
-    {
-      "file": "modules/monitor.py",
-      "role": "Module de surveillance du système Nexus",
+      "file": "logs\\test_self_update.py",
+      "role": "?",
       "dependencies": [],
-      "improvements": [
-        "utilisation d'un module de surveillance pour le système Nexus"
-      ]
+      "improvements": []
     },
     {
-      "file": "modules/nexus_statistics.py",
-      "role": "Outils statistiques pour le système Nexus",
-      "dependencies": [
-        "sqlite3",
-        "scikit-learn"
-      ],
-      "improvements": [
-        "utilisation d'une base de données SQLite pour stocker les données",
-        "calcul des métriques statistiques (précision, rappel, etc.)"
-      ]
-    },
-    {
-      "file": "modules/scheduler.py",
-      "role": "Module de planification du système Nexus",
+      "file": "memory\\__init__.py",
+      "role": "?",
       "dependencies": [],
-      "improvements": [
-        "utilisation d'un module de planification pour le système Nexus"
-      ]
+      "improvements": []
     },
     {
-      "file": "modules/self_update.py",
-      "role": "Module de mise à jour automatique du système Nexus",
+      "file": "memory\\db.py",
+      "role": "?",
       "dependencies": [],
-      "improvements": [
-        "utilisation d'un module de mise à jour automatique pour le système Nexus"
-      ]
+      "improvements": []
     },
     {
-      "file": "modules/state.py",
-      "role": "Module de gestion des états du système Nexus",
-      "dependencies": [
-        "openai"
-      ],
-      "improvements": [
-        "utilisation d'un client OpenAI singleton thread-safe",
-        "stockage des conversations dans un fichier JSON"
-      ]
+      "file": "modules\\agent.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\autonomy.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\consciousness.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\cortex.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\marc.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\monitor.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\nexus_statistics.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\scheduler.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\self_update.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\state.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     }
   ],
-  "global_improvements": [
-    "utilisation d'une base de données SQLite pour stocker les données",
-    "calcul des métriques statistiques (précision, rappel, etc.)",
-    "utilisation d'un client OpenAI singleton thread-safe",
-    "stockage des conversations dans un fichier JSON"
-  ],
-  "analyzed_at": "2026-05-11T15:13:34",
+  "global_improvements": [],
+  "analyzed_at": "2026-05-11T15:15:33",
   "file_count": 21
 }
