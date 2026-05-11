@@ -664,6 +664,8 @@ def _clean_wiki_content(raw: str) -> str:
     """Retire les éléments de navigation Wikipedia et retourne les 300 premiers chars utiles."""
     cleaned = _WIKI_NAV_RE.sub("", raw)
     cleaned = re.sub(r"\n{3,}", "\n\n", cleaned).strip()
+    if len(cleaned) < 50:
+        return raw.strip()[:300]
     return cleaned[:300]
 
 
@@ -684,7 +686,9 @@ def _send_lesson_to_kaia():
     if use_web:
         raw     = browse_url("https://fr.wikipedia.org/wiki/Special:Random")
         content = _clean_wiki_content(raw)
-        subject = next((l.strip() for l in content.splitlines() if len(l.strip()) > 3), "ce sujet")[:60]
+        subject = next((l.strip() for l in content.splitlines() if len(l.strip()) > 3), "")[:60]
+        if not subject:
+            subject = f"web_{datetime.now().strftime('%H%M')}"
         topic_key = f"web_{datetime.now().strftime('%Y%m%d_%H%M')}"
         lesson    = f"Kaïa, voici ce que j'ai trouvé sur {subject} : {content}"
         source    = "web"
