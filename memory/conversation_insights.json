@@ -58,5 +58,23 @@
     "value": "Le fichier est désormais disponible dans le répertoire `modules`.",
     "category": "fact",
     "updated_at": "2026-05-11T15:16:26"
+  },
+  {
+    "key": "style de réponse préféré",
+    "value": "courtes et directes",
+    "category": "preference",
+    "updated_at": "2026-05-11T15:29:50"
+  },
+  {
+    "key": "préférence pour la mise en forme des réponses",
+    "value": "sans fioritures",
+    "category": "preference",
+    "updated_at": "2026-05-11T15:29:50"
+  },
+  {
+    "key": "code fourni",
+    "value": "print(\"Regex OK\")",
+    "category": "fact",
+    "updated_at": "2026-05-11T15:29:50"
   }
 ]

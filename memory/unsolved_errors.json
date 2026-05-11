@@ -1,0 +1,10 @@
+[
+  {
+    "key": "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpeztee0ij.py\", line 1 python kaia_server.py --debug ^^^",
+    "snippet": "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpeztee0ij.py\", line 1 python kaia_server.py --debug ^^^",
+    "attempt": 1,
+    "fix_code": "import subprocess\nimport sqlite3\n\ndef run_code(func):\n    try:\n        result = func()\n        return result\n    except Exception as e:\n        print(f\"Erreur lors de l'exécution du code : {e}\")\n        return None\n\n@run_code\ndef create_module():\n    try:\n        # Créer une connexion à la base de d",
+    "fix_error": "Traceback (most recent call last):\n  File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmptmbn8u8r.py\", line 27, in <module>\n    create_module()\n    ~~~~~~~~~~~~~^^\nTypeError: 'str' object is not callable",
+    "ts": "2026-05-11T15:29:52"
+  }
+]

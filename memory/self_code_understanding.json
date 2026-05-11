@@ -1,99 +1,116 @@
 {
   "modules": [
     {
-      "file": "modules/agent.py",
-      "role": "Agent",
+      "file": "jkai.py",
+      "role": "Assistant IA avancé",
       "dependencies": [
-        "modules/state.py",
         "openai"
       ],
       "improvements": [
-        "gérer les conversations avec l'utilisateur",
-        "améliorer la prise en charge de la sécurité"
+        "core memory",
+        "system prompt"
+      ]
+    },
+    {
+      "file": "jkai_voice.py",
+      "role": "Module vocal",
+      "dependencies": [
+        "speech recognition",
+        "text-to-speech"
+      ],
+      "improvements": [
+        "voice assistant capabilities"
+      ]
+    },
+    {
+      "file": "kaia_server.py",
+      "role": "Serveur web",
+      "dependencies": [
+        "flask",
+        "sqlite3"
+      ],
+      "improvements": [
+        "web search functionality",
+        "autonomous mode"
+      ]
+    },
+    {
+      "file": "killswitch.py",
+      "role": "Module de sécurité",
+      "dependencies": [],
+      "improvements": [
+        "shutdown mechanism"
+      ]
+    },
+    {
+      "file": "nexus_statistics.py",
+      "role": "Analyse de données",
+      "dependencies": [
+        "sqlite3",
+        "scikit-learn"
+      ],
+      "improvements": [
+        "accuracy score calculation"
+      ]
+    },
+    {
+      "file": "modules/agent.py",
+      "role": "Module agent",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "thoughts log",
+        "autonomous mode"
       ]
     },
     {
       "file": "modules/autonomy.py",
-      "role": "Autonomie",
-      "dependencies": [
-        "modules/state.py"
-      ],
+      "role": "Mode autonome",
+      "dependencies": [],
       "improvements": [
-        "développer un système d'apprentissage autonome",
-        "améliorer la prise en charge de l'analyse de situations"
-      ]
-    },
-    {
-      "file": "modules/consciousness.py",
-      "role": "Conscience",
-      "dependencies": [
-        "modules/state.py"
-      ],
-      "improvements": [
-        "développer un système d'intelligence artificielle évolutive",
-        "améliorer la prise en charge de la prise de décision"
+        "decision-making functionality"
       ]
     },
     {
       "file": "modules/cortex.py",
-      "role": "Cortex",
+      "role": "Module Dev AI",
       "dependencies": [
         "openai"
       ],
       "improvements": [
-        "développer un système d'intelligence artificielle spécialisée dans le développement logiciel",
-        "améliorer la prise en charge de la génération de code"
+        "code generation",
+        "cognitive development"
       ]
     },
     {
       "file": "modules/marc.py",
-      "role": "Conseiller sceptique et rigoureux",
-      "dependencies": [
-        "openai"
-      ],
+      "role": "Conseiller sceptique",
+      "dependencies": [],
       "improvements": [
-        "développer un système d'intelligence artificielle spécialisée dans la prise en charge de l'analyse de situations",
-        "améliorer la prise en charge de la prise de décision"
+        "critical thinking functionality"
       ]
     },
     {
       "file": "modules/monitor.py",
-      "role": " Surveillance",
+      "role": "Module de surveillance",
       "dependencies": [],
       "improvements": [
-        "développer un système d'intelligence artificielle spécialisée dans la surveillance et l'alerte",
-        "améliorer la prise en charge de l'analyse de situations"
-      ]
-    },
-    {
-      "file": "modules/scheduler.py",
-      "role": "Planificateur",
-      "dependencies": [
-        "modules/state.py"
-      ],
-      "improvements": [
-        "développer un système d'intelligence artificielle spécialisée dans la planification et l'organisation",
-        "améliorer la prise en charge de la gestion des tâches"
-      ]
-    },
-    {
-      "file": "modules/self_update.py",
-      "role": "Mise à jour automatique",
-      "dependencies": [],
-      "improvements": [
-        "développer un système d'intelligence artificielle spécialisée dans la mise à jour et la maintenance",
-        "améliorer la prise en charge de l'analyse de situations"
+        "error detection and alert mechanism"
       ]
     }
   ],
   "global_improvements": [
-    "développer un système d'intelligence artificielle évolutive",
-    "améliorer la prise en charge de la sécurité",
-    "développer un système d'apprentissage autonome",
-    "améliorer la prise en charge de l'analyse de situations",
-    "développer un système d'intelligence artificielle spécialisée dans le développement logiciel",
-    "améliorer la prise en charge de la génération de code"
+    "core memory management",
+    "system prompt generation",
+    "voice assistant capabilities",
+    "web search functionality",
+    "autonomous mode development",
+    "thoughts log analysis",
+    "cognitive development",
+    "critical thinking functionality",
+    "error detection and alert mechanism"
   ],
-  "analyzed_at": "2026-05-11T15:25:25",
+  "analyzed_at": "2026-05-11T15:29:56",
   "file_count": 23
 }
