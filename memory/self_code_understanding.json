@@ -2,228 +2,120 @@
   "modules": [
     {
       "file": "jkai.py",
-      "role": "Assistant IA avancé",
-      "dependencies": [
-        "os",
-        "json",
-        "datetime"
-      ],
-      "improvements": [
-        "chargement de mémoire core",
-        "initialisation du client OpenAI"
-      ]
-    },
-    {
-      "file": "jkai_voice.py",
-      "role": "Conversation vocale",
-      "dependencies": [
-        "os",
-        "json",
-        "pyaudio",
-        "wave",
-        "pyttsx3"
-      ],
-      "improvements": [
-        "détection de voix",
-        "conversion en texte"
-      ]
-    },
-    {
-      "file": "kaia_server.py",
-      "role": "Serveur web",
-      "dependencies": [
-        "sqlite3",
-        "random",
-        "json",
-        "os",
-        "threading"
-      ],
-      "improvements": [
-        "initialisation du serveur Flask",
-        "génération de log"
-      ]
-    },
-    {
-      "file": "killswitch.py",
-      "role": "Arrêt d'urgence",
-      "dependencies": [
-        "os",
-        "signal",
-        "threading"
-      ],
-      "improvements": [
-        "détection de mot de passe",
-        "envoi de signal SIGINT"
-      ]
-    },
-    {
-      "file": "server.py",
-      "role": "Serveur principal",
-      "dependencies": [
-        "sys",
-        "os",
-        "json",
-        "re",
-        "random",
-        "threading"
-      ],
-      "improvements": [
-        "initialisation du serveur Flask",
-        "génération de log"
-      ]
-    },
-    {
-      "file": "test_teach.py",
-      "role": "Test d'enseignement",
+      "role": "?",
       "dependencies": [],
       "improvements": []
     },
     {
-      "file": "memory/__init__.py",
-      "role": "Initialisation de la mémoire",
-      "dependencies": [
-        "sqlite3",
-        "os"
-      ],
+      "file": "jkai_voice.py",
+      "role": "?",
+      "dependencies": [],
       "improvements": []
     },
     {
-      "file": "memory/db.py",
-      "role": "Gestion de la base de données",
-      "dependencies": [
-        "sqlite3",
-        "os"
-      ],
-      "improvements": [
-        "initialisation de la base de données",
-        "génération de log"
-      ]
-    },
-    {
-      "file": "modules/agent.py",
-      "role": "Agent d'intelligence artificielle",
-      "dependencies": [
-        "os",
-        "json",
-        "re",
-        "time",
-        "threading"
-      ],
-      "improvements": [
-        "initialisation du client OpenAI",
-        "génération de log"
-      ]
-    },
-    {
-      "file": "modules/autonomy.py",
-      "role": "Autonomie",
-      "dependencies": [
-        "os",
-        "json"
-      ],
-      "improvements": [
-        "détection d'événements",
-        "envoi de signal SIGINT"
-      ]
-    },
-    {
-      "file": "modules/consciousness.py",
-      "role": "Conscience",
-      "dependencies": [
-        "os",
-        "json"
-      ],
-      "improvements": [
-        "initialisation du client OpenAI",
-        "génération de log"
-      ]
-    },
-    {
-      "file": "modules/cortex.py",
-      "role": "Cerveau",
-      "dependencies": [
-        "os",
-        "re",
-        "sys",
-        "subprocess"
-      ],
-      "improvements": [
-        "détection de code Python",
-        "envoi de signal SIGINT"
-      ]
-    },
-    {
-      "file": "modules/marc.py",
-      "role": "Conseiller sceptique",
-      "dependencies": [
-        "os"
-      ],
+      "file": "kaia_server.py",
+      "role": "?",
+      "dependencies": [],
       "improvements": []
     },
     {
-      "file": "modules/monitor.py",
-      "role": "Surveillance",
-      "dependencies": [
-        "os",
-        "re",
-        "time",
-        "threading"
-      ],
-      "improvements": [
-        "détection d'erreurs",
-        "envoi de signal SIGINT"
-      ]
-    },
-    {
-      "file": "modules/scheduler.py",
-      "role": "Planificateur",
-      "dependencies": [
-        "os",
-        "json",
-        "time"
-      ],
+      "file": "killswitch.py",
+      "role": "?",
+      "dependencies": [],
       "improvements": []
     },
     {
-      "file": "modules/self_update.py",
-      "role": "Mise à jour automatique",
-      "dependencies": [
-        "os",
-        "sys",
-        "socket",
-        "subprocess"
-      ],
+      "file": "server.py",
+      "role": "?",
+      "dependencies": [],
       "improvements": []
     },
     {
-      "file": "modules/state.py",
-      "role": "État global",
-      "dependencies": [
-        "os",
-        "re",
-        "json"
-      ],
-      "improvements": [
-        "initialisation du client OpenAI",
-        "génération de log"
-      ]
+      "file": "test_teach.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
-      "file": "modules/voice.py",
-      "role": "Conversation vocale",
-      "dependencies": [
-        "pyaudio",
-        "wave",
-        "pyttsx3"
-      ],
+      "file": "logs\\test_self_update.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "memory\\__init__.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "memory\\db.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\agent.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\autonomy.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\consciousness.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\cortex.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\marc.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\monitor.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\scheduler.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\self_update.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\state.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\voice.py",
+      "role": "?",
+      "dependencies": [],
       "improvements": []
     }
   ],
-  "global_improvements": [
-    "chargement de mémoire core",
-    "initialisation du client OpenAI",
-    "génération de log"
-  ],
-  "analyzed_at": "2026-05-11T14:06:32",
+  "global_improvements": [],
+  "analyzed_at": "2026-05-11T14:12:23",
   "file_count": 19
 }

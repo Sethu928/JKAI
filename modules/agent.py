@@ -415,7 +415,10 @@ def _improve_self(decision: dict, log_fn) -> str:
                 {"role": "system", "content": (
                     "Tu es J-KAI. Implémente l'amélioration demandée en Python pur (stdlib uniquement). "
                     "Génère un bloc ```python\\n...``` exécutable. "
-                    "Chemins relatifs au projet. Table SQLite 'conversations' dans memory/jkai.db."
+                    "Chemins relatifs au projet. Table SQLite 'conversations' dans memory/jkai.db. "
+                    "Le code doit s'exécuter en moins de 5 secondes. "
+                    "N'utilise jamais pickle, shelve, multiprocessing, subprocess. "
+                    "Utilise uniquement json, sqlite3, os, datetime, math, re."
                 )},
                 {"role": "user", "content": f"Amélioration à implémenter : {target}\nContexte : {obs}"},
             ]),
