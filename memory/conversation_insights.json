@@ -1,0 +1,44 @@
+[
+  {
+    "key": "module_name",
+    "value": "nexus_statistics.py",
+    "category": "fact",
+    "updated_at": "2026-05-11T15:00:48"
+  },
+  {
+    "key": "module_purpose",
+    "value": "analyse les performances du système Nexus",
+    "category": "fact",
+    "updated_at": "2026-05-11T15:00:48"
+  },
+  {
+    "key": "database_connection",
+    "value": "sqlite3",
+    "category": "context",
+    "updated_at": "2026-05-11T15:00:48"
+  },
+  {
+    "key": "metrics_used",
+    "value": "accuracy_score, precision_score, recall_score, f1_score",
+    "category": "fact",
+    "updated_at": "2026-05-11T15:00:48"
+  },
+  {
+    "key": "deployment",
+    "value": "modules/nexus_statistics.py",
+    "category": "fact",
+    "updated_at": "2026-05-11T15:03:53"
+  },
+  {
+    "key": "creation",
+    "value": "J-KAI",
+    "category": "decision",
+    "updated_at": "2026-05-11T15:03:53"
+  },
+  {
+    "key": "context",
+    "value": "project deployment",
+    "category": "context",
+    "updated_at": "2026-05-11T15:03:53"
+  }
+]

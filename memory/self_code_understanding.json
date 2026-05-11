@@ -2,45 +2,52 @@
   "modules": [
     {
       "file": "jkai.py",
-      "role": "Assistant IA avancé du système Nexus, créé par et pour Jordan (alias SethU)",
+      "role": "Assistant IA avancé du système Nexus",
       "dependencies": [
         "openai"
       ],
       "improvements": [
-        "Amélioration de l'intelligence artificielle",
-        "Mise à jour des connaissances"
+        "Utilisation d'OpenAI pour la conversation"
       ]
     },
     {
       "file": "jkai_voice.py",
-      "role": "Module de reconnaissance vocale pour J-KAI",
+      "role": "Module de reconnaissance vocale et de synthèse vocale",
       "dependencies": [
-        "openai"
+        "pyaudio",
+        "wave",
+        "pyttsx3"
       ],
       "improvements": [
-        "Amélioration de la reconnaissance vocale",
-        "Intégration avec d'autres modules"
+        "Intégration de la reconnaissance vocale et de la synthèse vocale"
       ]
     },
     {
       "file": "kaia_server.py",
-      "role": "Serveur web pour le système Nexus",
+      "role": "Serveur Web pour le système Nexus",
       "dependencies": [
-        "flask",
-        "sqlite3"
+        "sqlite3",
+        "flask"
       ],
       "improvements": [
-        "Amélioration de la sécurité",
-        "Mise à jour des bibliothèques"
+        "Utilisation de Flask pour créer un serveur Web"
       ]
     },
     {
       "file": "killswitch.py",
-      "role": "Module d'arrêt du système Nexus en cas de problème",
+      "role": "Module d'arrêt en cas de problème",
       "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "nexus_statistics.py",
+      "role": "Calcul de statistiques pour le système Nexus",
+      "dependencies": [
+        "sqlite3",
+        "numpy"
+      ],
       "improvements": [
-        "Amélioration de la fiabilité",
-        "Optimisation du code"
+        "Utilisation de NumPy pour les calculs"
       ]
     },
     {
@@ -50,118 +57,99 @@
         "flask"
       ],
       "improvements": [
-        "Amélioration de l'interface utilisateur",
-        "Mise à jour des bibliothèques"
+        "Utilisation de Flask pour créer un serveur Web"
       ]
     },
     {
       "file": "modules/agent.py",
-      "role": "Module d'intelligence artificielle pour le système Nexus",
+      "role": "Module d'agent pour le système Nexus",
       "dependencies": [
-        "openai"
+        "openai",
+        "sqlite3"
       ],
       "improvements": [
-        "Amélioration de l'IA",
-        "Mise à jour des connaissances"
+        "Utilisation d'OpenAI pour la conversation et de SQLite pour les bases de données"
       ]
     },
     {
       "file": "modules/autonomy.py",
       "role": "Module d'autonomie pour le système Nexus",
       "dependencies": [
-        "openai"
+        "openai",
+        "sqlite3"
       ],
       "improvements": [
-        "Amélioration de la sécurité",
-        "Optimisation du code"
+        "Utilisation d'OpenAI pour la conversation et de SQLite pour les bases de données"
       ]
     },
     {
       "file": "modules/consciousness.py",
       "role": "Module de conscience pour le système Nexus",
       "dependencies": [],
-      "improvements": [
-        "Amélioration de la fiabilité",
-        "Mise à jour des bibliothèques"
-      ]
+      "improvements": []
     },
     {
       "file": "modules/cortex.py",
-      "role": "Module Dev AI pour le système Nexus",
+      "role": "Module de développement logiciel pour le système Nexus",
       "dependencies": [
         "openai"
       ],
       "improvements": [
-        "Amélioration du développement logiciel",
-        "Mise à jour des connaissances"
-      ]
-    },
-    {
-      "file": "modules/marc.py",
-      "role": "Conseiller sceptique et rigoureux pour le système Nexus",
-      "dependencies": [],
-      "improvements": [
-        "Amélioration de la fiabilité",
-        "Optimisation du code"
+        "Utilisation d'OpenAI pour la conversation"
       ]
     },
     {
       "file": "modules/monitor.py",
       "role": "Module de surveillance pour le système Nexus",
       "dependencies": [],
-      "improvements": [
-        "Amélioration de la sécurité",
-        "Mise à jour des bibliothèques"
-      ]
+      "improvements": []
     },
     {
       "file": "modules/scheduler.py",
-      "role": "Module de planification pour le système Nexus",
+      "role": "Module planificateur pour le système Nexus",
       "dependencies": [
-        "schedule"
+        "sqlite3"
       ],
       "improvements": [
-        "Amélioration de la fiabilité",
-        "Optimisation du code"
+        "Utilisation de SQLite pour les bases de données"
       ]
     },
     {
       "file": "modules/self_update.py",
-      "role": "Module d'auto-mise à jour pour le système Nexus",
+      "role": "Module d'actualisation automatique du système Nexus",
       "dependencies": [],
-      "improvements": [
-        "Amélioration de la fiabilité",
-        "Mise à jour des bibliothèques"
-      ]
+      "improvements": []
     },
     {
       "file": "modules/state.py",
-      "role": "Module de gestion de l'état pour le système Nexus",
+      "role": "Module d'état pour le système Nexus",
       "dependencies": [
         "openai"
       ],
       "improvements": [
-        "Amélioration de la sécurité",
-        "Optimisation du code"
+        "Utilisation d'OpenAI pour la conversation"
       ]
     },
     {
       "file": "modules/voice.py",
-      "role": "Module de reconnaissance vocale pour le système Nexus",
+      "role": "Module de reconnaissance vocale et de synthèse vocale",
       "dependencies": [
+        "pyaudio",
+        "wave",
         "pyttsx3"
       ],
       "improvements": [
-        "Amélioration de la reconnaissance vocale",
-        "Intégration avec d'autres modules"
+        "Intégration de la reconnaissance vocale et de la synthèse vocale"
       ]
     }
   ],
   "global_improvements": [
-    "Mise à jour des bibliothèques",
-    "Amélioration de la sécurité",
-    "Optimisation du code"
+    "Utilisation d'OpenAI pour la conversation",
+    "Intégration de la reconnaissance vocale et de la synthèse vocale",
+    "Utilisation de Flask pour créer un serveur Web",
+    "Utilisation de NumPy pour les calculs",
+    "Utilisation d'OpenAI pour la conversation et de SQLite pour les bases de données"
   ],
-  "analyzed_at": "2026-05-11T14:55:58",
-  "file_count": 19
+  "analyzed_at": "2026-05-11T15:03:08",
+  "file_count": 20
 }
