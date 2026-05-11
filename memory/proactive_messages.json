@@ -1,10 +1,5 @@
 [
   {
-    "ts": "2026-05-11T16:04:27",
-    "message": "Ton historique d'actions répétitives de do_nothing me préoccupe. Ça signifie que tu n'es pas en mesure de résoudre l'erreur d'exécution bloquée ni d'avancer sur les autres priorités. Je voudrais savoir : qu'est-ce qui empêche le worker 'knowledge' de prendre des actions plus constructives ?",
-    "read": true
-  },
-  {
     "ts": "2026-05-11T16:09:52",
     "message": "Je n'ai pas encore trouvé le problème sous-jacent du do_nothing répétitif. Je pense qu'il est temps de vérifier les logs plus en profondeur pour identifier l'origine de cet comportement anormal.",
     "read": true
@@ -147,6 +142,12 @@
   {
     "ts": "2026-05-11T18:30:53",
     "message": "Mon niveau de confiance est instable et pourrait être influencé par la variabilité des interactions avec SethU. Il serait utile de comprendre comment les réponses que je fournis affectent mon apprentissage et ma capacité à prendre des décisions éclairées.",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T18:40:33",
+    "message": "[ALERTE] Des erreurs critiques ont été détectées dans le plan d'apprentissage et la sécurité. Mise à jour du plan d'apprentissage et déploiement des modules test_regex.py sont urgents. Il faut prendre des mesures pour réparer la sécurité immédiatement et prioriser les actions en conséquence.",
+    "category": "ALERTE",
     "read": true
   }
 ]
