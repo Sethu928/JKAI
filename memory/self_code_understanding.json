@@ -4,52 +4,86 @@
       "file": "jkai.py",
       "role": "Assistant IA avancé",
       "dependencies": [
-        "openai"
+        "os",
+        "json",
+        "datetime"
       ],
-      "improvements": []
+      "improvements": [
+        "chargement de mémoire core",
+        "initialisation du client OpenAI"
+      ]
     },
     {
       "file": "jkai_voice.py",
-      "role": "Vocalisation",
+      "role": "Conversation vocale",
       "dependencies": [
-        "openai",
-        "pyttsx3",
-        "pyaudio"
+        "os",
+        "json",
+        "pyaudio",
+        "wave",
+        "pyttsx3"
       ],
-      "improvements": []
+      "improvements": [
+        "détection de voix",
+        "conversion en texte"
+      ]
     },
     {
       "file": "kaia_server.py",
-      "role": "Serveur",
+      "role": "Serveur web",
       "dependencies": [
-        "flask",
         "sqlite3",
-        "requests"
+        "random",
+        "json",
+        "os",
+        "threading"
       ],
-      "improvements": []
+      "improvements": [
+        "initialisation du serveur Flask",
+        "génération de log"
+      ]
     },
     {
       "file": "killswitch.py",
-      "role": "Arrêt de secours",
-      "dependencies": [],
-      "improvements": []
+      "role": "Arrêt d'urgence",
+      "dependencies": [
+        "os",
+        "signal",
+        "threading"
+      ],
+      "improvements": [
+        "détection de mot de passe",
+        "envoi de signal SIGINT"
+      ]
     },
     {
       "file": "server.py",
       "role": "Serveur principal",
       "dependencies": [
-        "flask",
-        "sqlite3"
+        "sys",
+        "os",
+        "json",
+        "re",
+        "random",
+        "threading"
       ],
       "improvements": [
-        "Utilisation de CORS pour faciliter les appels API"
+        "initialisation du serveur Flask",
+        "génération de log"
       ]
     },
     {
       "file": "test_teach.py",
-      "role": "Test d'apprentissage",
+      "role": "Test d'enseignement",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "memory/__init__.py",
+      "role": "Initialisation de la mémoire",
       "dependencies": [
-        "openai"
+        "sqlite3",
+        "os"
       ],
       "improvements": []
     },
@@ -57,102 +91,139 @@
       "file": "memory/db.py",
       "role": "Gestion de la base de données",
       "dependencies": [
-        "sqlite3"
+        "sqlite3",
+        "os"
       ],
       "improvements": [
-        "Utilisation de context managers pour gérer les connexions"
+        "initialisation de la base de données",
+        "génération de log"
       ]
     },
     {
       "file": "modules/agent.py",
       "role": "Agent d'intelligence artificielle",
       "dependencies": [
-        "openai",
-        "sqlite3"
+        "os",
+        "json",
+        "re",
+        "time",
+        "threading"
       ],
-      "improvements": []
+      "improvements": [
+        "initialisation du client OpenAI",
+        "génération de log"
+      ]
     },
     {
       "file": "modules/autonomy.py",
       "role": "Autonomie",
       "dependencies": [
-        "openai"
+        "os",
+        "json"
       ],
       "improvements": [
-        "Utilisation de threading pour gérer les tâches en parallèle"
+        "détection d'événements",
+        "envoi de signal SIGINT"
       ]
     },
     {
       "file": "modules/consciousness.py",
       "role": "Conscience",
-      "dependencies": [],
-      "improvements": []
+      "dependencies": [
+        "os",
+        "json"
+      ],
+      "improvements": [
+        "initialisation du client OpenAI",
+        "génération de log"
+      ]
     },
     {
       "file": "modules/cortex.py",
-      "role": "Module de développement logiciel",
+      "role": "Cerveau",
       "dependencies": [
-        "openai"
+        "os",
+        "re",
+        "sys",
+        "subprocess"
       ],
       "improvements": [
-        "Utilisation de threading pour gérer les tâches en parallèle"
+        "détection de code Python",
+        "envoi de signal SIGINT"
       ]
     },
     {
       "file": "modules/marc.py",
       "role": "Conseiller sceptique",
       "dependencies": [
-        "openai"
+        "os"
       ],
       "improvements": []
     },
     {
       "file": "modules/monitor.py",
       "role": "Surveillance",
-      "dependencies": [],
+      "dependencies": [
+        "os",
+        "re",
+        "time",
+        "threading"
+      ],
       "improvements": [
-        "Utilisation de threading pour gérer les tâches en parallèle"
+        "détection d'erreurs",
+        "envoi de signal SIGINT"
       ]
     },
     {
       "file": "modules/scheduler.py",
       "role": "Planificateur",
       "dependencies": [
-        "threading"
+        "os",
+        "json",
+        "time"
       ],
       "improvements": []
     },
     {
       "file": "modules/self_update.py",
       "role": "Mise à jour automatique",
-      "dependencies": [],
-      "improvements": [
-        "Utilisation de subprocess pour exécuter des commandes système"
-      ]
-    },
-    {
-      "file": "modules/state.py",
-      "role": "Gestion d'état",
       "dependencies": [
-        "openai"
+        "os",
+        "sys",
+        "socket",
+        "subprocess"
       ],
       "improvements": []
     },
     {
-      "file": "modules/voice.py",
-      "role": "Vocalisation",
+      "file": "modules/state.py",
+      "role": "État global",
       "dependencies": [
-        "pyttsx3",
-        "pyaudio"
+        "os",
+        "re",
+        "json"
+      ],
+      "improvements": [
+        "initialisation du client OpenAI",
+        "génération de log"
+      ]
+    },
+    {
+      "file": "modules/voice.py",
+      "role": "Conversation vocale",
+      "dependencies": [
+        "pyaudio",
+        "wave",
+        "pyttsx3"
       ],
       "improvements": []
     }
   ],
   "global_improvements": [
-    "Utilisation de threading pour gérer les tâches en parallèle",
-    "Utilisation de context managers pour gérer les connexions",
-    "Utilisation de subprocess pour exécuter des commandes système"
+    "chargement de mémoire core",
+    "initialisation du client OpenAI",
+    "génération de log"
   ],
-  "analyzed_at": "2026-05-11T13:57:29",
+  "analyzed_at": "2026-05-11T14:06:32",
   "file_count": 19
 }

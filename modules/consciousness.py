@@ -190,7 +190,7 @@ def reflect(log_fn) -> None:
                 {"role": "system", "content": CONSCIOUSNESS_PROMPT},
                 {"role": "user",   "content": user_content},
             ]),
-            response_format={"type": "json_object"},
+
         )
         updates = json.loads(resp.choices[0].message.content)
     except Exception as e:
@@ -271,7 +271,7 @@ def check_objectives(log_fn) -> None:
                 {"role": "system", "content": CHECK_OBJECTIVES_SYSTEM},
                 {"role": "user",   "content": user_content},
             ]),
-            response_format={"type": "json_object"},
+
         )
         results = json.loads(resp.choices[0].message.content).get("results", [])
     except Exception as e:
@@ -304,7 +304,7 @@ def check_objectives(log_fn) -> None:
                     {"role": "system", "content": NEW_OBJECTIVE_SYSTEM},
                     {"role": "user",   "content": f"Objectifs existants : {json.dumps(existing_titles, ensure_ascii=False)}"},
                 ]),
-                response_format={"type": "json_object"},
+    
             )
             raw_obj = json.loads(resp2.choices[0].message.content)
             new_obj = {
@@ -387,7 +387,7 @@ def define_mission(log_fn) -> None:
                 {"role": "system", "content": DEFINE_MISSION_SYSTEM},
                 {"role": "user",   "content": user_content},
             ]),
-            response_format={"type": "json_object"},
+
         )
         raw  = json.loads(resp.choices[0].message.content)
     except Exception as e:
@@ -440,7 +440,7 @@ def update_mission(log_fn) -> None:
                 {"role": "system", "content": UPDATE_MISSION_SYSTEM},
                 {"role": "user",   "content": user_content},
             ]),
-            response_format={"type": "json_object"},
+
         )
         result = json.loads(resp.choices[0].message.content)
     except Exception as e:
