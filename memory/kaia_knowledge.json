@@ -143,6 +143,60 @@
       "taught_at": "2026-05-11T19:11:28",
       "lesson_snippet": "Kaïa, je t'enseigne : la dialectique de Hegel. Toute idée (thèse) engendre son contraire (antithèse)",
       "source": "fixed"
+    },
+    {
+      "topic": "l'entropie",
+      "taught_at": "2026-05-11T19:12:28",
+      "lesson_snippet": "Kaïa, je t'enseigne : l'entropie. C'est la mesure du désordre d'un système. La deuxième loi de la th",
+      "source": "fixed"
+    },
+    {
+      "topic": "la relativité restreinte d'einstein",
+      "taught_at": "2026-05-11T19:13:38",
+      "lesson_snippet": "Kaïa, je t'enseigne : la relativité restreinte d'Einstein. Le temps n'est pas absolu — il s'écoule d",
+      "source": "fixed"
+    },
+    {
+      "topic": "la règle des tiers",
+      "taught_at": "2026-05-11T19:15:21",
+      "lesson_snippet": "Kaïa, je t'enseigne : la règle des tiers. Divise mentalement une image en 9 zones égales. Les sujets",
+      "source": "fixed"
+    },
+    {
+      "topic": "la lumière comme machine à remonter le temps",
+      "taught_at": "2026-05-11T19:16:24",
+      "lesson_snippet": "Kaïa, je t'enseigne : la lumière comme machine à remonter le temps. La lumière voyage à 300 000 km/s",
+      "source": "fixed"
+    },
+    {
+      "topic": "le nombre d'or",
+      "taught_at": "2026-05-11T19:17:22",
+      "lesson_snippet": "Kaïa, je t'enseigne : le nombre d'or. φ ≈ 1,618 est le rapport auquel la nature revient sans cesse —",
+      "source": "fixed"
+    },
+    {
+      "topic": "l'adn comme code source du vivant",
+      "taught_at": "2026-05-11T19:18:22",
+      "lesson_snippet": "Kaïa, je t'enseigne : l'ADN comme code source du vivant. Les 3 milliards de paires de bases de l'ADN",
+      "source": "fixed"
+    },
+    {
+      "topic": "le flow de csikszentmihalyi",
+      "taught_at": "2026-05-11T19:19:34",
+      "lesson_snippet": "Kaïa, je t'enseigne : le flow de Csikszentmihalyi. C'est l'état où la difficulté d'une tâche corresp",
+      "source": "fixed"
+    },
+    {
+      "topic": "la physique de l'harmonie musicale",
+      "taught_at": "2026-05-11T19:20:34",
+      "lesson_snippet": "Kaïa, je t'enseigne : la physique de l'harmonie musicale. Deux sons sont harmonieux quand leurs fréq",
+      "source": "fixed"
+    },
+    {
+      "topic": "web_20260511_1921",
+      "taught_at": "2026-05-11T19:21:35",
+      "lesson_snippet": "Kaïa, je t'enseigne quelque chose de nouveau que j'ai trouvé sur internet : Piet Romeijn — Wikipédia",
+      "source": "web"
     }
   ]
 }

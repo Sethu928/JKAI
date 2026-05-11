@@ -3,6 +3,7 @@ import json
 import re
 import time
 import threading
+import urllib.parse
 import requests
 from datetime import datetime
 from modules.state import self_model_lock, get_local_client, LOCAL_MODEL, format_messages_for_local, tail_file, parse_json_fence
@@ -252,30 +253,115 @@ def _load_project_context() -> tuple[str, str]:
     return code_ctx, mission_ctx
 
 
-# ── Recherche web DuckDuckGo ────────────────────────────────────────────── #
+# ── Recherche web et navigation Playwright ────────────────────────────────── #
 
-def _web_search(query: str) -> str:
-    """Interroge l'API DuckDuckGo Instant Answer et retourne jusqu'à 3 extraits."""
+_PLAYWRIGHT_UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+)
+_SEARCH_HEADERS = {"User-Agent": _PLAYWRIGHT_UA}
+
+
+def _playwright_browse(url: str) -> str:
+    """Ouvre Chromium headless, navigue vers l'URL, retourne les 1000 premiers chars de texte visible."""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return _browse_requests(url)
+    try:
+        with sync_playwright() as pw:
+            browser = pw.chromium.launch(headless=True)
+            try:
+                page = browser.new_page(user_agent=_PLAYWRIGHT_UA)
+                page.goto(url, wait_until="domcontentloaded", timeout=15000)
+                text = page.inner_text("body")
+                text = re.sub(r"\s+", " ", text).strip()
+                return text[:1000]
+            finally:
+                browser.close()
+    except Exception as e:
+        return f"Erreur Playwright browse : {e}"
+
+
+def _playwright_search(query: str) -> list[str]:
+    """Recherche Google via Playwright headless, retourne jusqu'à 5 résultats structurés."""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return []
+    try:
+        search_url = (
+            "https://www.google.com/search"
+            f"?q={urllib.parse.quote_plus(query)}&hl=fr&gl=fr"
+        )
+        with sync_playwright() as pw:
+            browser = pw.chromium.launch(headless=True)
+            try:
+                page = browser.new_page(user_agent=_PLAYWRIGHT_UA)
+                page.goto(search_url, wait_until="domcontentloaded", timeout=15000)
+                results = page.evaluate("""() => {
+                    const out = [];
+                    document.querySelectorAll('h3').forEach(h3 => {
+                        if (out.length >= 5 || !h3.innerText.trim()) return;
+                        const block   = h3.closest('[data-ved]')
+                                     || h3.parentElement.parentElement;
+                        const raw     = block ? block.innerText : '';
+                        const snippet = raw.replace(h3.innerText, '')
+                                           .trim().slice(0, 300);
+                        out.push({ title: h3.innerText.trim(), snippet: snippet });
+                    });
+                    return out;
+                }""")
+            finally:
+                browser.close()
+        snippets = []
+        for r in (results or [])[:5]:
+            title   = (r.get("title")   or "").strip()
+            snippet = (r.get("snippet") or "").strip()
+            if title:
+                line = f"[Google] {title}"
+                if snippet:
+                    line += f" — {snippet[:250]}"
+                snippets.append(line)
+        return snippets
+    except Exception as e:
+        return [f"Erreur Playwright search : {e}"]
+
+
+def _browse_requests(url: str) -> str:
+    """Fallback requests si Playwright non installé."""
+    try:
+        resp = requests.get(url, timeout=10, headers=_SEARCH_HEADERS)
+        resp.raise_for_status()
+        html = resp.text
+        html = re.sub(r"<script[^>]*>.*?</script>", "", html, flags=re.DOTALL | re.IGNORECASE)
+        html = re.sub(r"<style[^>]*>.*?</style>",   "", html, flags=re.DOTALL | re.IGNORECASE)
+        text = re.sub(r"<[^>]+>", " ", html)
+        text = re.sub(r"\s+", " ", text).strip()
+        return text[:1000]
+    except Exception as e:
+        return f"Erreur browse : {e}"
+
+
+def _duckduckgo_search(query: str) -> list[str]:
+    """Fallback DuckDuckGo Instant Answer si Playwright indisponible ou Google vide."""
     try:
         resp = requests.get(
             "https://api.duckduckgo.com/",
             params={"q": query, "format": "json", "no_html": "1", "skip_disambig": "1"},
+            headers=_SEARCH_HEADERS,
             timeout=8,
         )
         resp.raise_for_status()
         data = resp.json()
-    except Exception as e:
-        return f"Erreur réseau : {e}"
-
+    except Exception:
+        return []
     snippets = []
-
     if data.get("Answer"):
         snippets.append(f"[Réponse directe] {data['Answer'][:300]}")
-
     if data.get("AbstractText"):
         src = data.get("AbstractSource", "Source")
         snippets.append(f"[{src}] {data['AbstractText'][:400]}")
-
     for item in data.get("RelatedTopics", []):
         if len(snippets) >= 3:
             break
@@ -287,7 +373,44 @@ def _web_search(query: str) -> str:
                     break
                 if isinstance(sub, dict) and sub.get("Text"):
                     snippets.append(f"[Résultat] {sub['Text'][:250]}")
+    return snippets
 
+
+def _wikipedia_search(query: str) -> list[str]:
+    """Fallback Wikipedia FR — dernier recours."""
+    try:
+        resp = requests.get(
+            "https://fr.wikipedia.org/w/api.php",
+            params={
+                "action":   "query",
+                "list":     "search",
+                "srsearch": query,
+                "srlimit":  3,
+                "format":   "json",
+                "utf8":     1,
+            },
+            headers=_SEARCH_HEADERS,
+            timeout=8,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+    except Exception as e:
+        return [f"Erreur réseau Wikipedia : {e}"]
+    results = data.get("query", {}).get("search", [])
+    snippets = []
+    for r in results[:3]:
+        title   = r.get("title", "")
+        snippet = re.sub(r"<[^>]+>", "", r.get("snippet", "")).strip()
+        if title or snippet:
+            snippets.append(f"[Wikipedia] {title} — {snippet[:300]}")
+    return snippets
+
+
+def _web_search(query: str) -> str:
+    """Recherche via Playwright (Google). Fallback DuckDuckGo → Wikipedia si Playwright échoue ou retourne vide."""
+    snippets = _playwright_search(query)
+    if not snippets or (len(snippets) == 1 and snippets[0].startswith("Erreur")):
+        snippets = _duckduckgo_search(query) or _wikipedia_search(query)
     return "\n".join(snippets[:3]) if snippets else "Aucun résultat trouvé."
 
 
@@ -324,18 +447,8 @@ def _load_web_context() -> str:
 # ── Navigation web directe ───────────────────────────────────────────────── #
 
 def browse_url(url: str) -> str:
-    """Fetche une URL et retourne les 500 premiers caractères de texte extrait."""
-    try:
-        resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
-        resp.raise_for_status()
-        html = resp.text
-        html = re.sub(r'<script[^>]*>.*?</script>', '', html, flags=re.DOTALL | re.IGNORECASE)
-        html = re.sub(r'<style[^>]*>.*?</style>',  '', html, flags=re.DOTALL | re.IGNORECASE)
-        text = re.sub(r'<[^>]+>', ' ', html)
-        text = re.sub(r'\s+', ' ', text).strip()
-        return text[:500]
-    except Exception as e:
-        return f"Erreur browse : {e}"
+    """Fetche une URL via Playwright headless et retourne les 1000 premiers chars de texte visible."""
+    return _playwright_browse(url)
 
 
 def _browse(decision: dict, log_fn) -> str:

@@ -1,4 +1,20 @@
 {
-  "priorities": [],
-  "updated_at": ""
+  "priorities": [
+    {
+      "title": "Réparer l'erreur dans le code Python sandbox",
+      "action": "Revenir sur la correction automatique de l'éreur détectée en temps réel et re-réparer les fichiers temporaires générés",
+      "why": "La progression de la mission est à 40% et il y a des erreurs critiques détectées dans le code Python sandbox."
+    },
+    {
+      "title": "Écrire des tests unitaires pour modules/cortex.py",
+      "action": "Effectuer les étapes nécessaires pour terminer l'objectif en cours",
+      "why": "L'objectif est en cours de réalisation et il est important d'avoir des tests unitaires pour s'assurer que le module cortex.py fonctionne correctement."
+    },
+    {
+      "title": "Documenter toutes les fonctions de memory/db.py",
+      "action": "Effectuer les étapes nécessaires pour terminer l'objectif en cours",
+      "why": "L'objectif est en cours de réalisation et il est important d'avoir une documentation claire des fonctionnalités du module db.py."
+    }
+  ],
+  "updated_at": "2026-05-11T19:13:35"
 }

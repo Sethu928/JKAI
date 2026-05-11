@@ -2,144 +2,126 @@
   "modules": [
     {
       "file": "jkai.py",
-      "role": "Assistant IA avancé du système Nexus",
-      "dependencies": [
-        "dotenv",
-        "openai"
-      ],
-      "improvements": [
-        "utilisation de la bibliothèque OpenAI pour l'intelligence artificielle"
-      ]
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "jkai_voice.py",
-      "role": "Module de reconnaissance vocale",
-      "dependencies": [
-        "dotenv",
-        "openai",
-        "modules.voice"
-      ],
-      "improvements": [
-        "intégration de la reconnaissance vocale pour des interactions plus naturelles"
-      ]
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "kaia_server.py",
-      "role": "Serveur web du système Nexus",
-      "dependencies": [
-        "sqlite3",
-        "random",
-        "json"
-      ],
-      "improvements": [
-        "implémentation d'un serveur web pour les interactions avec le système"
-      ]
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "killswitch.py",
-      "role": "Module de sécurité pour l'arrêt du système Nexus",
-      "dependencies": [
-        "dotenv",
-        "signal"
-      ],
-      "improvements": [
-        "implémentation d'un mécanisme de sécurité pour arrêter le système en cas de besoin"
-      ]
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "nexus_statistics.py",
-      "role": "Module de statistiques pour le système Nexus",
-      "dependencies": [
-        "json",
-        "sqlite3"
-      ],
-      "improvements": [
-        "implémentation d'un module de statistiques pour analyser les interactions avec le système"
-      ]
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "server.py",
-      "role": "Serveur principal du système Nexus",
-      "dependencies": [
-        "dotenv",
-        "flask"
-      ],
-      "improvements": [
-        "implémentation d'un serveur principal pour les interactions avec le système"
-      ]
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
-      "file": "modules/agent.py",
-      "role": "Module agent pour l'intelligence artificielle du système Nexus",
-      "dependencies": [
-        "dotenv",
-        "openai"
-      ],
-      "improvements": [
-        "implémentation d'un module agent pour l'intelligence artificielle"
-      ]
+      "file": "test_regex.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
-      "file": "modules/autonomy.py",
-      "role": "Module autonome pour le système Nexus",
-      "dependencies": [
-        "dotenv",
-        "openai"
-      ],
-      "improvements": [
-        "implémentation d'un module autonome pour la prise de décision automatique"
-      ]
+      "file": "test_teach.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
-      "file": "modules/consciousness.py",
-      "role": "Module de conscience pour le système Nexus",
-      "dependencies": [
-        "dotenv",
-        "openai"
-      ],
-      "improvements": [
-        "implémentation d'un module de conscience pour la prise en compte des émotions"
-      ]
+      "file": "logs\\test_self_update.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
-      "file": "modules/cortex.py",
-      "role": "Module cortex pour le développement logiciel du système Nexus",
-      "dependencies": [
-        "dotenv",
-        "openai"
-      ],
-      "improvements": [
-        "implémentation d'un module cortex pour le développement logiciel"
-      ]
+      "file": "memory\\__init__.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
-      "file": "modules/marc.py",
-      "role": "Module Marc pour la réflexion critique du système Nexus",
-      "dependencies": [
-        "dotenv",
-        "openai"
-      ],
-      "improvements": [
-        "implémentation d'un module Marc pour la réflexion critique"
-      ]
+      "file": "memory\\db.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
-      "file": "modules/monitor.py",
-      "role": "Module de surveillance pour le système Nexus",
-      "dependencies": [
-        "dotenv",
-        "json"
-      ],
-      "improvements": [
-        "implémentation d'un module de surveillance pour l'analyse des données"
-      ]
+      "file": "modules\\agent.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\autonomy.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\consciousness.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\cortex.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\historique_worker_analysis.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\marc.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\monitor.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\nexus_statistics.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\scheduler.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     }
   ],
-  "global_improvements": [
-    "utilisation de la bibliothèque OpenAI pour l'intelligence artificielle",
-    "intégration de la reconnaissance vocale pour des interactions plus naturelles",
-    "implémentation d'un serveur web pour les interactions avec le système"
-  ],
-  "analyzed_at": "2026-05-11T19:10:32",
+  "global_improvements": [],
+  "analyzed_at": "2026-05-11T19:19:24",
   "file_count": 24
 }

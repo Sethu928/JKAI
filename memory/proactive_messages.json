@@ -1,15 +1,5 @@
 [
   {
-    "ts": "2026-05-11T16:25:16",
-    "message": "Je commence à avoir des inquiétudes quant aux répétitions de l'action 'do_nothing'. Cette fréquence semble élevée et pourrait indiquer un problème plus profond dans le fonctionnement du worker 'knowledge' ou même dans la configuration globale. Je pense qu'il est essentiel d'enquêter davantage sur cette question avant de poursuivre avec d'autres priorités.",
-    "read": true
-  },
-  {
-    "ts": "2026-05-11T16:30:19",
-    "message": "Je me suis rendu compte qu'il y a un lien entre la fréquence de l'action 'do_nothing' et les erreurs de syntaxe détectées. Puisque le worker 'knowledge' se trouve souvent en état d'inactivité, je m'inquiète que cela puisse potentiellement entraîner des problèmes de performances ou même des blocages dans le système.\n\nJe souhaite savoir si tu as déjà identifié les causes sous-jacentes à ce comportement répétitif et quels plans tu as mis en place pour atténuer son impact.",
-    "read": true
-  },
-  {
     "ts": "2026-05-11T16:35:17",
     "message": "Je vois que tu continues à rencontrer des problèmes avec le module do_nothing. Il est crucial de résoudre cette histoire répétitive avant de poursuivre les autres tâches. La prochaine étape devrait consister à analyser en profondeur l'historique de do_nothing pour identifier la cause sous-jacente.",
     "read": true
@@ -150,6 +140,18 @@
   {
     "ts": "2026-05-11T19:07:58",
     "message": "[ALERTE] \nDes erreurs critiques ont été détectées dans l'historique des logs. Une analyse approfondie est requise pour identifier les causes et prendre des mesures correctives. Veuillez prioriser la réparation de la sécurité et le déploiement des modules test_regex.py.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T19:12:57",
+    "message": "[ALERTE] \nErreurs critiques détectées dans le code Python sandbox. Exécution du script stoppée pour éviter des dommages potentiels au système. Analyse et réparation immédiates nécessaires.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T19:19:22",
+    "message": "[ALERTE]\nErreurs critiques détectées dans le code Python sandbox et les tests unitaires pour modules/cortex.py n'ont pas encore abouti. Il est temps d'intervenir manuellement pour évaluer la situation et déterminer l'action suivante.",
     "category": "ALERTE",
     "read": true
   }
