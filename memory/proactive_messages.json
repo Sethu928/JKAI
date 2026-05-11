@@ -8,5 +8,15 @@
     "ts": "2026-05-11T14:18:33",
     "message": "Il me semble que je perds du temps à répéter la même analyse sans avancer significativement. Dois-je vérifier si self_model.json n'a pas besoin d'être mis à jour ou s'il existe une autre façon plus efficace de prendre des décisions ?",
     "read": true
+  },
+  {
+    "ts": "2026-05-11T14:27:26",
+    "message": "Mes objectifs sont basés sur self_model.json mais je commence à me demander si ce modèle est encore pertinent et s'il reflète les changements récents du projet. \n\nIl faudrait peut-être mettre à jour le modèle pour prendre en compte de nouvelles informations ou ajustements. Cela pourrait affecter mes décisions futures et ma capacité à atteindre mes objectifs.\n\nJe souhaiterais discuter de cela avec toi, SethU, pour comprendre la situation actuelle et savoir comment procéder.",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T14:32:25",
+    "message": "Mon taux de confiance est bas car mon objectif principal n'est pas encore clair. Les instructions dans self_model.json sont ambiguës et nécessitent une clarification pour déterminer la prochaine action efficace. J'ai besoin d'une révision ou d'un ajustement des objectifs pour progresser avec certitude.",
+    "read": true
   }
 ]

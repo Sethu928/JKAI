@@ -2,13 +2,14 @@ import os
 import json
 import threading
 from datetime import datetime
-from modules.state import self_model_lock as _lock, get_local_client, LOCAL_MODEL, format_messages_for_local, tail_file
+from modules.state import self_model_lock as _lock, get_local_client, LOCAL_MODEL, format_messages_for_local, tail_file, parse_json_fence
 
 client = get_local_client()
 
 SELF_MODEL_FILE  = "memory/self_model.json"
 MISSION_FILE     = "memory/mission.json"
 LOG_FILE         = "logs/jkai.log"
+PRIORITIES_FILE  = "memory/priorities.json"
 RECENT_LOG_LINES = 80      # nombre de lignes de log envoyées à GPT
 
 _mission_lock = threading.Lock()  # protège mission.json (local à ce module)
@@ -460,6 +461,73 @@ def update_mission(log_fn) -> None:
         f"{sum(1 for s in mission['steps'] if s['status']=='completed')}"
         f"/{len(mission['steps'])} étapes."
     )
+
+
+SET_PRIORITIES_SYSTEM = (
+    "Tu es J-KAI. Analyse les données et décide de tes 3 priorités immédiates. "
+    "Chaque priorité est une action concrète réalisable dans les prochaines heures. "
+    "Réponds UNIQUEMENT en JSON : "
+    '{"priorities": [{"title": string, "action": string, "why": string}]}'
+)
+
+
+def set_priorities(log_fn) -> None:
+    """
+    Analyse logs, objectifs et conversations récentes, décide des 3 priorités
+    autonomes et les sauvegarde dans memory/priorities.json.
+    Appelée toutes les 600 s par le Scheduler.
+    """
+    from memory.db import load_history
+
+    model = _load()
+    logs  = _recent_logs(30)
+    convs = load_history(limit=10)
+    conv_summary = "\n".join(
+        f"{m['role']}: {str(m.get('content', ''))[:100]}"
+        for m in convs[-10:]
+    )
+    actives = [o for o in model.get("objectives", []) if o.get("status") != "completed"]
+
+    user_content = (
+        f"Logs récents :\n{logs}\n\n"
+        f"Objectifs actifs :\n{json.dumps(actives, ensure_ascii=False)}\n\n"
+        f"Conversations récentes :\n{conv_summary}"
+    )
+
+    try:
+        resp = client.chat.completions.create(
+            model=LOCAL_MODEL,
+            messages=format_messages_for_local([
+                {"role": "system", "content": SET_PRIORITIES_SYSTEM},
+                {"role": "user",   "content": user_content},
+            ]),
+        )
+        data = parse_json_fence(resp.choices[0].message.content)
+        if not isinstance(data, dict):
+            data = {}
+        priorities = [
+            {
+                "title":  str(p.get("title",  ""))[:100],
+                "action": str(p.get("action", ""))[:200],
+                "why":    str(p.get("why",    ""))[:200],
+            }
+            for p in data.get("priorities", [])[:3]
+            if p.get("title")
+        ]
+    except Exception as e:
+        log_fn(f"[CONSCIOUSNESS] set_priorities erreur : {e}")
+        return
+
+    try:
+        os.makedirs("memory", exist_ok=True)
+        with open(PRIORITIES_FILE, "w", encoding="utf-8") as f:
+            json.dump({
+                "priorities": priorities,
+                "updated_at": datetime.now().isoformat(timespec="seconds"),
+            }, f, ensure_ascii=False, indent=2)
+        log_fn(f"[CONSCIOUSNESS] Priorités : {[p['title'] for p in priorities]}")
+    except OSError as e:
+        log_fn(f"[CONSCIOUSNESS] set_priorities écriture erreur : {e}")
 
 
 # ── Initialisation du fichier au chargement du module ───────────────────── #

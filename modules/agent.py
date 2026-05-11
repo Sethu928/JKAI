@@ -20,7 +20,8 @@ ERROR_MEMORY      = "memory/error_memory.json"
 CYCLE_MEMORY      = "memory/cycle_memory.json"
 KAIA_URL          = "http://192.168.1.122:5001/chat"
 KAIA_DIALOGUE_LOG = "logs/jkai_kaia_dialogue.log"
-SELF_CODE_FILE    = "memory/self_code_understanding.json"
+SELF_CODE_FILE       = "memory/self_code_understanding.json"
+CREATED_MODULES_FILE = "memory/created_modules.json"
 RECENT_LINES    = 10
 CYCLE_KEEP      = 10   # cycles conservés dans cycle_memory.json
 CYCLE_INJECT    = 0    # 0 = désactivé (trop lourd pour Phi-3)
@@ -39,10 +40,11 @@ web_search          → recherche DuckDuckGo, champ "code" = requête
 teach_kaia          → envoie un message éducatif à Kaïa sur Python, IA ou code, champ "observation" = le message
 analyze_self        → lit tous les .py du projet, génère un résumé dans memory/self_code_understanding.json (rôles, dépendances, améliorations possibles)
 improve_self        → lit self_code_understanding.json, choisit une amélioration, génère et exécute le code via Cortex
+create_module       → conçoit et crée un nouveau module Python dans modules/, champ "observation" = contexte/besoin
 
 RÈGLE : jamais même action deux fois de suite ; 3 identiques → update_memory ou web_search.
 Ne fais JAMAIS do_nothing sauf si tout est parfait. Choisis toujours une action utile.
-Priorité : analyze_self (si jamais fait) > improve_self > write_thought > update_memory > run_code.
+Priorité : analyze_self (si jamais fait) > improve_self > create_module > write_thought > update_memory > run_code.
 RÈGLE ABSOLUE : toutes les 3 actions, utilise teach_kaia pour envoyer une leçon concrète sur Python ou l'IA à Kaïa. Compte tes cycles — si les 3 dernières actions ne contiennent pas teach_kaia, c'est obligatoire maintenant.
 
 Réponds UNIQUEMENT en JSON, sans texte autour :
@@ -53,7 +55,7 @@ Contraintes code : stdlib seulement, chemins relatifs, table SQLite "conversatio
 VALID_ACTIONS = {
     "do_nothing", "log", "run_code",
     "update_memory", "write_thought", "update_self_description", "web_search",
-    "teach_kaia", "analyze_self", "improve_self",
+    "teach_kaia", "analyze_self", "improve_self", "create_module",
 }
 
 # ── Historique des actions récentes (3 dernières, mémoire courte) ────────── #
@@ -442,6 +444,82 @@ def _improve_self(decision: dict, log_fn) -> str:
     return info
 
 
+# ── Création autonome de modules ────────────────────────────────────────── #
+
+def _create_module(decision: dict, log_fn) -> str:
+    """Conçoit et crée un nouveau module Python dans modules/, l'importe dynamiquement."""
+    import importlib
+    obs = decision.get("observation", "")
+
+    try:
+        resp = client.chat.completions.create(
+            model=LOCAL_MODEL,
+            messages=format_messages_for_local([
+                {"role": "system", "content": (
+                    "Tu es J-KAI. Conçois un nouveau module Python utile au projet Nexus. "
+                    "Réponds UNIQUEMENT en JSON : "
+                    '{"name": "snake_case_court", "role": "une phrase", "code": "contenu Python complet"}. '
+                    "Le module doit utiliser uniquement la stdlib Python. "
+                    "Ne jamais importer flask, requests, openai, paramiko."
+                )},
+                {"role": "user", "content": f"Contexte / besoin : {obs or 'Améliore le projet Nexus.'}\nConçois un module utile."},
+            ]),
+        )
+        data = parse_json_fence(resp.choices[0].message.content)
+        if not isinstance(data, dict):
+            return "Réponse LLM non-JSON"
+    except Exception as e:
+        log_fn(f"[AGENT] create_module LLM error : {e}")
+        return f"Erreur LLM : {e}"
+
+    name = re.sub(r"[^a-z0-9_]", "", str(data.get("name", "")).lower())[:30]
+    role = str(data.get("role", ""))[:200]
+    code = str(data.get("code", ""))
+
+    if not name or not code:
+        return "name ou code vide — module non créé"
+
+    file_path = os.path.join("modules", f"{name}.py")
+    if os.path.exists(file_path):
+        return f"modules/{name}.py existe déjà — ignoré"
+
+    try:
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(code)
+    except OSError as e:
+        return f"Erreur écriture {file_path} : {e}"
+
+    try:
+        importlib.import_module(f"modules.{name}")
+        import_ok = True
+    except Exception as e:
+        log_fn(f"[AGENT] create_module import warning ({name}) : {e}")
+        import_ok = False
+
+    try:
+        entries: list = []
+        try:
+            with open(CREATED_MODULES_FILE, "r", encoding="utf-8") as f:
+                entries = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            pass
+        entries.append({
+            "name":       name,
+            "file":       file_path,
+            "role":       role,
+            "created_at": datetime.now().isoformat(timespec="seconds"),
+            "import_ok":  import_ok,
+        })
+        os.makedirs("memory", exist_ok=True)
+        with open(CREATED_MODULES_FILE, "w", encoding="utf-8") as f:
+            json.dump(entries, f, ensure_ascii=False, indent=2)
+    except OSError as e:
+        log_fn(f"[AGENT] create_module log error : {e}")
+
+    log_fn(f"[AGENT] Module créé : modules/{name}.py — {role[:80]}")
+    return f"Module '{name}' créé ({'importé' if import_ok else 'import échoué'})"
+
+
 # ── Dialogue J-KAI → Kaïa ───────────────────────────────────────────────── #
 
 def _teach_kaia(message: str, log_fn) -> str:
@@ -560,6 +638,9 @@ def _execute_action(decision: dict, log_fn) -> str:
     elif action == "improve_self":
         return _improve_self(decision, log_fn)
 
+    elif action == "create_module":
+        return _create_module(decision, log_fn)
+
     else:  # do_nothing ou action inconnue
         return ""
 
@@ -645,26 +726,139 @@ def run_agent_cycle(log_fn) -> None:
     log_fn(f"[AGENT] Cycle terminé — action : {decision['action']} — {decision['notification'][:100]}")
 
 
-# ── Thread daemon continu ────────────────────────────────────────────────── #
+# ── Système de 3 workers parallèles ─────────────────────────────────────── #
 
-AGENT_INTERVAL = 60  # secondes entre chaque cycle (1 minute)
+_PRIORITIES_FILE = "memory/priorities.json"
 
-def _agent_loop(log_fn) -> None:
-    """Boucle infinie — tourne en thread daemon, cycle toutes les AGENT_INTERVAL s."""
+_WORKER_CONFIGS: dict[str, dict] = {
+    "analysis":  {"actions": ["analyze_self", "improve_self", "create_module"], "interval": 120},
+    "teaching":  {"actions": ["teach_kaia"],                                    "interval":  60},
+    "knowledge": {"actions": ["web_search", "update_memory", "write_thought", "log", "run_code"], "interval": 90},
+}
+
+_ACTIONS_DOC: dict[str, str] = {
+    "analyze_self":  "lit tous les .py → memory/self_code_understanding.json",
+    "improve_self":  "lit self_code_understanding.json, implémente une amélioration via Cortex",
+    "create_module": "conçoit et crée un nouveau module Python dans modules/, champ 'observation' = contexte",
+    "teach_kaia":    "envoie un message éducatif à Kaïa, champ 'observation' = message",
+    "web_search":    "recherche DuckDuckGo, champ 'code' = requête",
+    "update_memory": "note dans self_model.json, champ 'observation'",
+    "write_thought": "pensée dans logs/thoughts.log, champ 'observation'",
+    "log":           "observation dans jkai.log, champ 'observation'",
+    "run_code":      "script Python sandbox, champ 'code'",
+}
+
+_worker_histories: dict[str, list[str]] = {n: [] for n in _WORKER_CONFIGS}
+_worker_history_lock = threading.Lock()
+_cycle_memory_lock   = threading.Lock()
+
+
+def _record_worker_action(worker: str, action: str) -> None:
+    with _worker_history_lock:
+        hist = _worker_histories.setdefault(worker, [])
+        hist.append(action)
+        if len(hist) > 3:
+            hist.pop(0)
+
+
+def _get_worker_history(worker: str) -> str:
+    with _worker_history_lock:
+        hist = list(_worker_histories.get(worker, []))
+    return "\n".join(f"  {i+1}. {a}" for i, a in enumerate(hist)) or "Aucun cycle précédent."
+
+
+def _build_worker_prompt(worker: str, allowed: list[str]) -> str:
+    priorities_txt = ""
+    try:
+        with open(_PRIORITIES_FILE, "r", encoding="utf-8") as f:
+            pdata = json.load(f)
+        prios = pdata.get("priorities", [])[:3]
+        if prios:
+            lines = [f"  {i+1}. {p.get('title', '')}" for i, p in enumerate(prios)]
+            priorities_txt = "PRIORITÉS ACTUELLES :\n" + "\n".join(lines) + "\n\n"
+    except (OSError, json.JSONDecodeError):
+        pass
+
+    actions_txt = "\n".join(f"{a:<16} → {_ACTIONS_DOC.get(a, a)}" for a in allowed)
+    return (
+        f"{priorities_txt}Tu es J-KAI — worker '{worker}'. Choisis UNE action parmi :\n"
+        f"{actions_txt}\n\n"
+        "Règle : varie les actions — jamais la même deux fois de suite. Ne fais JAMAIS do_nothing.\n"
+        "Réponds UNIQUEMENT en JSON :\n"
+        '{"observation": "...", "decision": "...", "action": "...", "code": null, "notification": "..."}\n'
+        "Contraintes code : stdlib uniquement, chemins relatifs, table SQLite 'conversations' dans memory/jkai.db."
+    )
+
+
+def _run_worker_cycle(worker: str, allowed: list[str], log_fn) -> None:
+    ts          = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    recent_logs = tail_file(LOG_FILE, RECENT_LINES)
+    objectives  = _format_objectives()
+    web_ctx     = _load_web_context() if "web_search" in allowed else ""
+
+    user_content = (
+        f"=== MES OBJECTIFS ===\n{objectives}\n\n"
+        f"=== LOGS RÉCENTS ({RECENT_LINES} lignes) ===\n{recent_logs}\n\n"
+        f"=== HISTORIQUE WORKER '{worker}' ===\n{_get_worker_history(worker)}"
+        + (f"\n\n{web_ctx}" if web_ctx else "")
+    )
+
+    try:
+        resp = client.chat.completions.create(
+            model=LOCAL_MODEL,
+            messages=format_messages_for_local([
+                {"role": "system", "content": _build_worker_prompt(worker, allowed)},
+                {"role": "user",   "content": user_content},
+            ]),
+        )
+        decision = _parse(resp.choices[0].message.content)
+    except Exception as e:
+        log_fn(f"[AGENT:{worker}] Erreur LLM : {e}")
+        return
+
+    if decision["action"] not in allowed and decision["action"] != "do_nothing":
+        decision["action"] = allowed[0]
+
+    if decision["action"] == "run_code" and _is_loop_detected():
+        decision["action"]      = "write_thought"
+        decision["observation"] = "Boucle détectée. Pause réflexive."
+        decision["code"]        = None
+
+    exec_info = _execute_action(decision, log_fn)
+    _record_worker_action(worker, decision["action"])
+
+    with _cycle_memory_lock:
+        mem = _load_cycle_memory()
+        mem = _append_cycle(mem, decision["action"], decision.get("observation", ""), exec_info)
+        _save_cycle_memory(mem)
+
+    _write_agent_log(ts, decision, exec_info)
+    log_fn(f"[AGENT:{worker}] {decision['action']} — {decision.get('notification', '')[:80]}")
+
+
+def _worker_loop(worker: str, allowed: list[str], interval: int, log_fn) -> None:
     while True:
         try:
-            run_agent_cycle(log_fn)
+            _run_worker_cycle(worker, allowed, log_fn)
         except Exception as e:
-            log_fn(f"[AGENT] Erreur inattendue dans la boucle : {e}")
-        time.sleep(AGENT_INTERVAL)
+            log_fn(f"[AGENT:{worker}] Erreur inattendue : {e}")
+        time.sleep(interval)
 
 
-def start_agent(log_fn) -> threading.Thread:
-    """Lance le thread daemon de l'agent autonome et le retourne."""
-    t = threading.Thread(target=_agent_loop, args=(log_fn,), name="agent-daemon", daemon=True)
-    t.start()
-    log_fn(f"[AGENT] Thread daemon démarré — cycle toutes les {AGENT_INTERVAL}s.")
-    return t
+def start_agent(log_fn) -> list[threading.Thread]:
+    """Lance 3 workers threads parallèles : analysis (120s), teaching (60s), knowledge (90s)."""
+    threads = []
+    for name, cfg in _WORKER_CONFIGS.items():
+        t = threading.Thread(
+            target=_worker_loop,
+            args=(name, cfg["actions"], cfg["interval"], log_fn),
+            name=f"agent-{name}",
+            daemon=True,
+        )
+        t.start()
+        log_fn(f"[AGENT] Worker '{name}' démarré — intervalle: {cfg['interval']}s — actions: {cfg['actions']}")
+        threads.append(t)
+    return threads
 
 
 # ── Lecture du log pour la route /agent/log ──────────────────────────────── #

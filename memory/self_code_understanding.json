@@ -4,40 +4,48 @@
       "file": "jkai.py",
       "role": "Assistant IA avancé",
       "dependencies": [
-        "openai"
+        "openai",
+        "dotenv"
       ],
-      "improvements": []
+      "improvements": [
+        "Utilisation des variables d'environnement pour stocker les clés API",
+        "Chargement du core memory"
+      ]
     },
     {
       "file": "jkai_voice.py",
-      "role": "Module de reconnaissance vocale",
+      "role": "Voix de J-KAI",
       "dependencies": [
-        "pyaudio",
-        "wave",
-        "pyttsx3"
+        "openai",
+        "voice"
       ],
       "improvements": [
-        "Améliorer la reconnaissance vocale",
-        "Ajouter des fonctionnalités de dialogue"
+        "Utilisation d'OpenAI pour la reconnaissance vocale",
+        "Chargement du core memory"
       ]
     },
     {
       "file": "kaia_server.py",
-      "role": "Serveur Web",
+      "role": "Serveur de J-KAI",
       "dependencies": [
         "sqlite3",
-        "flask"
+        "requests"
       ],
       "improvements": [
-        "Améliorer la sécurité du serveur",
-        "Ajouter des fonctionnalités de gestion d'utilisateurs"
+        "Utilisation d'un serveur Flask pour gérer les requêtes",
+        "Chargement du core memory"
       ]
     },
     {
       "file": "killswitch.py",
-      "role": "Module de sécurité",
-      "dependencies": [],
-      "improvements": []
+      "role": "Fonction de sécurité",
+      "dependencies": [
+        "dotenv"
+      ],
+      "improvements": [
+        "Utilisation d'un mot de passe pour activer la fonctionnalité de sécurité",
+        "Chargement du core memory"
+      ]
     },
     {
       "file": "server.py",
@@ -47,31 +55,19 @@
         "cors"
       ],
       "improvements": [
-        "Améliorer la gestion des requêtes HTTP",
-        "Ajouter des fonctionnalités de sauvegarde"
+        "Utilisation d'un serveur Flask pour gérer les requêtes",
+        "Chargement du core memory"
       ]
     },
     {
-      "file": "test_teach.py",
-      "role": "Module de test",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "memory/__init__.py",
-      "role": "Fichier initiale pour les modules de mémoire",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
       "file": "memory/db.py",
-      "role": "Module de gestion de la base de données",
+      "role": "Base de données locale",
       "dependencies": [
         "sqlite3"
       ],
       "improvements": [
-        "Améliorer la sécurité des opérations de base de données",
-        "Ajouter des fonctionnalités de mise à jour automatique"
+        "Utilisation d'une base de données SQLite pour stocker les conversations",
+        "Chargement du core memory"
       ]
     },
     {
@@ -81,8 +77,8 @@
         "openai"
       ],
       "improvements": [
-        "Améliorer la reconnaissance des commandes vocales",
-        "Ajouter des fonctionnalités de dialogue"
+        "Utilisation d'OpenAI pour la reconnaissance vocale",
+        "Chargement du core memory"
       ]
     },
     {
@@ -92,8 +88,8 @@
         "openai"
       ],
       "improvements": [
-        "Améliorer la reconnaissance des commandes vocales",
-        "Ajouter des fonctionnalités de dialogue"
+        "Utilisation d'OpenAI pour la reconnaissance vocale",
+        "Chargement du core memory"
       ]
     },
     {
@@ -104,80 +100,78 @@
     },
     {
       "file": "modules/cortex.py",
-      "role": "Module de cortex",
+      "role": "Module cortex",
       "dependencies": [
         "openai"
       ],
       "improvements": [
-        "Améliorer la reconnaissance des commandes vocales",
-        "Ajouter des fonctionnalités de dialogue"
+        "Utilisation d'OpenAI pour la reconnaissance vocale",
+        "Chargement du core memory"
       ]
     },
     {
       "file": "modules/marc.py",
-      "role": "Module de Marc",
-      "dependencies": [],
-      "improvements": []
+      "role": "Module Marc",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "Utilisation d'OpenAI pour la reconnaissance vocale",
+        "Chargement du core memory"
+      ]
     },
     {
       "file": "modules/monitor.py",
       "role": "Module de surveillance",
-      "dependencies": [
-        "sqlite3"
-      ],
-      "improvements": [
-        "Améliorer la reconnaissance des anomalies",
-        "Ajouter des fonctionnalités de notification"
-      ]
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "modules/scheduler.py",
-      "role": "Module de planification",
+      "role": "Module planificateur",
       "dependencies": [
-        "flask",
-        "cors"
+        "flask"
       ],
       "improvements": [
-        "Améliorer la gestion des tâches",
-        "Ajouter des fonctionnalités de mise à jour automatique"
+        "Utilisation d'un serveur Flask pour gérer les requêtes",
+        "Chargement du core memory"
       ]
     },
     {
       "file": "modules/self_update.py",
-      "role": "Module d'auto-mise à jour",
+      "role": "Module de mise à jour automatique",
       "dependencies": [],
       "improvements": []
     },
     {
       "file": "modules/state.py",
-      "role": "Fichier initiale pour les modules de l'état",
+      "role": "Module d'état",
       "dependencies": [
+        "dotenv",
         "openai"
       ],
       "improvements": [
-        "Améliorer la reconnaissance des commandes vocales",
-        "Ajouter des fonctionnalités de dialogue"
+        "Utilisation d'un singleton pour le client OpenAI",
+        "Chargement du core memory"
       ]
     },
     {
       "file": "modules/voice.py",
-      "role": "Module de reconnaissance vocale",
+      "role": "Module de voix",
       "dependencies": [
-        "pyaudio",
-        "wave",
         "pyttsx3"
       ],
       "improvements": [
-        "Améliorer la reconnaissance vocale",
-        "Ajouter des fonctionnalités de dialogue"
+        "Utilisation d'une bibliothèque de synthèse vocale",
+        "Chargement du core memory"
       ]
     }
   ],
   "global_improvements": [
-    "Améliorer la sécurité du système",
-    "Ajouter des fonctionnalités de gestion d'utilisateurs",
-    "Mettre à jour les dépendances et les bibliothèques"
+    "Utilisation des variables d'environnement pour stocker les clés API",
+    "Chargement du core memory",
+    "Utilisation d'un singleton pour le client OpenAI"
   ],
-  "analyzed_at": "2026-05-11T14:20:42",
+  "analyzed_at": "2026-05-11T14:34:21",
   "file_count": 19
 }

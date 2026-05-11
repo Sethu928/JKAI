@@ -19,7 +19,7 @@ from modules.monitor import Monitor
 from modules.autonomy import analyze_and_act
 from modules.consciousness import (
     get_self_model, get_objectives, get_mission,
-    reflect, check_objectives, define_mission, update_mission,
+    reflect, check_objectives, define_mission, update_mission, set_priorities,
 )
 from modules.agent import read_agent_log, start_agent
 from modules.self_update import self_update_cycle, delete_file
@@ -121,15 +121,86 @@ Cortex pour les modifications sandboxées en temps réel.
 === MÉMOIRE PERMANENTE ===
 {json.dumps(core, ensure_ascii=False, indent=2)}"""
 
+INSIGHTS_FILE = "memory/conversation_insights.json"
+
+
+def _load_insights_context() -> str:
+    """Charge les insights de SethU et les formate pour injection dans le prompt."""
+    try:
+        with open(INSIGHTS_FILE, "r", encoding="utf-8") as f:
+            insights = json.load(f)
+        if not insights:
+            return ""
+        lines = [f"- [{i.get('category', '?')}] {i['key']} : {i['value']}" for i in insights[-20:]]
+        return "=== CONTEXTE CONNU DE SETHU ===\n" + "\n".join(lines)
+    except (OSError, json.JSONDecodeError):
+        return ""
+
+
+def _extract_insights(user_input: str, reply: str) -> None:
+    """Extrait les informations importantes d'un échange — tourne en thread daemon."""
+    system = (
+        "Tu es J-KAI. Analyse cet échange avec SethU. "
+        "Extrait uniquement les informations durables : préférences, décisions, contexte projet, faits clés. "
+        'Si l\'échange est banal, renvoie {"insights": []}. '
+        'Réponds UNIQUEMENT en JSON : '
+        '{"insights": [{"key": string, "value": string, "category": "preference|decision|context|fact"}]}'
+    )
+    try:
+        active_client = _get_active_client()
+        model = "gpt-4o" if USE_OPENAI else LOCAL_MODEL
+        resp = active_client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user",   "content": f"SethU: {user_input[:500]}\nJ-KAI: {reply[:500]}"},
+            ],
+            max_tokens=400,
+        )
+        m = re.search(r'\{.*\}', resp.choices[0].message.content, re.DOTALL)
+        if not m:
+            return
+        new_insights = [i for i in json.loads(m.group(0)).get("insights", []) if i.get("key")]
+        if not new_insights:
+            return
+    except Exception:
+        return
+
+    try:
+        existing: list = []
+        try:
+            with open(INSIGHTS_FILE, "r", encoding="utf-8") as f:
+                existing = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            pass
+        keys_map = {i["key"]: idx for idx, i in enumerate(existing)}
+        now = datetime.now().isoformat(timespec="seconds")
+        for insight in new_insights:
+            key = insight["key"].strip()
+            if key in keys_map:
+                existing[keys_map[key]].update({"value": insight["value"], "updated_at": now})
+            else:
+                insight["updated_at"] = now
+                existing.append(insight)
+        existing = existing[-50:]
+        os.makedirs("memory", exist_ok=True)
+        with open(INSIGHTS_FILE, "w", encoding="utf-8") as f:
+            json.dump(existing, f, ensure_ascii=False, indent=2)
+    except OSError:
+        pass
+
+
 def ask_jkai(user_input):
     history = load_history(limit=100)
     save_message("user", user_input)
     active_client = _get_active_client()
     model = "gpt-4o" if USE_OPENAI else LOCAL_MODEL
+    insights_ctx   = _load_insights_context()
+    system_content = SYSTEM_PROMPT + ("\n\n" + insights_ctx if insights_ctx else "")
     try:
         response = active_client.chat.completions.create(
             model=model,
-            messages=[{"role": "system", "content": SYSTEM_PROMPT}] + history + [{"role": "user", "content": user_input}]
+            messages=[{"role": "system", "content": system_content}] + history + [{"role": "user", "content": user_input}]
         )
         reply = response.choices[0].message.content
     except Exception as e:
@@ -138,6 +209,7 @@ def ask_jkai(user_input):
     save_message("assistant", reply)
     log(f"SethU: {user_input}")
     log(f"J-KAI: {reply}")
+    threading.Thread(target=_extract_insights, args=(user_input, reply), daemon=True, name="insights").start()
     return reply
 
 # ── Détection auto-update dans les réponses chat ──────────────────────────
@@ -461,6 +533,7 @@ if AUTONOMIE_ACTIVE:
     scheduler.add_task("consciousness_reflect", 300,  lambda: reflect(log))
     scheduler.add_task("check_objectives",      300,  lambda: check_objectives(log))
     scheduler.add_task("update_mission",        600,  lambda: update_mission(log))
+    scheduler.add_task("set_priorities",        600,  lambda: set_priorities(log))
 scheduler.start()
 
 if AUTONOMIE_ACTIVE:
