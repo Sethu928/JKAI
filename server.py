@@ -627,7 +627,17 @@ def _get_lesson_key(lesson: str) -> str:
 def _load_kaia_knowledge() -> dict:
     try:
         with open(KAIA_KNOWLEDGE_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+        if not isinstance(data, dict):
+            return {"topics": []}
+        # Ancien format : dict plat {sujet: [résultats]} sans clé "topics"
+        if "topics" not in data:
+            migrated = [
+                {"topic": k, "taught_at": "", "lesson_snippet": "", "source": "legacy"}
+                for k in data.keys()
+            ]
+            return {"topics": migrated}
+        return data
     except (OSError, json.JSONDecodeError):
         return {"topics": []}
 
@@ -641,8 +651,9 @@ def _save_kaia_knowledge(data: dict) -> None:
 def _send_lesson_to_kaia():
     from modules.agent import browse_url
 
-    knowledge   = _load_kaia_knowledge()
-    known_keys  = {t.get("topic", "") for t in knowledge.get("topics", [])}
+    knowledge  = _load_kaia_knowledge()
+    knowledge.setdefault("topics", [])
+    known_keys = {t.get("topic", "") for t in knowledge["topics"]}
 
     # Cherche une leçon que Kaïa ne connaît pas encore
     new_lessons = [l for l in _KAIA_LESSONS if _get_lesson_key(l) not in known_keys]

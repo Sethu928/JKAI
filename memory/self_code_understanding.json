@@ -2,8 +2,11 @@
   "modules": [
     {
       "file": "jkai.py",
-      "role": "Assistant IA avancé du système Nexus",
+      "role": "J-KAI, assistant IA avancé du système Nexus",
       "dependencies": [
+        "os",
+        "json",
+        "datetime",
         "dotenv",
         "openai"
       ],
@@ -11,116 +14,166 @@
     },
     {
       "file": "jkai_voice.py",
-      "role": "Module de reconnaissance vocale",
+      "role": "Module de reconnaissance vocale de J-KAI",
       "dependencies": [
+        "os",
+        "json",
         "dotenv",
-        "openai"
+        "openai",
+        "modules.voice"
       ],
       "improvements": []
     },
     {
       "file": "kaia_server.py",
-      "role": "Serveur web pour le système Nexus",
+      "role": "Serveur web pour le projet Nexus",
       "dependencies": [
         "sqlite3",
-        "flask",
-        "requests"
+        "random",
+        "json",
+        "os",
+        "threading",
+        "time",
+        "re"
       ],
       "improvements": []
     },
     {
       "file": "killswitch.py",
-      "role": "Module de sécurité pour arrêter le processus",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "nexus_statistics.py",
-      "role": "Statistiques et analyse des données du système Nexus",
+      "role": "Module de killswitch pour le projet Nexus",
       "dependencies": [
-        "sqlite3",
-        "numpy",
-        "sklearn"
-      ],
-      "improvements": []
-    },
-    {
-      "file": "server.py",
-      "role": "Serveur principal pour le système Nexus",
-      "dependencies": [
-        "flask",
+        "os",
+        "signal",
+        "hmac",
         "dotenv"
       ],
       "improvements": []
     },
     {
-      "file": "modules/agent.py",
-      "role": "Module de gestion des conversations et de l'intelligence artificielle",
+      "file": "nexus_statistics.py",
+      "role": "Statistiques du projet Nexus",
       "dependencies": [
-        "openai",
-        "requests"
+        "json",
+        "sqlite3",
+        "numpy",
+        "sklearn.metrics"
+      ],
+      "improvements": []
+    },
+    {
+      "file": "server.py",
+      "role": "Serveur web principal pour le projet Nexus",
+      "dependencies": [
+        "sys",
+        "os",
+        "json",
+        "re",
+        "threading",
+        "datetime"
+      ],
+      "improvements": []
+    },
+    {
+      "file": "modules/agent.py",
+      "role": "Agent de conversation du projet Nexus",
+      "dependencies": [
+        "os",
+        "json",
+        "re",
+        "time",
+        "requests",
+        "datetime"
       ],
       "improvements": []
     },
     {
       "file": "modules/autonomy.py",
-      "role": "Module d'autonomie pour le système Nexus",
+      "role": "Module d'autonomie du projet Nexus",
       "dependencies": [
-        "openai"
+        "os",
+        "json",
+        "datetime",
+        "modules.cortex"
       ],
       "improvements": []
     },
     {
       "file": "modules/consciousness.py",
-      "role": "Module de conscience et de prise de décision",
-      "dependencies": [],
+      "role": "Module de conscience du projet Nexus",
+      "dependencies": [
+        "os",
+        "json",
+        "threading",
+        "datetime"
+      ],
       "improvements": []
     },
     {
       "file": "modules/cortex.py",
-      "role": "Module de développement logiciel",
+      "role": "Module Dev AI du projet Nexus",
       "dependencies": [
-        "openai"
+        "os",
+        "re",
+        "sys",
+        "subprocess",
+        "tempfile"
       ],
       "improvements": []
     },
     {
       "file": "modules/historique_worker_analysis.py",
-      "role": "Analyse des fichiers de logs pour les tâches du worker 'analysis'",
-      "dependencies": [],
+      "role": "Analyse des logs de worker d'analyse",
+      "dependencies": [
+        "datetime"
+      ],
       "improvements": []
     },
     {
       "file": "modules/marc.py",
-      "role": "Module de conseil sceptique et rigoureux",
+      "role": "Module de conseil sceptique du projet Nexus",
       "dependencies": [
-        "openai"
+        "os",
+        "modules.state"
       ],
       "improvements": []
     },
     {
       "file": "modules/monitor.py",
-      "role": "Module de surveillance et de détection d'erreurs",
-      "dependencies": [],
+      "role": "Module de monitoring du projet Nexus",
+      "dependencies": [
+        "os",
+        "re",
+        "json",
+        "time",
+        "threading"
+      ],
+      "improvements": []
+    },
+    {
+      "file": "modules/nexus_statistics.py",
+      "role": "Statistiques du projet Nexus (répétition)",
+      "dependencies": [
+        "json",
+        "sqlite3",
+        "numpy",
+        "sklearn.metrics"
+      ],
       "improvements": []
     },
     {
       "file": "modules/scheduler.py",
-      "role": "Module de planification et de gestion des tâches",
+      "role": "Module de planification pour le projet Nexus",
       "dependencies": [
-        "datetime",
-        "threading"
+        "os",
+        "json",
+        "time",
+        "threading",
+        "datetime"
       ],
       "improvements": []
     }
   ],
-  "global_improvements": [
-    "Utilisation de l'API OpenAI pour améliorer les capacités d'intelligence artificielle",
-    "Intégration de la reconnaissance vocale pour une interaction plus naturelle",
-    "Développement d'un serveur web pour gérer les requêtes et les réponses",
-    "Implémentation d'un système de sécurité pour arrêter le processus en cas d'erreur",
-    "Analyse des statistiques et des données pour améliorer la prise de décision"
-  ],
-  "analyzed_at": "2026-05-11T18:52:28",
+  "global_improvements": [],
+  "analyzed_at": "2026-05-11T18:57:00",
   "file_count": 24
 }
