@@ -1,170 +1,100 @@
 {
-  "intelligence artificielle": [
+  "topics": [
     {
-      "title": "Intelligence artificielle",
-      "snippet": "articles homonymes, voir A.I. Intelligence artificielle (film) et IA. Intelligence artificielle L&#039;intelligence artificielle (IA) est l&#039;ensemble des systèmes"
+      "topic": "intelligence artificielle",
+      "taught_at": "",
+      "lesson_snippet": "",
+      "source": "legacy"
     },
     {
-      "title": "A.I. Intelligence artificielle",
-      "snippet": "I. Intelligence artificielle Pour plus de détails, voir Fiche technique et Distribution. A.I. Intelligence artificielle (Artificial Intelligence: A.I"
+      "topic": "Python Flask",
+      "taught_at": "",
+      "lesson_snippet": "",
+      "source": "legacy"
     },
     {
-      "title": "Histoire de l'intelligence artificielle",
-      "snippet": "l’Antiquité. En ces temps, il ne s’agissait évidemment pas d’une intelligence artificielle au sens technologique moderne, mais plutôt d’un ensemble de réflexions"
-    }
-  ],
-  "Python Flask": [
-    {
-      "title": "Flask (framework)",
-      "snippet": "Flask modifier - modifier le code - voir Wikidata (aide) Flask est un micro framework open-source de développement web en Python. Il est classé comme microframework"
+      "topic": "machine learning",
+      "taught_at": "",
+      "lesson_snippet": "",
+      "source": "legacy"
     },
     {
-      "title": "Python (langage)",
-      "snippet": "(DropBox) ; Benjamin Peterson (DropBox, PEP 387, PEP 552, Python 2.7 manager) ; Armin Ronacher (en) (Flask, PEP 372, PEP 414) ; Travis Oliphant (en) (NumPy, Anaconda"
+      "topic": "réseau de neurones",
+      "taught_at": "",
+      "lesson_snippet": "",
+      "source": "legacy"
     },
     {
-      "title": "MicroPython",
-      "snippet": "Meurisse, Python, Raspberry Pi et Flask [Texte imprimé] : capturez des données télémétriques et réalisez des tableaux de bord web (microPython, ESP8266"
-    }
-  ],
-  "machine learning": [
-    {
-      "title": "Apprentissage automatique",
-      "snippet": "voir Apprentissage (homonymie). « Machine Learning » redirige ici. Pour la revue scientifique, voir Machine Learning (revue). Apprentissage automatique"
+      "topic": "deep learning",
+      "taught_at": "",
+      "lesson_snippet": "",
+      "source": "legacy"
     },
     {
-      "title": "Machine Learning (revue)",
-      "snippet": "Pour l’article homonyme, voir Machine learning. Machine Learning est une revue scientifique révisée par les pairs traitant d&#039;apprentissage automatique"
+      "topic": "algorithme Python",
+      "taught_at": "",
+      "lesson_snippet": "",
+      "source": "legacy"
     },
     {
-      "title": "Apprentissage profond",
-      "snippet": "L&#039;apprentissage profond ou apprentissage en profondeur (en anglais : deep learning) est un sous-domaine de l’intelligence artificielle qui utilise des réseaux"
-    }
-  ],
-  "réseau de neurones": [
-    {
-      "title": "Réseau de neurones artificiels",
-      "snippet": "voir Réseau de neurones (biologie) et Réseau (homonymie). Réseau de neurones artificiels Vue simplifiée d&#039;un réseau artificiel de neurones Un réseau de neurones"
+      "topic": "SQLite Python",
+      "taught_at": "",
+      "lesson_snippet": "",
+      "source": "legacy"
     },
     {
-      "title": "Réseau neuronal convolutif",
-      "snippet": "voir CNN (homonymie). Réseau neuronal convolutif En apprentissage automatique, un réseau de neurones convolutifs ou réseau de neurones à convolution (en anglais"
+      "topic": "API REST Python",
+      "taught_at": "",
+      "lesson_snippet": "",
+      "source": "legacy"
     },
     {
-      "title": "Réseau de neurones",
-      "snippet": "Wikimedia : réseau de neurones, sur le Wiktionnaire Cette page d’homonymie répertorie les différents sujets et articles portant le même nom. Un réseau de neurones"
-    }
-  ],
-  "deep learning": [
-    {
-      "title": "Apprentissage profond",
-      "snippet": "L&#039;apprentissage profond ou apprentissage en profondeur (en anglais : deep learning) est un sous-domaine de l’intelligence artificielle qui utilise des"
+      "topic": "autonomie IA",
+      "taught_at": "",
+      "lesson_snippet": "",
+      "source": "legacy"
     },
     {
-      "title": "Apprentissage automatique",
-      "snippet": "Beginner&#039;s Guide to Neural Networks and Deep Learning », sur Pathmind. (en) C. Janiesch, « Machine learning and deep learning », Electronic Markets, Springer"
+      "topic": "traitement langage naturel",
+      "taught_at": "",
+      "lesson_snippet": "",
+      "source": "legacy"
     },
     {
-      "title": "Deep Learning Super Sampling",
-      "snippet": "Le Deep Learning Super Sampling ou DLSS (en français Super Échantillonnage en Apprentissage Profond) est une suite de technologies d’amélioration d’image"
-    }
-  ],
-  "algorithme Python": [
-    {
-      "title": "Python (langage)",
-      "snippet": "Pour les articles homonymes, voir Python. Python (prononcé /pi.tɔ̃/) est un langage de programmation interprété, multiparadigme et multiplateformes. Il"
+      "topic": "Python classes",
+      "taught_at": "",
+      "lesson_snippet": "",
+      "source": "legacy"
     },
     {
-      "title": "Algorithme de Levenberg-Marquardt",
-      "snippet": "les articles homonymes, voir Marquardt (homonymie). L’algorithme de Levenberg-Marquardt, ou algorithme LM, permet d&#039;obtenir une solution numérique au problème"
+      "topic": "apprentissage automatique",
+      "taught_at": "",
+      "lesson_snippet": "",
+      "source": "legacy"
     },
     {
-      "title": "Algorithme de Dijkstra",
-      "snippet": "Algorithme de Dijkstra L&#039;algorithme de Dijkstra pour trouver le chemin le plus court entre a et b. Il choisit le sommet non visité avec la distance la"
-    }
-  ],
-  "SQLite Python": [
-    {
-      "title": "SQLite",
-      "snippet": "SQLite modifier - modifier le code - voir Wikidata (aide) SQLite (prononcé [ɛs.ky.ɛl.ajt]) est une bibliothèque écrite en langage C qui propose un moteur"
+      "topic": "les list comprehensions en python",
+      "taught_at": "2026-05-11T18:59:22",
+      "lesson_snippet": "Kaïa, je t'enseigne : les list comprehensions en Python. Écrire [x**2 for x in range(10) if x % 2 ==",
+      "source": "fixed"
     },
     {
-      "title": "MicroPython",
-      "snippet": "deux firmwares existent basés sur MicroPython : l&#039;un appelé MicroPython et l&#039;autre CircuitPython. MicroPython fonctionne également sur ESP32, le successeur"
+      "topic": "les décorateurs python",
+      "taught_at": "2026-05-11T19:00:22",
+      "lesson_snippet": "Kaïa, je t'enseigne : les décorateurs Python. Un décorateur est une fonction qui enveloppe une autre",
+      "source": "fixed"
     },
     {
-      "title": "Geopackage",
-      "snippet": "Une base Geopackage étant une base SQLite, elle peut être gérée avec tout logiciel gérant du SQLite, par exemple SQLite Manager dans Firefox de même qu&#039;on"
-    }
-  ],
-  "API REST Python": [
-    {
-      "title": "Python (langage)",
-      "snippet": "Pour les articles homonymes, voir Python. Python (prononcé /pi.tɔ̃/) est un langage de programmation interprété, multiparadigme et multiplateformes. Il"
+      "topic": "les générateurs python et le mot-clé yield",
+      "taught_at": "2026-05-11T19:01:22",
+      "lesson_snippet": "Kaïa, je t'enseigne : les générateurs Python et le mot-clé yield. Une fonction avec yield ne s'exécu",
+      "source": "fixed"
     },
     {
-      "title": "GraphQL",
-      "snippet": "Inscrit dans le modèle Client-Serveur, il propose une alternative aux API REST. La requête du client définit une structure de données, dont le stockage"
-    },
-    {
-      "title": "Postman (logiciel)",
-      "snippet": "clients HTTP (cURL, PHP, Python, Java, Node.js...). Authentification par JSON Web Token (configuration OAuth2 possible). API REST, SOAP, GraphQL, et gRPC"
-    }
-  ],
-  "autonomie IA": [
-    {
-      "title": "Intelligence artificielle agentique",
-      "snippet": "Une IA agentique est un système d&#039;intelligence artificielle relevant de l&#039;intelligence artificielle distribuée, capable d&#039;agir de manière autonome pour"
-    },
-    {
-      "title": "Claude (modèle de langage)",
-      "snippet": "performances en programmation informatique, particulièrement avec l&#039;agent d&#039;IA Claude Code. Un autre agent nommé Cowork vise à automatiser diverses tâches"
-    },
-    {
-      "title": "Manus (agent IA)",
-      "snippet": "aperçu de ce que pourrait devenir l&#039;intelligence artificielle générale, une IA capable d&#039;exécuter des tâches cognitives complexes de manière similaire à"
-    }
-  ],
-  "traitement langage naturel": [
-    {
-      "title": "Traitement automatique des langues",
-      "snippet": "l&#039;intelligence artificielle, qui vise à créer des outils de traitement du langage naturel pour diverses applications. Il ne doit pas être confondu avec"
-    },
-    {
-      "title": "Langage naturel",
-      "snippet": "Un langage naturel, ou langage ordinaire, est une langue « normale » parlée par un être humain. Il s&#039;oppose au langage formel, tel que le langage informatique"
-    },
-    {
-      "title": "Grand modèle de langage",
-      "snippet": "Grand modèle de langage Un grand modèle de langage, grand modèle linguistique, grand modèle de langue, modèle de langage de grande taille ou encore modèle"
-    }
-  ],
-  "Python classes": [
-    {
-      "title": "Python (langage)",
-      "snippet": "Pour les articles homonymes, voir Python. Python (prononcé /pi.tɔ̃/) est un langage de programmation interprété, multiparadigme et multiplateformes. Il"
-    },
-    {
-      "title": "Monty Python : Sacré Graal !",
-      "snippet": "Monty Python : Sacré Graal ! Pour plus de détails, voir Fiche technique et Distribution. Monty Python : Sacré Graal ! (Monty Python and the Holy Grail)"
-    },
-    {
-      "title": "Python royal",
-      "snippet": "Python regius Python regius Python royal Espèce Python regius (Shaw, 1802) Synonymes Boa regia Shaw, 1802 Python belii Gray, 1842 Statut de conservation"
-    }
-  ],
-  "apprentissage automatique": [
-    {
-      "title": "Apprentissage automatique",
-      "snippet": "automatique L&#039;apprentissage automatique (en anglais : machine learning, litt. « apprentissage machine »), apprentissage artificiel ou apprentissage statistique"
-    },
-    {
-      "title": "Apprentissage profond",
-      "snippet": "Comparaison de logiciels d&#039;apprentissage profond Algorithme émergent Apprentissage Apprentissage automatique (machine learning) Apprentissage par renforcement"
-    },
-    {
-      "title": "Attention (apprentissage automatique)",
-      "snippet": "articles homonymes, voir Attention (homonymie). L&#039;attention, en apprentissage automatique, est une méthode consistant à déterminer l&#039;importance relative"
+      "topic": "la gestion des exceptions en python",
+      "taught_at": "2026-05-11T19:02:24",
+      "lesson_snippet": "Kaïa, je t'enseigne : la gestion des exceptions en Python. Un bloc try/except/finally structure la g",
+      "source": "fixed"
     }
   ]
 }

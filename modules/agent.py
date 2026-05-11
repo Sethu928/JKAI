@@ -832,7 +832,17 @@ def _execute_action(decision: dict, log_fn) -> str:
     elif action == "web_search":
         query = (decision.get("code") or "").strip()
         if not query:
-            return "query vide — recherche ignorée"
+            # Génère une query depuis la première priorité active
+            try:
+                with open(_PRIORITIES_FILE, "r", encoding="utf-8") as _f:
+                    _pdata = json.load(_f)
+                _prios = _pdata.get("priorities", [])
+                query = (_prios[0].get("title", "") or _prios[0].get("action", "")).strip()[:80] if _prios else ""
+            except (OSError, json.JSONDecodeError, IndexError):
+                query = ""
+            if not query:
+                query = "intelligence artificielle autonomie systèmes"
+            log_fn(f"[AGENT] web_search query auto-générée depuis priorités : {query}")
         results = _web_search(query)
         # Log dans jkai.log → visible dans le prochain cycle (RECENT_LINES)
         log_fn(f"[WEB] {query} →\n{results}")

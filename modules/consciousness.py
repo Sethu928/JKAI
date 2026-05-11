@@ -183,33 +183,45 @@ def reflect(log_fn) -> None:
         f"Nombre total d'interactions enregistrées : {total}"
     )
 
-    # ── Appel GPT-4o ─────────────────────────────────────────────────────── #
+    # ── Appel LLM local ──────────────────────────────────────────────────── #
     try:
-        resp    = client.chat.completions.create(
+        resp = client.chat.completions.create(
             model=LOCAL_MODEL,
             messages=format_messages_for_local([
                 {"role": "system", "content": CONSCIOUSNESS_PROMPT},
                 {"role": "user",   "content": user_content},
             ]),
-
         )
-        updates = json.loads(resp.choices[0].message.content)
+        raw_content = resp.choices[0].message.content
     except Exception as e:
         log_fn(f"[CONSCIOUSNESS] Erreur LLM local : {e}")
+        return
+
+    updates = parse_json_fence(raw_content)
+    if not isinstance(updates, dict) or not updates:
+        log_fn(f"[CONSCIOUSNESS] Réponse LLM malformée — cycle ignoré : {raw_content[:120]!r}")
         return
 
     # ── Fusion des mises à jour dans le modèle existant ─────────────────── #
     now = datetime.now().isoformat(timespec="seconds")
 
-    model["confidence"]       = max(0, min(100, int(updates.get("confidence",       model["confidence"]))))
-    model["strengths"]        = updates.get("strengths",        model["strengths"])
-    model["weaknesses"]       = updates.get("weaknesses",       model["weaknesses"])
-    model["self_description"] = updates.get("self_description", model["self_description"])
-    model["improvement"]      = updates.get("improvement",      model["improvement"])
+    try:
+        model["confidence"] = max(0, min(100, int(updates.get("confidence", model["confidence"]))))
+    except (TypeError, ValueError):
+        pass
+    if isinstance(updates.get("strengths"), list):
+        model["strengths"] = updates["strengths"]
+    if isinstance(updates.get("weaknesses"), list):
+        model["weaknesses"] = updates["weaknesses"]
+    if updates.get("self_description"):
+        model["self_description"] = str(updates["self_description"])[:500]
+    if updates.get("improvement"):
+        model["improvement"] = str(updates["improvement"])[:300]
     model["total_interactions"] = total
-    model["last_reflection"]  = now
+    model["last_reflection"]    = now
     raw_ant = updates.get("anticipations", [])
-    model["anticipations"] = [str(a)[:200] for a in raw_ant if a][:3]
+    if isinstance(raw_ant, list):
+        model["anticipations"] = [str(a)[:200] for a in raw_ant if a][:3]
 
     # ── Fusion des objectifs ─────────────────────────────────────────────── #
     new_objs      = updates.get("objectives", [])

@@ -1,179 +1,102 @@
 {
   "modules": [
     {
-      "file": "jkai.py",
-      "role": "J-KAI, assistant IA avancé du système Nexus",
-      "dependencies": [
-        "os",
-        "json",
-        "datetime",
-        "dotenv",
-        "openai"
-      ],
-      "improvements": []
-    },
-    {
-      "file": "jkai_voice.py",
-      "role": "Module de reconnaissance vocale de J-KAI",
-      "dependencies": [
-        "os",
-        "json",
-        "dotenv",
-        "openai",
-        "modules.voice"
-      ],
-      "improvements": []
-    },
-    {
-      "file": "kaia_server.py",
-      "role": "Serveur web pour le projet Nexus",
-      "dependencies": [
-        "sqlite3",
-        "random",
-        "json",
-        "os",
-        "threading",
-        "time",
-        "re"
-      ],
-      "improvements": []
-    },
-    {
-      "file": "killswitch.py",
-      "role": "Module de killswitch pour le projet Nexus",
-      "dependencies": [
-        "os",
-        "signal",
-        "hmac",
-        "dotenv"
-      ],
-      "improvements": []
-    },
-    {
-      "file": "nexus_statistics.py",
-      "role": "Statistiques du projet Nexus",
-      "dependencies": [
-        "json",
-        "sqlite3",
-        "numpy",
-        "sklearn.metrics"
-      ],
-      "improvements": []
-    },
-    {
-      "file": "server.py",
-      "role": "Serveur web principal pour le projet Nexus",
-      "dependencies": [
-        "sys",
-        "os",
-        "json",
-        "re",
-        "threading",
-        "datetime"
-      ],
-      "improvements": []
+      "file": "memory/db.py",
+      "role": "Database management",
+      "dependencies": [],
+      "improvements": [
+        "Use a more secure database connection method"
+      ]
     },
     {
       "file": "modules/agent.py",
-      "role": "Agent de conversation du projet Nexus",
+      "role": "AI agent and conversation manager",
       "dependencies": [
-        "os",
-        "json",
-        "re",
-        "time",
-        "requests",
-        "datetime"
+        "get_openai_client",
+        "LOCAL_MODEL"
       ],
-      "improvements": []
-    },
-    {
-      "file": "modules/autonomy.py",
-      "role": "Module d'autonomie du projet Nexus",
-      "dependencies": [
-        "os",
-        "json",
-        "datetime",
-        "modules.cortex"
-      ],
-      "improvements": []
+      "improvements": [
+        "Improve conversation flow logic",
+        "Add more AI models"
+      ]
     },
     {
       "file": "modules/consciousness.py",
-      "role": "Module de conscience du projet Nexus",
+      "role": "Consciousness and decision-making module",
       "dependencies": [
-        "os",
-        "json",
-        "threading",
-        "datetime"
+        "self_model_lock",
+        "get_local_client",
+        "LOCAL_MODEL"
       ],
-      "improvements": []
+      "improvements": [
+        "Improve decision-making logic",
+        "Add more prioritization rules"
+      ]
     },
     {
       "file": "modules/cortex.py",
-      "role": "Module Dev AI du projet Nexus",
+      "role": "Code generation and development module",
       "dependencies": [
-        "os",
-        "re",
-        "sys",
-        "subprocess",
-        "tempfile"
+        "CORTEX_SYSTEM_PROMPT",
+        "get_openai_client"
       ],
-      "improvements": []
+      "improvements": [
+        "Improve code quality and efficiency",
+        "Add more development tools"
+      ]
     },
     {
-      "file": "modules/historique_worker_analysis.py",
-      "role": "Analyse des logs de worker d'analyse",
+      "file": "modules/autonomy.py",
+      "role": "Autonomous decision-making module",
       "dependencies": [
-        "datetime"
+        "AUTONOMY_SYSTEM_PROMPT",
+        "get_openai_client"
       ],
-      "improvements": []
+      "improvements": [
+        "Improve autonomous decision-making logic",
+        "Add more autonomy features"
+      ]
     },
     {
       "file": "modules/marc.py",
-      "role": "Module de conseil sceptique du projet Nexus",
+      "role": "Skeptical advisor and critic module",
       "dependencies": [
-        "os",
-        "modules.state"
+        "MARC_SYSTEM_PROMPT",
+        "get_openai_client"
       ],
-      "improvements": []
+      "improvements": [
+        "Improve skeptical reasoning logic",
+        "Add more critical thinking tools"
+      ]
     },
     {
       "file": "modules/monitor.py",
-      "role": "Module de monitoring du projet Nexus",
-      "dependencies": [
-        "os",
-        "re",
-        "json",
-        "time",
-        "threading"
-      ],
-      "improvements": []
-    },
-    {
-      "file": "modules/nexus_statistics.py",
-      "role": "Statistiques du projet Nexus (répétition)",
-      "dependencies": [
-        "json",
-        "sqlite3",
-        "numpy",
-        "sklearn.metrics"
-      ],
-      "improvements": []
+      "role": "Error monitoring and reporting module",
+      "dependencies": [],
+      "improvements": [
+        "Improve error detection and reporting logic",
+        "Add more monitoring features"
+      ]
     },
     {
       "file": "modules/scheduler.py",
-      "role": "Module de planification pour le projet Nexus",
+      "role": "Task scheduling and management module",
       "dependencies": [
-        "os",
-        "json",
-        "time",
-        "threading",
-        "datetime"
+        "get_local_client",
+        "LOCAL_MODEL"
       ],
-      "improvements": []
+      "improvements": [
+        "Improve task scheduling logic",
+        "Add more scheduling features"
+      ]
     }
   ],
-  "global_improvements": [],
-  "analyzed_at": "2026-05-11T18:57:00",
+  "global_improvements": [
+    "Improve overall system architecture and design",
+    "Add more AI models and algorithms",
+    "Improve conversation flow and decision-making logic",
+    "Add more development tools and features"
+  ],
+  "analyzed_at": "2026-05-11T18:58:44",
   "file_count": 24
 }

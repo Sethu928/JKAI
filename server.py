@@ -707,7 +707,13 @@ scheduler = create_default_scheduler(log)
 scheduler.add_task("check_api_budget", 300, check_api_budget)
 if AUTONOMIE_ACTIVE:
     scheduler.add_task("teach_kaia",            60,   _send_lesson_to_kaia)
-    scheduler.add_task("consciousness_reflect", 300,  lambda: reflect(log))
+    def _run_reflect():
+        try:
+            reflect(log)
+        except Exception as _e:
+            log(f"[SCHEDULER] consciousness_reflect erreur non gérée : {_e}")
+
+    scheduler.add_task("consciousness_reflect", 300, _run_reflect)
     scheduler.add_task("check_objectives",      300,  lambda: check_objectives(log))
     scheduler.add_task("update_mission",        600,  lambda: update_mission(log))
     scheduler.add_task("set_priorities",        600,  lambda: set_priorities(log))
