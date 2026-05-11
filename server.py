@@ -443,6 +443,14 @@ def _send_lesson_to_kaia():
         with open("logs/jkai_kaia_dialogue.log", "a", encoding="utf-8") as f:
             f.write(f"[{ts}] [J-KAI] {lesson}\n")
             f.write(f"[{ts}] [KAÏA] {kaia_reply}\n")
+        try:
+            _requests.post(
+                "http://192.168.1.122:5001/learn",
+                json={"question": lesson, "reponse": kaia_reply},
+                timeout=5,
+            )
+        except Exception as e_learn:
+            log(f"[LEÇON→KAÏA] /learn erreur : {e_learn}")
     except Exception as e:
         log(f"[LEÇON→KAÏA] Erreur : {e}")
 

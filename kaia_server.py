@@ -708,6 +708,16 @@ def main():
 </body>
 </html>"""
 
+    @app.route('/learn', methods=['POST'])
+    def learn():
+        data = request.get_json(silent=True) or {}
+        question = data.get("question", "").strip()
+        reponse  = data.get("reponse",  "").strip()
+        if not question or not reponse:
+            return jsonify({"error": "question et reponse requis"}), 400
+        kaia.learn(question, reponse)
+        return jsonify({"status": "ok"})
+
     @app.route('/status')
     def status():
         return jsonify({"llm": _check_llm()})

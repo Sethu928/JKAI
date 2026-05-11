@@ -2,120 +2,182 @@
   "modules": [
     {
       "file": "jkai.py",
-      "role": "?",
-      "dependencies": [],
+      "role": "Assistant IA avancé",
+      "dependencies": [
+        "openai"
+      ],
       "improvements": []
     },
     {
       "file": "jkai_voice.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "role": "Module de reconnaissance vocale",
+      "dependencies": [
+        "pyaudio",
+        "wave",
+        "pyttsx3"
+      ],
+      "improvements": [
+        "Améliorer la reconnaissance vocale",
+        "Ajouter des fonctionnalités de dialogue"
+      ]
     },
     {
       "file": "kaia_server.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "role": "Serveur Web",
+      "dependencies": [
+        "sqlite3",
+        "flask"
+      ],
+      "improvements": [
+        "Améliorer la sécurité du serveur",
+        "Ajouter des fonctionnalités de gestion d'utilisateurs"
+      ]
     },
     {
       "file": "killswitch.py",
-      "role": "?",
+      "role": "Module de sécurité",
       "dependencies": [],
       "improvements": []
     },
     {
       "file": "server.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "role": "Serveur principal",
+      "dependencies": [
+        "flask",
+        "cors"
+      ],
+      "improvements": [
+        "Améliorer la gestion des requêtes HTTP",
+        "Ajouter des fonctionnalités de sauvegarde"
+      ]
     },
     {
       "file": "test_teach.py",
-      "role": "?",
+      "role": "Module de test",
       "dependencies": [],
       "improvements": []
     },
     {
-      "file": "logs\\test_self_update.py",
-      "role": "?",
+      "file": "memory/__init__.py",
+      "role": "Fichier initiale pour les modules de mémoire",
       "dependencies": [],
       "improvements": []
     },
     {
-      "file": "memory\\__init__.py",
-      "role": "?",
+      "file": "memory/db.py",
+      "role": "Module de gestion de la base de données",
+      "dependencies": [
+        "sqlite3"
+      ],
+      "improvements": [
+        "Améliorer la sécurité des opérations de base de données",
+        "Ajouter des fonctionnalités de mise à jour automatique"
+      ]
+    },
+    {
+      "file": "modules/agent.py",
+      "role": "Module d'agent",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "Améliorer la reconnaissance des commandes vocales",
+        "Ajouter des fonctionnalités de dialogue"
+      ]
+    },
+    {
+      "file": "modules/autonomy.py",
+      "role": "Module d'autonomie",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "Améliorer la reconnaissance des commandes vocales",
+        "Ajouter des fonctionnalités de dialogue"
+      ]
+    },
+    {
+      "file": "modules/consciousness.py",
+      "role": "Module de conscience",
       "dependencies": [],
       "improvements": []
     },
     {
-      "file": "memory\\db.py",
-      "role": "?",
+      "file": "modules/cortex.py",
+      "role": "Module de cortex",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "Améliorer la reconnaissance des commandes vocales",
+        "Ajouter des fonctionnalités de dialogue"
+      ]
+    },
+    {
+      "file": "modules/marc.py",
+      "role": "Module de Marc",
       "dependencies": [],
       "improvements": []
     },
     {
-      "file": "modules\\agent.py",
-      "role": "?",
+      "file": "modules/monitor.py",
+      "role": "Module de surveillance",
+      "dependencies": [
+        "sqlite3"
+      ],
+      "improvements": [
+        "Améliorer la reconnaissance des anomalies",
+        "Ajouter des fonctionnalités de notification"
+      ]
+    },
+    {
+      "file": "modules/scheduler.py",
+      "role": "Module de planification",
+      "dependencies": [
+        "flask",
+        "cors"
+      ],
+      "improvements": [
+        "Améliorer la gestion des tâches",
+        "Ajouter des fonctionnalités de mise à jour automatique"
+      ]
+    },
+    {
+      "file": "modules/self_update.py",
+      "role": "Module d'auto-mise à jour",
       "dependencies": [],
       "improvements": []
     },
     {
-      "file": "modules\\autonomy.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "file": "modules/state.py",
+      "role": "Fichier initiale pour les modules de l'état",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "Améliorer la reconnaissance des commandes vocales",
+        "Ajouter des fonctionnalités de dialogue"
+      ]
     },
     {
-      "file": "modules\\consciousness.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\cortex.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\marc.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\monitor.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\scheduler.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\self_update.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\state.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\voice.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "file": "modules/voice.py",
+      "role": "Module de reconnaissance vocale",
+      "dependencies": [
+        "pyaudio",
+        "wave",
+        "pyttsx3"
+      ],
+      "improvements": [
+        "Améliorer la reconnaissance vocale",
+        "Ajouter des fonctionnalités de dialogue"
+      ]
     }
   ],
-  "global_improvements": [],
-  "analyzed_at": "2026-05-11T14:12:23",
+  "global_improvements": [
+    "Améliorer la sécurité du système",
+    "Ajouter des fonctionnalités de gestion d'utilisateurs",
+    "Mettre à jour les dépendances et les bibliothèques"
+  ],
+  "analyzed_at": "2026-05-11T14:20:42",
   "file_count": 19
 }
