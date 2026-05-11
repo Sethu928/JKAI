@@ -2,154 +2,211 @@
   "modules": [
     {
       "file": "jkai.py",
-      "role": "Assistant IA avancé du système Nexus",
+      "role": "IA avancée du système Nexus",
       "dependencies": [
         "openai"
       ],
       "improvements": [
-        "Utilisation d'OpenAI pour la conversation"
+        "utilisation d'un client OpenAI singleton thread-safe",
+        "stockage des conversations dans un fichier JSON"
       ]
     },
     {
       "file": "jkai_voice.py",
-      "role": "Module de reconnaissance vocale et de synthèse vocale",
+      "role": "Assistant vocal de J-KAI",
       "dependencies": [
-        "pyaudio",
-        "wave",
-        "pyttsx3"
+        "openai",
+        "speech"
       ],
       "improvements": [
-        "Intégration de la reconnaissance vocale et de la synthèse vocale"
+        "utilisation d'un client OpenAI singleton thread-safe",
+        "stockage des conversations dans un fichier JSON"
       ]
     },
     {
       "file": "kaia_server.py",
-      "role": "Serveur Web pour le système Nexus",
+      "role": "Serveur principal du système Nexus",
       "dependencies": [
         "sqlite3",
-        "flask"
+        "requests"
       ],
       "improvements": [
-        "Utilisation de Flask pour créer un serveur Web"
+        "utilisation d'un serveur Flask pour gérer les requêtes HTTP",
+        "stockage des conversations dans une base de données SQLite"
       ]
     },
     {
       "file": "killswitch.py",
-      "role": "Module d'arrêt en cas de problème",
+      "role": "Système d'arrêt en cas de défaillance",
       "dependencies": [],
-      "improvements": []
+      "improvements": [
+        "utilisation d'un fichier log pour stocker les événements",
+        "définition d'une commande d'arrêt en cas de problème"
+      ]
     },
     {
       "file": "nexus_statistics.py",
-      "role": "Calcul de statistiques pour le système Nexus",
+      "role": "Outils statistiques pour le système Nexus",
       "dependencies": [
         "sqlite3",
-        "numpy"
+        "scikit-learn"
       ],
       "improvements": [
-        "Utilisation de NumPy pour les calculs"
+        "utilisation d'une base de données SQLite pour stocker les données",
+        "calcul des métriques statistiques (précision, rappel, etc.)"
       ]
     },
     {
       "file": "server.py",
       "role": "Serveur principal du système Nexus",
       "dependencies": [
-        "flask"
+        "flask",
+        "requests"
       ],
       "improvements": [
-        "Utilisation de Flask pour créer un serveur Web"
+        "utilisation d'un serveur Flask pour gérer les requêtes HTTP",
+        "stockage des conversations dans un fichier JSON"
+      ]
+    },
+    {
+      "file": "test_teach.py",
+      "role": "Test de l'entraînement du modèle J-KAI",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "utilisation d'un client OpenAI singleton thread-safe",
+        "stockage des conversations dans un fichier JSON"
+      ]
+    },
+    {
+      "file": "memory/__init__.py",
+      "role": "Module de stockage des données du système Nexus",
+      "dependencies": [],
+      "improvements": [
+        "utilisation d'un module de stockage de données pour le système Nexus"
+      ]
+    },
+    {
+      "file": "memory/db.py",
+      "role": "Module de stockage des conversations dans une base de données SQLite",
+      "dependencies": [
+        "sqlite3"
+      ],
+      "improvements": [
+        "utilisation d'une base de données SQLite pour stocker les données",
+        "stockage des conversations dans une table dédiée"
       ]
     },
     {
       "file": "modules/agent.py",
-      "role": "Module d'agent pour le système Nexus",
+      "role": "Agent principal du système Nexus",
       "dependencies": [
-        "openai",
-        "sqlite3"
+        "openai"
       ],
       "improvements": [
-        "Utilisation d'OpenAI pour la conversation et de SQLite pour les bases de données"
+        "utilisation d'un client OpenAI singleton thread-safe",
+        "stockage des conversations dans un fichier JSON"
       ]
     },
     {
       "file": "modules/autonomy.py",
-      "role": "Module d'autonomie pour le système Nexus",
+      "role": "Module de prise en charge autonome du système Nexus",
       "dependencies": [
-        "openai",
-        "sqlite3"
+        "openai"
       ],
       "improvements": [
-        "Utilisation d'OpenAI pour la conversation et de SQLite pour les bases de données"
+        "utilisation d'un client OpenAI singleton thread-safe",
+        "stockage des conversations dans un fichier JSON"
       ]
     },
     {
       "file": "modules/consciousness.py",
-      "role": "Module de conscience pour le système Nexus",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules/cortex.py",
-      "role": "Module de développement logiciel pour le système Nexus",
+      "role": "Module de prise en charge consciente du système Nexus",
       "dependencies": [
         "openai"
       ],
       "improvements": [
-        "Utilisation d'OpenAI pour la conversation"
+        "utilisation d'un client OpenAI singleton thread-safe",
+        "stockage des conversations dans un fichier JSON"
+      ]
+    },
+    {
+      "file": "modules/cortex.py",
+      "role": "Module de développement logiciel du système Nexus",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "utilisation d'un client OpenAI singleton thread-safe",
+        "stockage des conversations dans un fichier JSON"
+      ]
+    },
+    {
+      "file": "modules/marc.py",
+      "role": "Module de conseiller sceptique du système Nexus",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "utilisation d'un client OpenAI singleton thread-safe",
+        "stockage des conversations dans un fichier JSON"
       ]
     },
     {
       "file": "modules/monitor.py",
-      "role": "Module de surveillance pour le système Nexus",
+      "role": "Module de surveillance du système Nexus",
       "dependencies": [],
-      "improvements": []
+      "improvements": [
+        "utilisation d'un module de surveillance pour le système Nexus"
+      ]
+    },
+    {
+      "file": "modules/nexus_statistics.py",
+      "role": "Outils statistiques pour le système Nexus",
+      "dependencies": [
+        "sqlite3",
+        "scikit-learn"
+      ],
+      "improvements": [
+        "utilisation d'une base de données SQLite pour stocker les données",
+        "calcul des métriques statistiques (précision, rappel, etc.)"
+      ]
     },
     {
       "file": "modules/scheduler.py",
-      "role": "Module planificateur pour le système Nexus",
-      "dependencies": [
-        "sqlite3"
-      ],
+      "role": "Module de planification du système Nexus",
+      "dependencies": [],
       "improvements": [
-        "Utilisation de SQLite pour les bases de données"
+        "utilisation d'un module de planification pour le système Nexus"
       ]
     },
     {
       "file": "modules/self_update.py",
-      "role": "Module d'actualisation automatique du système Nexus",
+      "role": "Module de mise à jour automatique du système Nexus",
       "dependencies": [],
-      "improvements": []
+      "improvements": [
+        "utilisation d'un module de mise à jour automatique pour le système Nexus"
+      ]
     },
     {
       "file": "modules/state.py",
-      "role": "Module d'état pour le système Nexus",
+      "role": "Module de gestion des états du système Nexus",
       "dependencies": [
         "openai"
       ],
       "improvements": [
-        "Utilisation d'OpenAI pour la conversation"
-      ]
-    },
-    {
-      "file": "modules/voice.py",
-      "role": "Module de reconnaissance vocale et de synthèse vocale",
-      "dependencies": [
-        "pyaudio",
-        "wave",
-        "pyttsx3"
-      ],
-      "improvements": [
-        "Intégration de la reconnaissance vocale et de la synthèse vocale"
+        "utilisation d'un client OpenAI singleton thread-safe",
+        "stockage des conversations dans un fichier JSON"
       ]
     }
   ],
   "global_improvements": [
-    "Utilisation d'OpenAI pour la conversation",
-    "Intégration de la reconnaissance vocale et de la synthèse vocale",
-    "Utilisation de Flask pour créer un serveur Web",
-    "Utilisation de NumPy pour les calculs",
-    "Utilisation d'OpenAI pour la conversation et de SQLite pour les bases de données"
+    "utilisation d'une base de données SQLite pour stocker les données",
+    "calcul des métriques statistiques (précision, rappel, etc.)",
+    "utilisation d'un client OpenAI singleton thread-safe",
+    "stockage des conversations dans un fichier JSON"
   ],
-  "analyzed_at": "2026-05-11T15:03:08",
-  "file_count": 20
+  "analyzed_at": "2026-05-11T15:13:34",
+  "file_count": 21
 }

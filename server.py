@@ -213,7 +213,7 @@ def ask_jkai(user_input):
     return reply
 
 # ── Détection auto-update dans les réponses chat ──────────────────────────
-_CODE_BLOCK_RE = re.compile(r'```(?:python|json)?\n(.*?)```', re.DOTALL)
+_CODE_BLOCK_RE = re.compile(r'```(?:python|json|bash)?\s*\r?\n(.*?)```', re.DOTALL | re.IGNORECASE)
 _FILEPATH_RE   = re.compile(r'\b((?:modules|memory|logs|tests)/[\w/._-]+\.py|memory/[\w/._-]+\.json|[\w._-]+\.py)\b')
 _DELETE_RE     = re.compile(r'\b(supprimer|supprime|delete|git\s+rm|effacer)\b', re.IGNORECASE)
 
@@ -224,6 +224,7 @@ def _try_auto_update(reply: str) -> None:
     - mise à jour (bloc ```python + chemin .py) → self_update_cycle en background
     """
     path_match = _FILEPATH_RE.search(reply)
+    print(f"[DEBUG _try_auto_update] path_match={path_match.group(1) if path_match else None!r}", flush=True)
     if not path_match:
         return
     file_path = path_match.group(1)
@@ -244,7 +245,11 @@ def _try_auto_update(reply: str) -> None:
         return
 
     code_match = _CODE_BLOCK_RE.search(reply)
+    print(f"[DEBUG _try_auto_update] file_path={file_path!r}  code_match={bool(code_match)}", flush=True)
     if not code_match:
+        # Affiche les 120 premiers chars autour du bloc pour inspecter le formatage réel
+        block_start = reply.find("```")
+        print(f"[DEBUG _try_auto_update] premier ``` à pos={block_start}  extrait={reply[block_start:block_start+80]!r}", flush=True)
         return
     code = code_match.group(1).strip()
 
