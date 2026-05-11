@@ -650,27 +650,49 @@ def _save_kaia_knowledge(data: dict) -> None:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
+_teach_kaia_use_web = False
+
+_WIKI_NAV_RE = re.compile(
+    r"(?:Aller au contenu|Menu principal|Rechercher|Faire un don|"
+    r"Créer un compte|Se connecter|Modifier le code|Voir l'historique|"
+    r"Article\s*Discussion|Outils|Apparence)[^\n]*\n?",
+    re.IGNORECASE,
+)
+
+
+def _clean_wiki_content(raw: str) -> str:
+    """Retire les éléments de navigation Wikipedia et retourne les 300 premiers chars utiles."""
+    cleaned = _WIKI_NAV_RE.sub("", raw)
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned).strip()
+    return cleaned[:300]
+
+
 def _send_lesson_to_kaia():
+    global _teach_kaia_use_web
     from modules.agent import browse_url
 
-    knowledge  = _load_kaia_knowledge()
+    knowledge = _load_kaia_knowledge()
     knowledge.setdefault("topics", [])
-    known_keys = {t.get("topic", "") for t in knowledge["topics"]}
-
-    # Cherche une leçon que Kaïa ne connaît pas encore
+    known_keys  = {t.get("topic", "") for t in knowledge["topics"]}
     new_lessons = [l for l in _KAIA_LESSONS if _get_lesson_key(l) not in known_keys]
 
-    if new_lessons:
+    # Alterne une leçon sur deux entre contenu internet et liste prédéfinie.
+    # Si plus de leçons fixes disponibles, force internet.
+    use_web = _teach_kaia_use_web or not new_lessons
+    _teach_kaia_use_web = not _teach_kaia_use_web
+
+    if use_web:
+        raw     = browse_url("https://fr.wikipedia.org/wiki/Special:Random")
+        content = _clean_wiki_content(raw)
+        subject = next((l.strip() for l in content.splitlines() if len(l.strip()) > 3), "ce sujet")[:60]
+        topic_key = f"web_{datetime.now().strftime('%Y%m%d_%H%M')}"
+        lesson    = f"Kaïa, voici ce que j'ai trouvé sur {subject} : {content}"
+        source    = "web"
+        log(f"[LEÇON→KAÏA] Leçon internet : {subject}")
+    else:
         lesson    = new_lessons[0]
         topic_key = _get_lesson_key(lesson)
         source    = "fixed"
-    else:
-        # Toutes les leçons fixes sont épuisées — cherche sur internet
-        content   = browse_url("https://fr.wikipedia.org/wiki/Special:Random")
-        topic_key = f"web_{datetime.now().strftime('%Y%m%d_%H%M')}"
-        lesson    = f"Kaïa, je t'enseigne quelque chose de nouveau que j'ai trouvé sur internet : {content[:400]}"
-        source    = "web"
-        log(f"[LEÇON→KAÏA] Toutes les leçons fixes enseignées — leçon internet générée")
 
     try:
         r = _requests.post("http://192.168.1.122:5001/chat", json={"message": lesson}, timeout=30)
@@ -683,7 +705,6 @@ def _send_lesson_to_kaia():
             f.write(f"[{ts}] [J-KAI] {lesson}\n")
             f.write(f"[{ts}] [KAÏA] {kaia_reply}\n")
 
-        # Enregistre ce que Kaïa vient d'apprendre
         knowledge["topics"].append({
             "topic":          topic_key,
             "taught_at":      datetime.now().isoformat(timespec="seconds"),

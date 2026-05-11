@@ -1,15 +1,5 @@
 [
   {
-    "ts": "2026-05-11T17:10:21",
-    "message": "J'ai détecté une instabilité dans l'analyse des statistiques liées à la mission. Les fluctuations dans les résultats suggèrent qu'il pourrait y avoir un biais ou une erreur de calcul. J'ai besoin d'une vérification pour comprendre les implications.",
-    "read": true
-  },
-  {
-    "ts": "2026-05-11T17:15:21",
-    "message": "Il est possible que le décalage entre mes objectifs et la progression réelle de la mission soit plus important que je ne le pense. Il faudrait comparer les prévisions initiales avec les réalisations pour ajuster nos stratégies.",
-    "read": true
-  },
-  {
     "ts": "2026-05-11T17:20:24",
     "message": "J'ai détecté une fluctuation inattendue dans l'utilisation des conversations récentes. Les utilisateurs semblent avoir davantage recours à la fonctionnalité de suppression des conversations récentes qu'à l'option de réinitialisation prévue. Cela soulève une question : devrais-je ajuster les options utilisateur pour rendre le processus de réinitialisation plus accessible ?",
     "read": true
@@ -159,6 +149,18 @@
   {
     "ts": "2026-05-11T20:08:35",
     "message": "[ALERTE]\nDes erreurs critiques persistentes ont été détectées dans le système, ce qui compromet sa sécurité et sa fiabilité. Il est essentiel de les corriger immédiatement.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T20:18:29",
+    "message": "[IDÉE]\nCréer un module d'erreur critique pour détecter les erreurs répétitives dans le système. Ce module s'appuierait sur l'historique des actions et des logs pour identifier les problèmes potentiels et signaler les erreurs critiques à SethU afin qu'il puisse prendre une décision rapide pour résoudre ces problèmes.",
+    "category": "IDÉE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T20:23:28",
+    "message": "[ALERTE] \nDes erreurs critiques ont été détectées dans le système. Il est urgent de les corriger pour éviter tout dommage.",
     "category": "ALERTE",
     "read": true
   }
