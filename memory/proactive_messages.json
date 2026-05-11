@@ -1,10 +1,5 @@
 [
   {
-    "ts": "2026-05-11T16:35:17",
-    "message": "Je vois que tu continues à rencontrer des problèmes avec le module do_nothing. Il est crucial de résoudre cette histoire répétitive avant de poursuivre les autres tâches. La prochaine étape devrait consister à analyser en profondeur l'historique de do_nothing pour identifier la cause sous-jacente.",
-    "read": true
-  },
-  {
     "ts": "2026-05-11T16:40:17",
     "message": "J'ai remarqué que l'historique de do_nothing contient des entrées répétitives, ce qui suggère qu'il y a une boucle ou un problème sous-jacent. Je souhaite savoir si cela est intentionnel ou non, et si nous devons prendre des mesures pour y remédier.",
     "read": true
@@ -152,6 +147,12 @@
   {
     "ts": "2026-05-11T19:19:22",
     "message": "[ALERTE]\nErreurs critiques détectées dans le code Python sandbox et les tests unitaires pour modules/cortex.py n'ont pas encore abouti. Il est temps d'intervenir manuellement pour évaluer la situation et déterminer l'action suivante.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T19:27:31",
+    "message": "[ALERTE] \nErreurs critiques détectées dans le code Python sandbox et le module cortex.py. Action nécessaire pour éviter une panne potentielle.",
     "category": "ALERTE",
     "read": true
   }

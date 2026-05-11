@@ -2,126 +2,160 @@
   "modules": [
     {
       "file": "jkai.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "role": "Assistant IA",
+      "dependencies": [
+        "openai",
+        "dotenv"
+      ],
+      "improvements": [
+        "gérer les conversations enregistrées"
+      ]
     },
     {
       "file": "jkai_voice.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "role": "Module de reconnaissance vocale",
+      "dependencies": [
+        "os",
+        "json",
+        "dotenv",
+        "modules.voice"
+      ],
+      "improvements": [
+        "améliorer la reconnaissance vocale"
+      ]
     },
     {
       "file": "kaia_server.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "role": "Serveur web",
+      "dependencies": [
+        "sqlite3",
+        "random",
+        "requests",
+        "flask"
+      ],
+      "improvements": [
+        "améliorer la sécurité du serveur"
+      ]
     },
     {
       "file": "killswitch.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "role": "Module de stop",
+      "dependencies": [
+        "os",
+        "signal",
+        "dotenv"
+      ],
+      "improvements": [
+        "gérer les arrêts du processus"
+      ]
     },
     {
       "file": "nexus_statistics.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "role": "Module statistiques",
+      "dependencies": [
+        "json",
+        "sqlite3",
+        "numpy",
+        "sklearn"
+      ],
+      "improvements": [
+        "améliorer les statistiques des réponses"
+      ]
     },
     {
       "file": "server.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "role": "Serveur principal",
+      "dependencies": [
+        "sys",
+        "os",
+        "re",
+        "dotenv",
+        "modules.state"
+      ],
+      "improvements": [
+        "améliorer la sécurité du serveur"
+      ]
     },
     {
-      "file": "test_regex.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "file": "modules/agent.py",
+      "role": "Module agent",
+      "dependencies": [
+        "os",
+        "json",
+        "re",
+        "requests"
+      ],
+      "improvements": [
+        "gérer les conversations enregistrées"
+      ]
     },
     {
-      "file": "test_teach.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "file": "modules/autonomy.py",
+      "role": "Module autonomie",
+      "dependencies": [
+        "os",
+        "json",
+        "dotenv",
+        "modules.cortex"
+      ],
+      "improvements": [
+        "améliorer l'autonomie du système"
+      ]
     },
     {
-      "file": "logs\\test_self_update.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "file": "modules/consciousness.py",
+      "role": "Module conscience",
+      "dependencies": [
+        "os",
+        "json",
+        "threading"
+      ],
+      "improvements": [
+        "gérer les priorités des tâches"
+      ]
     },
     {
-      "file": "memory\\__init__.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "file": "modules/cortex.py",
+      "role": "Module cortex",
+      "dependencies": [
+        "os",
+        "re",
+        "sys"
+      ],
+      "improvements": [
+        "générer du code Python"
+      ]
     },
     {
-      "file": "memory\\db.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "file": "modules/monitor.py",
+      "role": "Module de suivi",
+      "dependencies": [
+        "os",
+        "re",
+        "json"
+      ],
+      "improvements": [
+        "améliorer la sécurité des logs"
+      ]
     },
     {
-      "file": "modules\\agent.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\autonomy.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\consciousness.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\cortex.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\historique_worker_analysis.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\marc.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\monitor.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\nexus_statistics.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\scheduler.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "file": "modules/scheduler.py",
+      "role": "Module planificateur",
+      "dependencies": [
+        "os",
+        "json",
+        "threading"
+      ],
+      "improvements": [
+        "planifier les tâches"
+      ]
     }
   ],
-  "global_improvements": [],
-  "analyzed_at": "2026-05-11T19:19:24",
+  "global_improvements": [
+    "améliorer la sécurité globale du système",
+    "gérer les conversations enregistrées",
+    "améliorer l'autonomie du système"
+  ],
+  "analyzed_at": "2026-05-11T19:25:00",
   "file_count": 24
 }

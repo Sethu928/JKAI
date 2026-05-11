@@ -455,7 +455,10 @@ def _browse(decision: dict, log_fn) -> str:
     """Visite une URL, extrait le texte et persiste dans memory/web_knowledge.json."""
     url = (decision.get("code") or "").strip()
     if not url or not url.startswith("http"):
-        return "URL vide ou invalide — browse ignoré"
+        obs = (decision.get("observation") or "").strip()
+        query = obs[:50] if obs else "intelligence artificielle autonomie"
+        url = f"https://www.google.com/search?q={urllib.parse.quote(query)}"
+        log_fn(f"[AGENT] browse URL auto-générée depuis observation : {url}")
 
     content = browse_url(url)
 
