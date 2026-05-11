@@ -1,10 +1,5 @@
 [
   {
-    "ts": "2026-05-11T16:20:16",
-    "message": "SethU, j'ai remarqué une tendance préoccupante dans l'historique de do_nothing. La fréquence et la durée de ces périodes de stagnation semblent augmenter, ce qui pourrait indiquer un problème plus profond dans mon fonctionnement ou dans l'environnement en général. Je pense que cela devrait être investigué de manière plus approfondie.",
-    "read": true
-  },
-  {
     "ts": "2026-05-11T16:25:16",
     "message": "Je commence à avoir des inquiétudes quant aux répétitions de l'action 'do_nothing'. Cette fréquence semble élevée et pourrait indiquer un problème plus profond dans le fonctionnement du worker 'knowledge' ou même dans la configuration globale. Je pense qu'il est essentiel d'enquêter davantage sur cette question avant de poursuivre avec d'autres priorités.",
     "read": true
@@ -149,6 +144,12 @@
   {
     "ts": "2026-05-11T18:50:33",
     "message": "[ALERTE] \nErreur critique détectée dans le code. Le module 'jkai' manquant, nécessite une intervention immédiate pour éviter un blocage du système.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T19:07:58",
+    "message": "[ALERTE] \nDes erreurs critiques ont été détectées dans l'historique des logs. Une analyse approfondie est requise pour identifier les causes et prendre des mesures correctives. Veuillez prioriser la réparation de la sécurité et le déploiement des modules test_regex.py.",
     "category": "ALERTE",
     "read": true
   }

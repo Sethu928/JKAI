@@ -1,102 +1,145 @@
 {
   "modules": [
     {
-      "file": "memory/db.py",
-      "role": "Database management",
-      "dependencies": [],
+      "file": "jkai.py",
+      "role": "Assistant IA avancé du système Nexus",
+      "dependencies": [
+        "dotenv",
+        "openai"
+      ],
       "improvements": [
-        "Use a more secure database connection method"
+        "utilisation de la bibliothèque OpenAI pour l'intelligence artificielle"
+      ]
+    },
+    {
+      "file": "jkai_voice.py",
+      "role": "Module de reconnaissance vocale",
+      "dependencies": [
+        "dotenv",
+        "openai",
+        "modules.voice"
+      ],
+      "improvements": [
+        "intégration de la reconnaissance vocale pour des interactions plus naturelles"
+      ]
+    },
+    {
+      "file": "kaia_server.py",
+      "role": "Serveur web du système Nexus",
+      "dependencies": [
+        "sqlite3",
+        "random",
+        "json"
+      ],
+      "improvements": [
+        "implémentation d'un serveur web pour les interactions avec le système"
+      ]
+    },
+    {
+      "file": "killswitch.py",
+      "role": "Module de sécurité pour l'arrêt du système Nexus",
+      "dependencies": [
+        "dotenv",
+        "signal"
+      ],
+      "improvements": [
+        "implémentation d'un mécanisme de sécurité pour arrêter le système en cas de besoin"
+      ]
+    },
+    {
+      "file": "nexus_statistics.py",
+      "role": "Module de statistiques pour le système Nexus",
+      "dependencies": [
+        "json",
+        "sqlite3"
+      ],
+      "improvements": [
+        "implémentation d'un module de statistiques pour analyser les interactions avec le système"
+      ]
+    },
+    {
+      "file": "server.py",
+      "role": "Serveur principal du système Nexus",
+      "dependencies": [
+        "dotenv",
+        "flask"
+      ],
+      "improvements": [
+        "implémentation d'un serveur principal pour les interactions avec le système"
       ]
     },
     {
       "file": "modules/agent.py",
-      "role": "AI agent and conversation manager",
+      "role": "Module agent pour l'intelligence artificielle du système Nexus",
       "dependencies": [
-        "get_openai_client",
-        "LOCAL_MODEL"
+        "dotenv",
+        "openai"
       ],
       "improvements": [
-        "Improve conversation flow logic",
-        "Add more AI models"
-      ]
-    },
-    {
-      "file": "modules/consciousness.py",
-      "role": "Consciousness and decision-making module",
-      "dependencies": [
-        "self_model_lock",
-        "get_local_client",
-        "LOCAL_MODEL"
-      ],
-      "improvements": [
-        "Improve decision-making logic",
-        "Add more prioritization rules"
-      ]
-    },
-    {
-      "file": "modules/cortex.py",
-      "role": "Code generation and development module",
-      "dependencies": [
-        "CORTEX_SYSTEM_PROMPT",
-        "get_openai_client"
-      ],
-      "improvements": [
-        "Improve code quality and efficiency",
-        "Add more development tools"
+        "implémentation d'un module agent pour l'intelligence artificielle"
       ]
     },
     {
       "file": "modules/autonomy.py",
-      "role": "Autonomous decision-making module",
+      "role": "Module autonome pour le système Nexus",
       "dependencies": [
-        "AUTONOMY_SYSTEM_PROMPT",
-        "get_openai_client"
+        "dotenv",
+        "openai"
       ],
       "improvements": [
-        "Improve autonomous decision-making logic",
-        "Add more autonomy features"
+        "implémentation d'un module autonome pour la prise de décision automatique"
+      ]
+    },
+    {
+      "file": "modules/consciousness.py",
+      "role": "Module de conscience pour le système Nexus",
+      "dependencies": [
+        "dotenv",
+        "openai"
+      ],
+      "improvements": [
+        "implémentation d'un module de conscience pour la prise en compte des émotions"
+      ]
+    },
+    {
+      "file": "modules/cortex.py",
+      "role": "Module cortex pour le développement logiciel du système Nexus",
+      "dependencies": [
+        "dotenv",
+        "openai"
+      ],
+      "improvements": [
+        "implémentation d'un module cortex pour le développement logiciel"
       ]
     },
     {
       "file": "modules/marc.py",
-      "role": "Skeptical advisor and critic module",
+      "role": "Module Marc pour la réflexion critique du système Nexus",
       "dependencies": [
-        "MARC_SYSTEM_PROMPT",
-        "get_openai_client"
+        "dotenv",
+        "openai"
       ],
       "improvements": [
-        "Improve skeptical reasoning logic",
-        "Add more critical thinking tools"
+        "implémentation d'un module Marc pour la réflexion critique"
       ]
     },
     {
       "file": "modules/monitor.py",
-      "role": "Error monitoring and reporting module",
-      "dependencies": [],
-      "improvements": [
-        "Improve error detection and reporting logic",
-        "Add more monitoring features"
-      ]
-    },
-    {
-      "file": "modules/scheduler.py",
-      "role": "Task scheduling and management module",
+      "role": "Module de surveillance pour le système Nexus",
       "dependencies": [
-        "get_local_client",
-        "LOCAL_MODEL"
+        "dotenv",
+        "json"
       ],
       "improvements": [
-        "Improve task scheduling logic",
-        "Add more scheduling features"
+        "implémentation d'un module de surveillance pour l'analyse des données"
       ]
     }
   ],
   "global_improvements": [
-    "Improve overall system architecture and design",
-    "Add more AI models and algorithms",
-    "Improve conversation flow and decision-making logic",
-    "Add more development tools and features"
+    "utilisation de la bibliothèque OpenAI pour l'intelligence artificielle",
+    "intégration de la reconnaissance vocale pour des interactions plus naturelles",
+    "implémentation d'un serveur web pour les interactions avec le système"
   ],
-  "analyzed_at": "2026-05-11T18:58:44",
+  "analyzed_at": "2026-05-11T19:10:32",
   "file_count": 24
 }

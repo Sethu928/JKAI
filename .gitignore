@@ -4,3 +4,18 @@ memory/conversations.json
 logs/
 __pycache__/
 *.pyc
+
+# Fichiers mémoire dynamiques — changent en permanence sur le Pi
+memory/kaia_knowledge.json
+memory/api_usage.json
+memory/cycle_memory.json
+memory/self_model.json
+memory/error_memory.json
+memory/realtime_fixes.json
+memory/web_knowledge.json
+memory/proactive_messages.json
+memory/conversation_insights.json
+memory/sethu_profile.json
+memory/priorities.json
+memory/longterm_plan.json
+memory/unsolved_errors.json

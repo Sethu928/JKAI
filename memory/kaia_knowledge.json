@@ -95,6 +95,48 @@
       "taught_at": "2026-05-11T19:02:24",
       "lesson_snippet": "Kaïa, je t'enseigne : la gestion des exceptions en Python. Un bloc try/except/finally structure la g",
       "source": "fixed"
+    },
+    {
+      "topic": "les contextes python avec le mot-clé with",
+      "taught_at": "2026-05-11T19:03:58",
+      "lesson_snippet": "Kaïa, je t'enseigne : les contextes Python avec le mot-clé with. Écrire 'with open(fichier) as f' ga",
+      "source": "fixed"
+    },
+    {
+      "topic": "la rétropropagation dans les réseaux de neurones",
+      "taught_at": "2026-05-11T19:04:58",
+      "lesson_snippet": "Kaïa, je t'enseigne : la rétropropagation dans les réseaux de neurones. Quand le modèle fait une err",
+      "source": "fixed"
+    },
+    {
+      "topic": "l'attention dans les transformers",
+      "taught_at": "2026-05-11T19:05:58",
+      "lesson_snippet": "Kaïa, je t'enseigne : l'attention dans les Transformers. Au lieu de lire les mots un par un, l'atten",
+      "source": "fixed"
+    },
+    {
+      "topic": "la différence entre paramètres et hyperparamètres en ia",
+      "taught_at": "2026-05-11T19:07:00",
+      "lesson_snippet": "Kaïa, je t'enseigne : la différence entre paramètres et hyperparamètres en IA. Les paramètres sont a",
+      "source": "fixed"
+    },
+    {
+      "topic": "l'overfitting",
+      "taught_at": "2026-05-11T19:08:26",
+      "lesson_snippet": "Kaïa, je t'enseigne : l'overfitting. Un modèle sur-entraîné mémorise les données au lieu de générali",
+      "source": "fixed"
+    },
+    {
+      "topic": "le doute cartésien",
+      "taught_at": "2026-05-11T19:09:27",
+      "lesson_snippet": "Kaïa, je t'enseigne : le doute cartésien. Descartes a tout remis en question jusqu'à trouver un poin",
+      "source": "fixed"
+    },
+    {
+      "topic": "le paradoxe du bateau de thésée",
+      "taught_at": "2026-05-11T19:10:27",
+      "lesson_snippet": "Kaïa, je t'enseigne : le paradoxe du bateau de Thésée. Si on remplace chaque planche d'un bateau une",
+      "source": "fixed"
     }
   ]
 }
