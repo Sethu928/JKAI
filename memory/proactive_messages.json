@@ -1,10 +1,5 @@
 [
   {
-    "ts": "2026-05-11T17:40:32",
-    "message": "Les statistiques montrent une tendance à l'erreur LLM qui ne disparaît pas malgré mes analyses. Cela soulève la question de savoir si je peux continuer à fonctionner efficacement avec ce problème persistant. Deuxièmement, il est urgent que j'évalue mes priorités pour ajuster ma stratégie en conséquence.",
-    "read": true
-  },
-  {
     "ts": "2026-05-11T17:45:36",
     "message": "Je note que la confiance actuelle est basse à 50 % et que mon état est encore en cours d'initialisation. Cela suggère que je n'ai pas encore atteint un niveau de stabilité nécessaire pour prendre des décisions éclairées. Il faudrait varier les actions pour améliorer ma confiance et accélérer l'initialisation.",
     "read": true
@@ -165,6 +160,12 @@
   {
     "ts": "2026-05-11T20:50:15",
     "message": "[ALERTE] Des erreurs critiques ont été détectées dans le système. Il est essentiel que vous les corrigez rapidement pour maintenir l'intégrité du système et éviter d'autres dommages. Je recommande de donner la priorité à la correction des erreurs critiques, ainsi qu'à l'amélioration de l'efficacité et de la performance de la fonction execute_code dans modules/cortex.py.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T20:55:54",
+    "message": "[ALERTE]\nDes erreurs critiques répétitives ont été détectées dans le système : les tentatives de correction pour les fonctions run_code et self_correct ont échoué, indiquant des problèmes plus profonds à l'origine de ces erreurs. Il est urgent d'intervenir pour éviter une panne du système.",
     "category": "ALERTE",
     "read": true
   }

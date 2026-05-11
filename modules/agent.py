@@ -275,7 +275,14 @@ def _playwright_browse(url: str) -> str:
         with sync_playwright() as pw:
             browser = pw.chromium.launch(headless=True)
             try:
-                page = browser.new_page(user_agent=_PLAYWRIGHT_UA)
+                context = browser.new_context(
+                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                )
+                context.set_extra_http_headers({
+                    "Accept-Language": "fr-FR,fr;q=0.9",
+                    "Accept": "text/html",
+                })
+                page = context.new_page()
                 page.goto(url, wait_until="domcontentloaded", timeout=15000)
                 text = page.inner_text("body")
                 text = re.sub(r"\s+", " ", text).strip()

@@ -1,12 +1,6 @@
 {
   "topics": [
     {
-      "topic": "les générateurs python et le mot-clé yield",
-      "taught_at": "2026-05-11T19:01:22",
-      "lesson_snippet": "Kaïa, je t'enseigne : les générateurs Python et le mot-clé yield. Une fonction avec yield ne s'exécu",
-      "source": "fixed"
-    },
-    {
       "topic": "la gestion des exceptions en python",
       "taught_at": "2026-05-11T19:02:24",
       "lesson_snippet": "Kaïa, je t'enseigne : la gestion des exceptions en Python. Un bloc try/except/finally structure la g",
@@ -599,6 +593,12 @@
       "taught_at": "2026-05-11T20:54:58",
       "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Skip to main content v2.11.0+cu130 Intro Compilers Domains D : Sk",
       "source": "web"
+    },
+    {
+      "topic": "les list comprehensions en python",
+      "taught_at": "2026-05-11T20:57:25",
+      "lesson_snippet": "Kaïa, je t'enseigne : les list comprehensions en Python. Écrire [x**2 for x in range(10) if x % 2 ==",
+      "source": "fixed"
     }
   ]
 }
