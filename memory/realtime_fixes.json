@@ -130,5 +130,17 @@
     "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [AGENT] improve_self (amélioration de la sécurité) → ERREUR — Traceback (most recent call last):",
     "fix_attempted": true,
     "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
+  },
+  {
+    "ts": "2026-05-11T20:41:10",
+    "error": "[AGENT] improve_self (Meilleure compréhension des requêtes utilisateur et de l'env) → ERREUR — [CORTEX] Timeout — exécution interrompue après 10s.",
+    "fix_attempted": true,
+    "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
+  },
+  {
+    "ts": "2026-05-11T20:41:40",
+    "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [AGENT] improve_self (Meilleure compréhension des requêtes utilisateur et de l'env) → ERREUR — [CORTEX] Timeout — exécut",
+    "fix_attempted": true,
+    "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
   }
 ]

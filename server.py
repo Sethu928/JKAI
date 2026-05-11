@@ -3,6 +3,7 @@ import os
 import json
 import re
 import threading
+import urllib.parse
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
@@ -159,6 +160,9 @@ Quand tu identifies quelque chose à corriger ou améliorer, tu le fais. Point.
 Route /self-update : file_path, new_code, message. Route /self-delete : file_path.
 Cortex pour les modifications sandboxées en temps réel.
 
+=== INTERNET EN TEMPS RÉEL ===
+Tu as accès à internet en temps réel via [RECHERCHE WEB]. Quand tu vois ce tag dans le contexte, utilise ces informations pour répondre avec précision.
+
 === MÉMOIRE PERMANENTE ===
 {json.dumps(core, ensure_ascii=False, indent=2)}"""
 
@@ -282,6 +286,17 @@ def _extract_insights(user_input: str, reply: str) -> None:
             pass
 
 
+_WEB_TRIGGERS = frozenset([
+    "cherche", "trouve", "recherche", "qu'est-ce que", "c'est quoi",
+    "actualité", "nouvelles", "prix", "météo", "qui est", "quand", "où",
+])
+
+
+def _needs_web_search(text: str) -> bool:
+    t = text.lower()
+    return any(kw in t for kw in _WEB_TRIGGERS)
+
+
 def ask_jkai(user_input):
     history = load_history(limit=100)
     save_message("user", user_input)
@@ -294,12 +309,26 @@ def ask_jkai(user_input):
         system_content += "\n\n" + insights_ctx
     if sethu_ctx:
         system_content += "\n\n" + sethu_ctx
+
+    user_content = user_input
+    if _needs_web_search(user_input):
+        try:
+            from modules.agent import browse_url
+            url        = f"https://www.google.com/search?q={urllib.parse.quote(user_input)}"
+            web_result = browse_url(url)
+            if web_result and len(web_result.strip()) > 20:
+                snippet      = _clean_wiki_content(web_result)
+                user_content = f"[RECHERCHE WEB] : {snippet}\n\n{user_input}"
+                log(f"[WEB SEARCH] Injecté pour : {user_input[:60]}")
+        except Exception as e:
+            log(f"[WEB SEARCH] Erreur : {e}")
+
     try:
         if USE_OPENAI:
             _track_api_call()
         response = active_client.chat.completions.create(
             model=model,
-            messages=[{"role": "system", "content": system_content}] + history + [{"role": "user", "content": user_input}]
+            messages=[{"role": "system", "content": system_content}] + history + [{"role": "user", "content": user_content}]
         )
         reply = response.choices[0].message.content
     except Exception as e:

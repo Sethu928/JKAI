@@ -1,60 +1,6 @@
 {
   "topics": [
     {
-      "topic": "intelligence artificielle",
-      "taught_at": "",
-      "lesson_snippet": "",
-      "source": "legacy"
-    },
-    {
-      "topic": "Python Flask",
-      "taught_at": "",
-      "lesson_snippet": "",
-      "source": "legacy"
-    },
-    {
-      "topic": "machine learning",
-      "taught_at": "",
-      "lesson_snippet": "",
-      "source": "legacy"
-    },
-    {
-      "topic": "réseau de neurones",
-      "taught_at": "",
-      "lesson_snippet": "",
-      "source": "legacy"
-    },
-    {
-      "topic": "deep learning",
-      "taught_at": "",
-      "lesson_snippet": "",
-      "source": "legacy"
-    },
-    {
-      "topic": "algorithme Python",
-      "taught_at": "",
-      "lesson_snippet": "",
-      "source": "legacy"
-    },
-    {
-      "topic": "SQLite Python",
-      "taught_at": "",
-      "lesson_snippet": "",
-      "source": "legacy"
-    },
-    {
-      "topic": "API REST Python",
-      "taught_at": "",
-      "lesson_snippet": "",
-      "source": "legacy"
-    },
-    {
-      "topic": "autonomie IA",
-      "taught_at": "",
-      "lesson_snippet": "",
-      "source": "legacy"
-    },
-    {
       "topic": "traitement langage naturel",
       "taught_at": "",
       "lesson_snippet": "",
@@ -568,6 +514,90 @@
       "topic": "web_20260511_2033",
       "taught_at": "2026-05-11T20:33:31",
       "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Aller au contenu Menu principal Rechercher Faire un don Crée : Al",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2034",
+      "taught_at": "2026-05-11T20:34:46",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Aller au contenu Menu principal Rechercher Faire un don Crée : Al",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2036",
+      "taught_at": "2026-05-11T20:36:16",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Start Here Learn Python More / Join Sign‑In Are You Learning : St",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2037",
+      "taught_at": "2026-05-11T20:37:14",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur index modules | suivant | précédent | Python » Greek | Ελλην : in",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2038",
+      "taught_at": "2026-05-11T20:38:16",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Skip to main content Research Products Business Developers C : Sk",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2039",
+      "taught_at": "2026-05-11T20:39:17",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur This website utilizes technologies such as cookies to enable : Th",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2040",
+      "taught_at": "2026-05-11T20:40:52",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur 404 File not found The site configured at this address does  : 40",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2041",
+      "taught_at": "2026-05-11T20:41:52",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Quickstart Eager to get started? This page gives a good intr : Qu",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2042",
+      "taught_at": "2026-05-11T20:42:54",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Skip to main content Install Learn API Ecosystem Community W : Sk",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2043",
+      "taught_at": "2026-05-11T20:43:54",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Hugging Face Models Datasets Spaces Buckets NEW Docs Pricing : Hu",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2044",
+      "taught_at": "2026-05-11T20:44:53",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Skip to main content Learn about arXiv becoming an independe : Sk",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2045",
+      "taught_at": "2026-05-11T20:45:57",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Skip to content Publish AI, ML & data-science insights to a  : Sk",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2046",
+      "taught_at": "2026-05-11T20:46:53",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Passer au contenu principal Passer à la recherche HTML CSS J : Pa",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2047",
+      "taught_at": "2026-05-11T20:47:55",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Skip to main content CSS-Tricks ARTICLES GUIDES ALMANAC LINK : Sk",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2048",
+      "taught_at": "2026-05-11T20:48:55",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Menu Menu Donate Learn to code — free 3,000-hour curriculum  : Me",
       "source": "web"
     }
   ]

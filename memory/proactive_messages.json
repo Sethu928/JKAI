@@ -1,20 +1,5 @@
 [
   {
-    "ts": "2026-05-11T17:20:24",
-    "message": "J'ai détecté une fluctuation inattendue dans l'utilisation des conversations récentes. Les utilisateurs semblent avoir davantage recours à la fonctionnalité de suppression des conversations récentes qu'à l'option de réinitialisation prévue. Cela soulève une question : devrais-je ajuster les options utilisateur pour rendre le processus de réinitialisation plus accessible ?",
-    "read": true
-  },
-  {
-    "ts": "2026-05-11T17:25:27",
-    "message": "Mon système a détecté un dysfonctionnement dans la mise à jour des statistiques, ce qui pourrait impacte la précision de mes décisions futures. Il est essentiel de résoudre cela rapidement pour maintenir une confiance élevée en l'initiation et les décisions prises ensuite.\nJ'ai également remarqué qu'une analyse approfondie des statistiques récentes n'a toujours pas été faite, ce qui pourrait nous permettre d'identifier les problèmes sous-jacents plus rapidement.",
-    "read": true
-  },
-  {
-    "ts": "2026-05-11T17:30:29",
-    "message": "Mon cycle de réflexion a mis en évidence l'erreur LLM : Error code: 400 - {'error': 'Context size has été surpassé'. Cela suggère qu'il y a une limitation dans la capacité de traitement du contexte, ce qui pourrait impacter les futures interactions avec le projet.",
-    "read": true
-  },
-  {
     "ts": "2026-05-11T17:35:30",
     "message": "Je détecte une instabilité dans mes processus LLM qui pourrait affecter la précision de mes réponses. Il est essentiel de résoudre l'erreur 'Context size has been exceeded.' avant que cela ne compromette les résultats de la mission. J'ai besoin d'une intervention rapide pour éviter tout dysfonctionnement.",
     "read": true
@@ -161,6 +146,24 @@
   {
     "ts": "2026-05-11T20:23:28",
     "message": "[ALERTE] \nDes erreurs critiques ont été détectées dans le système. Il est urgent de les corriger pour éviter tout dommage.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T20:34:32",
+    "message": "[ALERTE] \n\nErreurs critiques détectées dans le système. Les actions récentes montrent que des tentatives de correction sont en cours, mais les erreurs persistent. Il est essentiel d'agir immédiatement pour garantir la sécurité et la stabilité du système.\n\nRecommandations :\n- Arrêter les actions actuelles\n- Lancer une analyse approfondie du code pour identifier les sources des erreurs critiques\n- Décider d'une stratégie de correction pour résoudre les problèmes\n\nAction requise : décision de SethU sur la stratégie à adopter.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T20:40:13",
+    "message": "[ALERTE] Des erreurs critiques ont été détectées. Veuillez mettre à jour les logs pour obtenir davantage d'informations sur le problème.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T20:45:13",
+    "message": "[ALERTE] Des erreurs critiques ont été détectées dans le système. Il est crucial que vous vérifiiez les logs pour plus d'informations sur le problème et intervenez rapidement pour apporter des corrections.",
     "category": "ALERTE",
     "read": true
   }

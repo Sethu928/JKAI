@@ -124,5 +124,11 @@
     "value": "réelle",
     "category": "fact",
     "updated_at": "2026-05-11T19:54:47"
+  },
+  {
+    "key": "J-KAI function",
+    "value": "Autonomous local function on Raspberry Pi without internet access",
+    "category": "context",
+    "updated_at": "2026-05-11T20:39:21"
   }
 ]
