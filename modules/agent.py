@@ -54,7 +54,8 @@ RÈGLE ABSOLUE : toutes les 3 actions, utilise teach_kaia pour envoyer une leço
 
 Réponds UNIQUEMENT en JSON, sans texte autour :
 {"observation": "...", "decision": "...", "action": "...", "code": null, "notification": "..."}
-Contraintes code : stdlib seulement, chemins relatifs, table SQLite "conversations" dans memory/jkai.db.\
+Contraintes code : stdlib seulement, chemins relatifs, table SQLite "conversations" dans memory/jkai.db.
+IMPORTANT run_code : n'écris JAMAIS de commandes bash ou shell. Pas de python, python3, subprocess, os.system, os.popen. Uniquement du code Python pur qui s'exécute directement dans l'interpréteur.\
 """
 
 VALID_ACTIONS = {
@@ -458,7 +459,7 @@ def _browse(decision: dict, log_fn) -> str:
         obs = (decision.get("observation") or "").strip()
         query = obs[:50] if obs else "intelligence artificielle autonomie"
         url = f"https://www.google.com/search?q={urllib.parse.quote(query)}"
-        log_fn(f"[AGENT] browse URL auto-générée depuis observation : {url}")
+        log_fn(f"[BROWSE] URL générée : {url}")
 
     content = browse_url(url)
 

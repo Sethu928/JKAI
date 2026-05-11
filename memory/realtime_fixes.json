@@ -118,5 +118,17 @@
     "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [MONITOR] Erreur détectée en temps réel — correction lancée : [AGENT] run_code → ERREUR — File \"C:\\Users\\UTILIS~1\\AppDat",
     "fix_attempted": true,
     "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpq1deogz8.py\", line 1 python3 pytho"
+  },
+  {
+    "ts": "2026-05-11T19:29:29",
+    "error": "[AGENT] improve_self (améliorer la sécurité globale du système) → ERREUR — Traceback (most recent call last):",
+    "fix_attempted": true,
+    "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpq1deogz8.py\", line 1 python3 pytho"
+  },
+  {
+    "ts": "2026-05-11T19:32:54",
+    "error": "[AGENT] improve_self (gestion de la mémoire et des requêtes HTTP) → ERREUR — [CORTEX] Exécution bloquée — opération interdite détectée : `\\beval\\s*\\(`",
+    "fix_attempted": true,
+    "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpq1deogz8.py\", line 1 python3 pytho"
   }
 ]

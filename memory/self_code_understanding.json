@@ -2,160 +2,134 @@
   "modules": [
     {
       "file": "jkai.py",
-      "role": "Assistant IA",
+      "role": "Assistant IA avancé du système Nexus",
       "dependencies": [
-        "openai",
-        "dotenv"
+        "dotenv",
+        "openai"
       ],
       "improvements": [
-        "gérer les conversations enregistrées"
+        "mémoire de conversation"
       ]
     },
     {
       "file": "jkai_voice.py",
       "role": "Module de reconnaissance vocale",
       "dependencies": [
-        "os",
-        "json",
-        "dotenv",
-        "modules.voice"
+        "voice",
+        "memory.db"
       ],
       "improvements": [
-        "améliorer la reconnaissance vocale"
+        "récupération des conversations enregistrées"
       ]
     },
     {
       "file": "kaia_server.py",
-      "role": "Serveur web",
+      "role": "Serveur du système Nexus",
       "dependencies": [
         "sqlite3",
-        "random",
-        "requests",
-        "flask"
+        "flask",
+        "requests"
       ],
       "improvements": [
-        "améliorer la sécurité du serveur"
+        "gestion de la mémoire et des requêtes HTTP"
       ]
     },
     {
       "file": "killswitch.py",
-      "role": "Module de stop",
-      "dependencies": [
-        "os",
-        "signal",
-        "dotenv"
-      ],
-      "improvements": [
-        "gérer les arrêts du processus"
-      ]
+      "role": "Module d'arrêt en cas de problème",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "nexus_statistics.py",
-      "role": "Module statistiques",
+      "role": "Analyse des statistiques du système Nexus",
       "dependencies": [
-        "json",
         "sqlite3",
-        "numpy",
         "sklearn"
       ],
-      "improvements": [
-        "améliorer les statistiques des réponses"
-      ]
+      "improvements": []
     },
     {
       "file": "server.py",
-      "role": "Serveur principal",
+      "role": "Serveur Web du système Nexus",
       "dependencies": [
-        "sys",
-        "os",
-        "re",
-        "dotenv",
-        "modules.state"
+        "flask",
+        "cors"
       ],
       "improvements": [
-        "améliorer la sécurité du serveur"
+        "gestion des requêtes HTTP et des données"
       ]
     },
     {
       "file": "modules/agent.py",
-      "role": "Module agent",
+      "role": "Module agent de décision",
       "dependencies": [
-        "os",
-        "json",
-        "re",
-        "requests"
+        "state",
+        "cortex",
+        "autonomy"
       ],
       "improvements": [
-        "gérer les conversations enregistrées"
+        "analyse des situations et prise de décision"
       ]
     },
     {
       "file": "modules/autonomy.py",
-      "role": "Module autonomie",
+      "role": "Module d'autonomie du système Nexus",
       "dependencies": [
-        "os",
-        "json",
-        "dotenv",
-        "modules.cortex"
+        "state",
+        "cortex"
       ],
-      "improvements": [
-        "améliorer l'autonomie du système"
-      ]
+      "improvements": []
     },
     {
       "file": "modules/consciousness.py",
-      "role": "Module conscience",
+      "role": "Module de conscience du système Nexus",
       "dependencies": [
-        "os",
-        "json",
-        "threading"
+        "state",
+        "cortex"
       ],
-      "improvements": [
-        "gérer les priorités des tâches"
-      ]
+      "improvements": []
     },
     {
       "file": "modules/cortex.py",
-      "role": "Module cortex",
+      "role": "Module cortex de développement logiciel",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules/historique_worker_analysis.py",
+      "role": "Analyse des tâches du worker 'analysis'",
       "dependencies": [
-        "os",
-        "re",
-        "sys"
+        "datetime"
       ],
-      "improvements": [
-        "générer du code Python"
-      ]
+      "improvements": []
+    },
+    {
+      "file": "modules/marc.py",
+      "role": "Module Marc, conseiller sceptique et rigoureux",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "modules/monitor.py",
-      "role": "Module de suivi",
+      "role": "Module de monitoring du système Nexus",
       "dependencies": [
-        "os",
         "re",
         "json"
       ],
-      "improvements": [
-        "améliorer la sécurité des logs"
-      ]
+      "improvements": []
     },
     {
       "file": "modules/scheduler.py",
-      "role": "Module planificateur",
-      "dependencies": [
-        "os",
-        "json",
-        "threading"
-      ],
-      "improvements": [
-        "planifier les tâches"
-      ]
+      "role": "Module de planification des tâches du système Nexus",
+      "dependencies": [],
+      "improvements": []
     }
   ],
   "global_improvements": [
-    "améliorer la sécurité globale du système",
-    "gérer les conversations enregistrées",
-    "améliorer l'autonomie du système"
+    "gestion de la mémoire et des requêtes HTTP",
+    "analyse des situations et prise de décision"
   ],
-  "analyzed_at": "2026-05-11T19:25:00",
+  "analyzed_at": "2026-05-11T19:30:19",
   "file_count": 24
 }

@@ -1,20 +1,20 @@
 {
   "priorities": [
     {
-      "title": "Réparer l'erreur dans le code Python sandbox",
-      "action": "Revenir sur la correction automatique de l'éreur détectée en temps réel et re-réparer les fichiers temporaires générés",
-      "why": "La progression de la mission est à 40% et il y a des erreurs critiques détectées dans le code Python sandbox."
+      "title": "Documenter memory/db.py",
+      "action": "Lire memory/db.py et ajouter des docstrings claires à chaque fonction.",
+      "why": "Le module db.py manque de documentation — objectif concret mesurable."
     },
     {
-      "title": "Écrire des tests unitaires pour modules/cortex.py",
-      "action": "Effectuer les étapes nécessaires pour terminer l'objectif en cours",
-      "why": "L'objectif est en cours de réalisation et il est important d'avoir des tests unitaires pour s'assurer que le module cortex.py fonctionne correctement."
+      "title": "Écrire un test unitaire pour modules/cortex.py",
+      "action": "Créer tests/test_cortex.py avec au moins un test vérifiant execute_code().",
+      "why": "cortex.py est critique mais non testé — un test simple suffit à valider l'objectif."
     },
     {
-      "title": "Documenter toutes les fonctions de memory/db.py",
-      "action": "Effectuer les étapes nécessaires pour terminer l'objectif en cours",
-      "why": "L'objectif est en cours de réalisation et il est important d'avoir une documentation claire des fonctionnalités du module db.py."
+      "title": "Explorer une page web sur l'IA autonome",
+      "action": "Utiliser browse sur une URL relative à l'autonomie des agents IA.",
+      "why": "Alimenter web_knowledge.json avec du contenu frais sur l'IA autonome."
     }
   ],
-  "updated_at": "2026-05-11T19:13:35"
+  "updated_at": "2026-05-11T20:00:00"
 }
