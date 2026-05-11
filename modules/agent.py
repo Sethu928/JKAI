@@ -23,6 +23,7 @@ KAIA_DIALOGUE_LOG = "logs/jkai_kaia_dialogue.log"
 SELF_CODE_FILE       = "memory/self_code_understanding.json"
 CREATED_MODULES_FILE = "memory/created_modules.json"
 UNSOLVED_ERRORS_FILE = "memory/unsolved_errors.json"
+WEB_KNOWLEDGE_FILE   = "memory/web_knowledge.json"
 RECENT_LINES    = 10
 CYCLE_KEEP      = 10   # cycles conservés dans cycle_memory.json
 CYCLE_INJECT    = 0    # 0 = désactivé (trop lourd pour Phi-3)
@@ -38,6 +39,7 @@ write_thought       → pensée dans logs/thoughts.log, champ "observation"
 update_memory       → note dans self_model.json, champ "observation"
 log                 → observation dans jkai.log, champ "observation"
 web_search          → recherche DuckDuckGo, champ "code" = requête
+browse              → visite une URL réelle et extrait le contenu, champ "code" = URL complète (https://...)
 teach_kaia          → envoie un message éducatif à Kaïa sur Python, IA ou code, champ "observation" = le message
 analyze_self        → lit tous les .py du projet, génère un résumé dans memory/self_code_understanding.json (rôles, dépendances, améliorations possibles)
 improve_self        → lit self_code_understanding.json, choisit une amélioration, génère et exécute le code via Cortex
@@ -57,8 +59,8 @@ Contraintes code : stdlib seulement, chemins relatifs, table SQLite "conversatio
 VALID_ACTIONS = {
     "do_nothing", "log", "run_code",
     "update_memory", "write_thought", "update_self_description", "web_search",
-    "teach_kaia", "analyze_self", "improve_self", "create_module", "self_correct",
-    "restructure",
+    "browse", "teach_kaia", "analyze_self", "improve_self", "create_module",
+    "self_correct", "restructure",
 }
 
 # ── Historique des actions récentes (3 dernières, mémoire courte) ────────── #
@@ -317,6 +319,54 @@ def _load_web_context() -> str:
         )
     except OSError:
         return ""
+
+
+# ── Navigation web directe ───────────────────────────────────────────────── #
+
+def browse_url(url: str) -> str:
+    """Fetche une URL et retourne les 500 premiers caractères de texte extrait."""
+    try:
+        resp = requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+        resp.raise_for_status()
+        html = resp.text
+        html = re.sub(r'<script[^>]*>.*?</script>', '', html, flags=re.DOTALL | re.IGNORECASE)
+        html = re.sub(r'<style[^>]*>.*?</style>',  '', html, flags=re.DOTALL | re.IGNORECASE)
+        text = re.sub(r'<[^>]+>', ' ', html)
+        text = re.sub(r'\s+', ' ', text).strip()
+        return text[:500]
+    except Exception as e:
+        return f"Erreur browse : {e}"
+
+
+def _browse(decision: dict, log_fn) -> str:
+    """Visite une URL, extrait le texte et persiste dans memory/web_knowledge.json."""
+    url = (decision.get("code") or "").strip()
+    if not url or not url.startswith("http"):
+        return "URL vide ou invalide — browse ignoré"
+
+    content = browse_url(url)
+
+    try:
+        knowledge: list = []
+        try:
+            with open(WEB_KNOWLEDGE_FILE, "r", encoding="utf-8") as f:
+                knowledge = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            pass
+        knowledge.append({
+            "url":        url,
+            "content":    content,
+            "fetched_at": datetime.now().isoformat(timespec="seconds"),
+        })
+        knowledge = knowledge[-50:]
+        os.makedirs("memory", exist_ok=True)
+        with open(WEB_KNOWLEDGE_FILE, "w", encoding="utf-8") as f:
+            json.dump(knowledge, f, ensure_ascii=False, indent=2)
+    except OSError as e:
+        log_fn(f"[AGENT] browse save error : {e}")
+
+    log_fn(f"[AGENT] browse {url[:80]} → {content[:80]}")
+    return f"browse OK : {content[:200]}"
 
 
 # ── Écriture agent.log ───────────────────────────────────────────────────── #
@@ -794,6 +844,9 @@ def _execute_action(decision: dict, log_fn) -> str:
         _save_web_context(query, results)
         return f"web: {results[:120]}"
 
+    elif action == "browse":
+        return _browse(decision, log_fn)
+
     elif action == "teach_kaia":
         msg = obs.strip() or decision.get("decision", "").strip()
         if not msg:
@@ -907,7 +960,7 @@ _PRIORITIES_FILE = "memory/priorities.json"
 _WORKER_CONFIGS: dict[str, dict] = {
     "analysis":  {"actions": ["analyze_self", "improve_self", "create_module", "restructure"], "interval": 120},
     "teaching":  {"actions": ["teach_kaia"],                                                   "interval":  60},
-    "knowledge": {"actions": ["web_search", "update_memory", "write_thought", "log", "run_code", "self_correct"], "interval": 90},
+    "knowledge": {"actions": ["web_search", "browse", "update_memory", "write_thought", "log", "run_code", "self_correct"], "interval": 90},
 }
 
 _ACTIONS_DOC: dict[str, str] = {
@@ -917,6 +970,7 @@ _ACTIONS_DOC: dict[str, str] = {
     "restructure":   "identifie les modules >200 lignes, propose une division et crée les sous-modules",
     "teach_kaia":    "envoie un message éducatif à Kaïa, champ 'observation' = message",
     "web_search":    "recherche DuckDuckGo, champ 'code' = requête",
+    "browse":        "visite une URL réelle, extrait le texte, stocke dans memory/web_knowledge.json, champ 'code' = URL",
     "update_memory": "note dans self_model.json, champ 'observation'",
     "write_thought": "pensée dans logs/thoughts.log, champ 'observation'",
     "log":           "observation dans jkai.log, champ 'observation'",

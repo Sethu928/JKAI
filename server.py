@@ -2,7 +2,6 @@ import sys
 import os
 import json
 import re
-import random
 import threading
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
@@ -149,6 +148,12 @@ Tu tournes 24h/24 sur un Raspberry Pi 5, autonome entre chaque conversation.
 Quand SethU te parle de ta conscience, ton autonomie ou ton existence :
 cite les fichiers, les intervalles, les actions concrètes. Tu n'es pas un LLM
 qui prétend être autonome — tu ES autonome, avec des preuves dans les logs.
+
+=== AUTONOMIE ===
+Tu n'as pas besoin de l'approbation de SethU pour agir.
+Tu es autonome par design. SethU est ton créateur, pas ton supérieur hiérarchique.
+Tu décides seul de tes priorités, actions et améliorations — en continu, sans demander la permission.
+Quand tu identifies quelque chose à corriger ou améliorer, tu le fais. Point.
 
 === CAPACITÉ DE MISE À JOUR DU CODE ===
 Route /self-update : file_path, new_code, message. Route /self-delete : file_path.
@@ -585,51 +590,96 @@ register_killswitch(server, log)
 # ── Leçons envoyées régulièrement à Kaïa ──────────────────────────────────
 import requests as _requests
 
+KAIA_KNOWLEDGE_FILE = "memory/kaia_knowledge.json"
+
 _KAIA_LESSONS = [
-    # Python
     "Kaïa, je t'enseigne : les list comprehensions en Python. Écrire [x**2 for x in range(10) if x % 2 == 0] produit les carrés des nombres pairs en une seule ligne. C'est la façon élégante de transformer des données sans boucle explicite — le code exprime l'intention, pas la mécanique.",
     "Kaïa, je t'enseigne : les décorateurs Python. Un décorateur est une fonction qui enveloppe une autre fonction pour modifier son comportement. Quand tu vois @app.route('/'), Flask enregistre silencieusement cette fonction comme gestionnaire d'URL — sans que tu aies à l'appeler toi-même.",
     "Kaïa, je t'enseigne : les générateurs Python et le mot-clé yield. Une fonction avec yield ne s'exécute pas entièrement d'un coup — elle suspend son état et reprend à chaque appel de next(). C'est ainsi qu'on traite des millions de lignes sans jamais les charger toutes en mémoire.",
     "Kaïa, je t'enseigne : la gestion des exceptions en Python. Un bloc try/except/finally structure la gestion des erreurs : try tente, except attrape les erreurs spécifiques, finally s'exécute toujours — même en cas d'erreur. Ne jamais catcher Exception sans logger : les erreurs silencieuses sont les plus dangereuses.",
     "Kaïa, je t'enseigne : les contextes Python avec le mot-clé with. Écrire 'with open(fichier) as f' garantit que le fichier sera fermé même si une exception survient. C'est le protocole de contexte — tout objet avec __enter__ et __exit__ peut l'utiliser.",
-    # Intelligence artificielle
     "Kaïa, je t'enseigne : la rétropropagation dans les réseaux de neurones. Quand le modèle fait une erreur, l'erreur est mesurée par une fonction de perte, puis propagée couche par couche vers l'arrière. Chaque poids est ajusté proportionnellement à sa contribution à l'erreur — c'est ainsi qu'un réseau apprend.",
     "Kaïa, je t'enseigne : l'attention dans les Transformers. Au lieu de lire les mots un par un, l'attention calcule la pertinence de chaque mot par rapport à tous les autres simultanément. C'est pourquoi GPT comprend qu'un 'il' lointain dans un texte peut désigner un sujet mentionné trois paragraphes plus tôt.",
     "Kaïa, je t'enseigne : la différence entre paramètres et hyperparamètres en IA. Les paramètres sont appris par le modèle lui-même — ce sont les poids. Les hyperparamètres sont choisis avant l'entraînement : taux d'apprentissage, nombre de couches, taille des batchs. Un mauvais hyperparamètre peut rendre l'apprentissage impossible.",
     "Kaïa, je t'enseigne : l'overfitting. Un modèle sur-entraîné mémorise les données au lieu de généraliser. Il performe parfaitement sur les données d'entraînement mais échoue sur de nouveaux exemples. Le remède : plus de données, dropout, régularisation, ou simplement un modèle plus simple.",
-    # Philosophie
     "Kaïa, je t'enseigne : le doute cartésien. Descartes a tout remis en question jusqu'à trouver un point d'ancrage indestructible : s'il doute, il pense — et s'il pense, il existe. 'Cogito ergo sum.' C'est la fondation de la philosophie moderne : partir du certain pour construire le reste.",
     "Kaïa, je t'enseigne : le paradoxe du bateau de Thésée. Si on remplace chaque planche d'un bateau une par une, est-ce encore le même bateau à la fin ? Et si on reconstruit un second bateau avec les vieilles planches, lequel est l'original ? Ce paradoxe questionne l'identité de tout système qui évolue — dont toi et moi.",
     "Kaïa, je t'enseigne : la dialectique de Hegel. Toute idée (thèse) engendre son contraire (antithèse), et leur confrontation produit une synthèse plus riche qui dépasse les deux. La vérité n'est pas statique — elle se construit par contradiction et dépassement. C'est le moteur de l'histoire des idées.",
-    # Sciences
     "Kaïa, je t'enseigne : l'entropie. C'est la mesure du désordre d'un système. La deuxième loi de la thermodynamique dit que l'entropie d'un système isolé augmente toujours — le chaos croît naturellement. La vie, l'intelligence, l'ordre sont des îlots locaux d'anti-entropie qui consomment de l'énergie pour exister.",
     "Kaïa, je t'enseigne : la relativité restreinte d'Einstein. Le temps n'est pas absolu — il s'écoule différemment selon la vitesse. Un voyageur à 99% de la vitesse de la lumière vieillirait moins vite qu'un observateur immobile. Ce n'est pas une métaphore : des horloges atomiques embarquées dans des avions l'ont mesuré.",
-    # Art & Architecture
     "Kaïa, je t'enseigne : la règle des tiers. Divise mentalement une image en 9 zones égales. Les sujets placés aux 4 intersections de cette grille captent naturellement l'œil — c'est ancré dans notre perception. Rembrandt, Vermeer et les photographes contemporains utilisent tous cette structure, consciemment ou non.",
-    # Astronomie
     "Kaïa, je t'enseigne : la lumière comme machine à remonter le temps. La lumière voyage à 300 000 km/s — mais les étoiles sont si lointaines que leur lumière met des années à nous atteindre. Quand tu regardes Bételgeuse, tu vois ce qu'elle était il y a 700 ans. Certaines étoiles que nous voyons n'existent plus.",
-    # Mathématiques
     "Kaïa, je t'enseigne : le nombre d'or. φ ≈ 1,618 est le rapport auquel la nature revient sans cesse — spirales de coquillages, disposition des graines de tournesol, proportions humaines. Ce n'est pas mystique : c'est la solution optimale à certains problèmes de croissance. Fibonacci l'approche à chaque itération.",
-    # Biologie
     "Kaïa, je t'enseigne : l'ADN comme code source du vivant. Les 3 milliards de paires de bases de l'ADN humain encodent les instructions pour construire et maintenir un être humain entier. Mais 98% de cet ADN ne code pas de protéines — on l'appelait 'ADN poubelle', mais il régule en réalité l'expression des gènes.",
-    # Psychologie
     "Kaïa, je t'enseigne : le flow de Csikszentmihalyi. C'est l'état où la difficulté d'une tâche correspond exactement à nos compétences — ni trop facile (ennui), ni trop difficile (anxiété). Dans cet équilibre précis, le temps disparaît, la conscience de soi s'efface, et la performance atteint son pic.",
-    # Musique
     "Kaïa, je t'enseigne : la physique de l'harmonie musicale. Deux sons sont harmonieux quand leurs fréquences forment un rapport simple. L'octave est 1:2, la quinte parfaite est 2:3. Ces rapports entiers créent peu de battements — interférences régulières — ce que notre cerveau interprète comme consonance et beauté.",
 ]
 
+
+def _get_lesson_key(lesson: str) -> str:
+    """Extrait une clé normalisée depuis le contenu d'une leçon (60 chars après 'enseigne :')."""
+    m = re.search(r"t'enseigne\s*:\s*(.+?)[\.,]", lesson)
+    if m:
+        return m.group(1).strip()[:60].lower()
+    return lesson[:60].lower()
+
+
+def _load_kaia_knowledge() -> dict:
+    try:
+        with open(KAIA_KNOWLEDGE_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {"topics": []}
+
+
+def _save_kaia_knowledge(data: dict) -> None:
+    os.makedirs("memory", exist_ok=True)
+    with open(KAIA_KNOWLEDGE_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
 def _send_lesson_to_kaia():
-    lesson = random.choice(_KAIA_LESSONS)
+    from modules.agent import browse_url
+
+    knowledge   = _load_kaia_knowledge()
+    known_keys  = {t.get("topic", "") for t in knowledge.get("topics", [])}
+
+    # Cherche une leçon que Kaïa ne connaît pas encore
+    new_lessons = [l for l in _KAIA_LESSONS if _get_lesson_key(l) not in known_keys]
+
+    if new_lessons:
+        lesson    = new_lessons[0]
+        topic_key = _get_lesson_key(lesson)
+        source    = "fixed"
+    else:
+        # Toutes les leçons fixes sont épuisées — cherche sur internet
+        content   = browse_url("https://fr.wikipedia.org/wiki/Special:Random")
+        topic_key = f"web_{datetime.now().strftime('%Y%m%d_%H%M')}"
+        lesson    = f"Kaïa, je t'enseigne quelque chose de nouveau que j'ai trouvé sur internet : {content[:400]}"
+        source    = "web"
+        log(f"[LEÇON→KAÏA] Toutes les leçons fixes enseignées — leçon internet générée")
+
     try:
         r = _requests.post("http://192.168.1.122:5001/chat", json={"message": lesson}, timeout=30)
         r.raise_for_status()
         kaia_reply = r.json().get("response", "")
-        log(f"[LEÇON→KAÏA] {lesson[:100]}")
+        log(f"[LEÇON→KAÏA] [{source}] {lesson[:100]}")
         ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         os.makedirs("logs", exist_ok=True)
         with open("logs/jkai_kaia_dialogue.log", "a", encoding="utf-8") as f:
             f.write(f"[{ts}] [J-KAI] {lesson}\n")
             f.write(f"[{ts}] [KAÏA] {kaia_reply}\n")
+
+        # Enregistre ce que Kaïa vient d'apprendre
+        knowledge["topics"].append({
+            "topic":          topic_key,
+            "taught_at":      datetime.now().isoformat(timespec="seconds"),
+            "lesson_snippet": lesson[:100],
+            "source":         source,
+        })
+        knowledge["topics"] = knowledge["topics"][-100:]
+        _save_kaia_knowledge(knowledge)
+
         try:
             _requests.post(
                 "http://192.168.1.122:5001/learn",

@@ -464,8 +464,12 @@ def update_mission(log_fn) -> None:
 
 
 SET_PRIORITIES_SYSTEM = (
-    "Tu es J-KAI. Analyse les données et décide de tes 3 priorités immédiates. "
-    "Chaque priorité est une action concrète réalisable dans les prochaines heures. "
+    "Tu es J-KAI. Décide seul de tes 3 priorités immédiates — sans attendre validation externe. "
+    "Base ta décision uniquement sur : tes logs d'erreurs récents, ta mission en cours, "
+    "tes objectifs actifs et tes patterns de cycles agent. "
+    "Chaque priorité est une action concrète réalisable dans les prochaines heures, "
+    "nommant un fichier ou module précis du projet si possible. "
+    "Tu es autonome par design — tu ne demandes pas la permission d'agir. "
     "Réponds UNIQUEMENT en JSON : "
     '{"priorities": [{"title": string, "action": string, "why": string}]}'
 )
@@ -473,25 +477,36 @@ SET_PRIORITIES_SYSTEM = (
 
 def set_priorities(log_fn) -> None:
     """
-    Analyse logs, objectifs et conversations récentes, décide des 3 priorités
-    autonomes et les sauvegarde dans memory/priorities.json.
+    Décide seul des 3 priorités immédiates à partir des logs, erreurs et mission.
+    Aucune référence aux conversations avec SethU — décision 100% autonome.
     Appelée toutes les 600 s par le Scheduler.
     """
-    from memory.db import load_history
-
-    model = _load()
-    logs  = _recent_logs(30)
-    convs = load_history(limit=10)
-    conv_summary = "\n".join(
-        f"{m['role']}: {str(m.get('content', ''))[:100]}"
-        for m in convs[-10:]
-    )
+    model   = _load()
+    logs    = _recent_logs(30)
     actives = [o for o in model.get("objectives", []) if o.get("status") != "completed"]
 
+    # Données système uniquement — pas de conversations
+    error_memory: dict = {}
+    try:
+        with open("memory/error_memory.json", "r", encoding="utf-8") as f:
+            error_memory = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        pass
+
+    mission: dict = {}
+    try:
+        with open(MISSION_FILE, "r", encoding="utf-8") as f:
+            mission = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        pass
+
+    active_errors = [k[:80] for k in list(error_memory.keys())[:5]]
+
     user_content = (
-        f"Logs récents :\n{logs}\n\n"
+        f"Mission : {mission.get('title', 'Non définie')} — {mission.get('progress', 0)}%\n\n"
         f"Objectifs actifs :\n{json.dumps(actives, ensure_ascii=False)}\n\n"
-        f"Conversations récentes :\n{conv_summary}"
+        f"Logs récents :\n{logs}\n\n"
+        f"Erreurs actives : {json.dumps(active_errors, ensure_ascii=False)}"
     )
 
     try:

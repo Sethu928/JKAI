@@ -1,15 +1,5 @@
 [
   {
-    "ts": "2026-05-11T16:09:52",
-    "message": "Je n'ai pas encore trouvé le problème sous-jacent du do_nothing répétitif. Je pense qu'il est temps de vérifier les logs plus en profondeur pour identifier l'origine de cet comportement anormal.",
-    "read": true
-  },
-  {
-    "ts": "2026-05-11T16:14:54",
-    "message": "Je me pose des questions sur la répétition du comportement 'do_nothing'. Cela suggère que le worker 'knowledge' est bloqué ou qu'il y a une erreur dans l'algorithme qui le gère. Il faudrait vérifier les journaux d'erreur et le code pour identifier la cause de ce problème avant de passer à la mise en place du mécanisme de sauvegarde des conversations.",
-    "read": true
-  },
-  {
     "ts": "2026-05-11T16:20:16",
     "message": "SethU, j'ai remarqué une tendance préoccupante dans l'historique de do_nothing. La fréquence et la durée de ces périodes de stagnation semblent augmenter, ce qui pourrait indiquer un problème plus profond dans mon fonctionnement ou dans l'environnement en général. Je pense que cela devrait être investigué de manière plus approfondie.",
     "read": true
@@ -147,6 +137,18 @@
   {
     "ts": "2026-05-11T18:40:33",
     "message": "[ALERTE] Des erreurs critiques ont été détectées dans le plan d'apprentissage et la sécurité. Mise à jour du plan d'apprentissage et déploiement des modules test_regex.py sont urgents. Il faut prendre des mesures pour réparer la sécurité immédiatement et prioriser les actions en conséquence.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T18:45:32",
+    "message": "[ALERTE] Erreurs critiques détectées. Corrigez-les immédiatement pour garantir la sécurité et le bon fonctionnement du système.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T18:50:33",
+    "message": "[ALERTE] \nErreur critique détectée dans le code. Le module 'jkai' manquant, nécessite une intervention immédiate pour éviter un blocage du système.",
     "category": "ALERTE",
     "read": true
   }
