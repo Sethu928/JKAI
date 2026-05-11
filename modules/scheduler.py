@@ -1,7 +1,9 @@
 import os
+import json
 import time
 import threading
 from datetime import datetime, timedelta
+from modules.state import get_local_client, LOCAL_MODEL, format_messages_for_local
 
 LOGS_DIR = "logs"
 
@@ -129,8 +131,6 @@ def daily_report(log_fn=None) -> None:
     Génère un rapport quotidien via GPT-4o à partir des logs des 24 dernières heures.
     Sauvegarde dans logs/daily_report.log avec horodatage.
     """
-    from modules.state import get_openai_client
-
     cutoff = datetime.now() - timedelta(hours=24)
     log_lines = []
 
@@ -159,17 +159,17 @@ def daily_report(log_fn=None) -> None:
     )
 
     try:
-        client = get_openai_client()
+        client = get_local_client()
         response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
+            model=LOCAL_MODEL,
+            messages=format_messages_for_local([
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": f"Voici les logs des dernières 24h :\n\n{log_content}"},
-            ],
+            ]),
         )
         report_text = response.choices[0].message.content
     except Exception as e:
-        report_text = f"(Erreur GPT-4o lors de la génération du rapport : {e})"
+        report_text = f"(Erreur LLM local lors de la génération du rapport : {e})"
 
     date_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     sep = "=" * 60
@@ -197,8 +197,6 @@ def proactive_message(log_fn=None) -> None:
     Stocke dans memory/proactive_messages.json (liste, champ read=False).
     Appelée toutes les 3600 s par le Scheduler.
     """
-    from modules.state import get_openai_client
-
     self_model  = {}
     thoughts    = ""
     anticipations = []
@@ -229,19 +227,19 @@ def proactive_message(log_fn=None) -> None:
     )
 
     try:
-        client = get_openai_client()
+        client = get_local_client()
         resp = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
+            model=LOCAL_MODEL,
+            messages=format_messages_for_local([
                 {"role": "system", "content": system_prompt},
                 {"role": "user",   "content": user_content},
-            ],
+            ]),
             max_tokens=150,
         )
         message = resp.choices[0].message.content.strip()
     except Exception as e:
         if log_fn:
-            log_fn(f"[SCHEDULER] proactive_message erreur GPT-4o : {e}")
+            log_fn(f"[SCHEDULER] proactive_message erreur LLM local : {e}")
         return
 
     try:
@@ -285,11 +283,11 @@ def create_default_scheduler(log_fn) -> Scheduler:
     def auto_save():
         log_fn("[SCHEDULER] Sauvegarde automatique effectuée.")
 
-    scheduler.add_task("health_check",      60,    health_check)
-    scheduler.add_task("memory_report",    3600,  memory_report)
-    scheduler.add_task("auto_save",        300,   auto_save)
-    scheduler.add_task("clean_logs",       3600,  lambda: clean_logs(log_fn))
-    scheduler.add_task("daily_report",     86400, lambda: daily_report(log_fn))
-    scheduler.add_task("proactive_message",3600,  lambda: proactive_message(log_fn))
+    scheduler.add_task("health_check",      30,   health_check)
+    scheduler.add_task("memory_report",   3600,  memory_report)
+    scheduler.add_task("auto_save",        120,  auto_save)
+    scheduler.add_task("clean_logs",      1800,  lambda: clean_logs(log_fn))
+    scheduler.add_task("daily_report",    3600,  lambda: daily_report(log_fn))
+    scheduler.add_task("proactive_message", 300, lambda: proactive_message(log_fn))
 
     return scheduler

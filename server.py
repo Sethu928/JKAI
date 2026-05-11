@@ -449,10 +449,10 @@ def _send_lesson_to_kaia():
 
 scheduler = create_default_scheduler(log)
 if AUTONOMIE_ACTIVE:
-    scheduler.add_task("teach_kaia",            60,    _send_lesson_to_kaia)
-    scheduler.add_task("consciousness_reflect", 7200,  lambda: reflect(log))
-    scheduler.add_task("check_objectives",      1800,  lambda: check_objectives(log))
-    scheduler.add_task("update_mission",        43200, lambda: update_mission(log))
+    scheduler.add_task("teach_kaia",            60,   _send_lesson_to_kaia)
+    scheduler.add_task("consciousness_reflect", 300,  lambda: reflect(log))
+    scheduler.add_task("check_objectives",      300,  lambda: check_objectives(log))
+    scheduler.add_task("update_mission",        600,  lambda: update_mission(log))
 scheduler.start()
 
 if AUTONOMIE_ACTIVE:

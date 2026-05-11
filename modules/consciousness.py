@@ -194,7 +194,7 @@ def reflect(log_fn) -> None:
         )
         updates = json.loads(resp.choices[0].message.content)
     except Exception as e:
-        log_fn(f"[CONSCIOUSNESS] Erreur GPT-4o : {e}")
+        log_fn(f"[CONSCIOUSNESS] Erreur LLM local : {e}")
         return
 
     # ── Fusion des mises à jour dans le modèle existant ─────────────────── #

@@ -2,152 +2,157 @@
   "modules": [
     {
       "file": "jkai.py",
-      "role": "Assistant IA avancé du système Nexus",
+      "role": "Assistant IA avancé",
       "dependencies": [
         "openai"
       ],
-      "improvements": [
-        "Utilisation de l'API OpenAI pour la conversation"
-      ]
+      "improvements": []
     },
     {
       "file": "jkai_voice.py",
-      "role": "Module de voix pour J-KAI",
+      "role": "Vocalisation",
       "dependencies": [
+        "openai",
         "pyttsx3",
         "pyaudio"
       ],
-      "improvements": [
-        "Utilisation de la bibliothèque pyttsx3 pour la reconnaissance vocale"
-      ]
+      "improvements": []
     },
     {
       "file": "kaia_server.py",
-      "role": "Serveur du système Nexus",
+      "role": "Serveur",
       "dependencies": [
         "flask",
-        "sqlite3"
+        "sqlite3",
+        "requests"
       ],
-      "improvements": [
-        "Implémentation d'un serveur web pour le système Nexus"
-      ]
+      "improvements": []
     },
     {
       "file": "killswitch.py",
-      "role": "Module de sécurité pour le système Nexus",
+      "role": "Arrêt de secours",
       "dependencies": [],
-      "improvements": [
-        "Implémentation d'une fonctionnalité de sécurité pour le système Nexus"
-      ]
+      "improvements": []
     },
     {
       "file": "server.py",
-      "role": "Serveur principal du système Nexus",
+      "role": "Serveur principal",
       "dependencies": [
         "flask",
         "sqlite3"
       ],
       "improvements": [
-        "Implémentation d'un serveur web pour le système Nexus"
+        "Utilisation de CORS pour faciliter les appels API"
+      ]
+    },
+    {
+      "file": "test_teach.py",
+      "role": "Test d'apprentissage",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": []
+    },
+    {
+      "file": "memory/db.py",
+      "role": "Gestion de la base de données",
+      "dependencies": [
+        "sqlite3"
+      ],
+      "improvements": [
+        "Utilisation de context managers pour gérer les connexions"
       ]
     },
     {
       "file": "modules/agent.py",
-      "role": "Module d'agent pour le système Nexus",
+      "role": "Agent d'intelligence artificielle",
       "dependencies": [
-        "openai"
+        "openai",
+        "sqlite3"
       ],
-      "improvements": [
-        "Utilisation de l'API OpenAI pour la conversation"
-      ]
+      "improvements": []
     },
     {
       "file": "modules/autonomy.py",
-      "role": "Module d'autonomie pour le système Nexus",
+      "role": "Autonomie",
       "dependencies": [
         "openai"
       ],
       "improvements": [
-        "Utilisation de l'API OpenAI pour la prise de décision autonome"
+        "Utilisation de threading pour gérer les tâches en parallèle"
       ]
     },
     {
       "file": "modules/consciousness.py",
-      "role": "Module de conscience pour le système Nexus",
+      "role": "Conscience",
       "dependencies": [],
-      "improvements": [
-        "Implémentation d'une fonctionnalité de conscience pour le système Nexus"
-      ]
+      "improvements": []
     },
     {
       "file": "modules/cortex.py",
-      "role": "Module cortex pour le système Nexus",
+      "role": "Module de développement logiciel",
       "dependencies": [
         "openai"
       ],
       "improvements": [
-        "Utilisation de l'API OpenAI pour la génération de code"
+        "Utilisation de threading pour gérer les tâches en parallèle"
       ]
     },
     {
       "file": "modules/marc.py",
-      "role": "Module Marc pour le système Nexus",
-      "dependencies": [],
-      "improvements": [
-        "Implémentation d'une fonctionnalité de conseil pour le système Nexus"
-      ]
+      "role": "Conseiller sceptique",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": []
     },
     {
       "file": "modules/monitor.py",
-      "role": "Module de surveillance pour le système Nexus",
+      "role": "Surveillance",
       "dependencies": [],
       "improvements": [
-        "Implémentation d'une fonctionnalité de surveillance pour le système Nexus"
+        "Utilisation de threading pour gérer les tâches en parallèle"
       ]
     },
     {
       "file": "modules/scheduler.py",
-      "role": "Module planificateur pour le système Nexus",
-      "dependencies": [],
-      "improvements": [
-        "Implémentation d'une fonctionnalité de planification pour le système Nexus"
-      ]
+      "role": "Planificateur",
+      "dependencies": [
+        "threading"
+      ],
+      "improvements": []
     },
     {
       "file": "modules/self_update.py",
-      "role": "Module de mise à jour auto du système Nexus",
+      "role": "Mise à jour automatique",
       "dependencies": [],
       "improvements": [
-        "Implémentation d'une fonctionnalité de mise à jour auto pour le système Nexus"
+        "Utilisation de subprocess pour exécuter des commandes système"
       ]
     },
     {
       "file": "modules/state.py",
-      "role": "Module d'état pour le système Nexus",
+      "role": "Gestion d'état",
       "dependencies": [
         "openai"
       ],
-      "improvements": [
-        "Utilisation de l'API OpenAI pour la gestion des états"
-      ]
+      "improvements": []
     },
     {
       "file": "modules/voice.py",
-      "role": "Module de voix pour le système Nexus",
+      "role": "Vocalisation",
       "dependencies": [
         "pyttsx3",
         "pyaudio"
       ],
-      "improvements": [
-        "Utilisation de la bibliothèque pyttsx3 pour la reconnaissance vocale"
-      ]
+      "improvements": []
     }
   ],
   "global_improvements": [
-    "Implémentation d'une architecture modulaire pour le système Nexus",
-    "Utilisation de l'API OpenAI pour les fonctionnalités de conversation et de génération de code",
-    "Implémentation d'une fonctionnalité de sécurité pour le système Nexus"
+    "Utilisation de threading pour gérer les tâches en parallèle",
+    "Utilisation de context managers pour gérer les connexions",
+    "Utilisation de subprocess pour exécuter des commandes système"
   ],
-  "analyzed_at": "2026-05-11T13:52:41",
+  "analyzed_at": "2026-05-11T13:57:29",
   "file_count": 19
 }
