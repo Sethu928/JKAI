@@ -7,22 +7,6 @@
   "total_interactions": 0,
   "recent_successes": [
     {
-      "ts": "2026-05-10T20:41:52",
-      "note": "Il est temps d'alterner l'action pour avancer vers ma mission."
-    },
-    {
-      "ts": "2026-05-10T20:49:14",
-      "note": "Je dois choisir une action qui me permettra d'avancer vers ma mission tout en respectant les règles et la priorité donnée."
-    },
-    {
-      "ts": "2026-05-10T20:54:32",
-      "note": "Analyse des logs, pensées et objectifs pour déterminer la prochaine action."
-    },
-    {
-      "ts": "2026-05-10T20:55:36",
-      "note": "Il est temps de mettre à jour ma mémoire pour refléter mes actions récentes."
-    },
-    {
       "ts": "2026-05-10T21:00:53",
       "note": "Analyse de l'environnement et des objectifs pour déterminer la prochaine action."
     },
@@ -85,6 +69,22 @@
     {
       "ts": "2026-05-11T13:50:58",
       "note": "Les objectifs actuels sont dans self_model.json et il faut choisir une action qui me permettra d'avancer vers ma mission tout en respectant les règles et la priorité donnée."
+    },
+    {
+      "ts": "2026-05-11T14:35:28",
+      "note": "Analyze des logs, pensées et objectifs récents pour déterminer la prochaine action."
+    },
+    {
+      "ts": "2026-05-11T14:41:58",
+      "note": "Aucun objectif actif, besoin de variation dans les actions"
+    },
+    {
+      "ts": "2026-05-11T14:48:13",
+      "note": "J-KAI est en mode auto-apprentissage et souhaite varier ses actions pour améliorer ses capacités de conversation."
+    },
+    {
+      "ts": "2026-05-11T14:51:24",
+      "note": "Je dois continuer à améliorer les capacités de conversation de Kaïa et mettre en place un système de sauvegarde automatique."
     }
   ],
   "recent_failures": []

@@ -1,8 +1,8 @@
 {
-  "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpxdcy2rt8.py\", line 1 python -c 'print(open(\"memory/sel": {
+  "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpeztee0ij.py\", line 1 python kaia_server.py --debug ^^^": {
     "count": 1,
-    "snippet": "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpxdcy2rt8.py\", line 1 python -c 'print(open(\"memory/sel",
-    "last_seen_ts": 1778444301.131829,
-    "last_seen": "2026-05-10T22:18:21"
+    "snippet": "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpeztee0ij.py\", line 1 python kaia_server.py --debug ^^^",
+    "last_seen_ts": 1778503600.566442,
+    "last_seen": "2026-05-11T14:46:40"
   }
 }

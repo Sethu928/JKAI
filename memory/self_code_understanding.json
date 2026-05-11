@@ -2,176 +2,166 @@
   "modules": [
     {
       "file": "jkai.py",
-      "role": "Assistant IA avancé",
+      "role": "Assistant IA avancé du système Nexus, créé par et pour Jordan (alias SethU)",
       "dependencies": [
-        "openai",
-        "dotenv"
+        "openai"
       ],
       "improvements": [
-        "Utilisation des variables d'environnement pour stocker les clés API",
-        "Chargement du core memory"
+        "Amélioration de l'intelligence artificielle",
+        "Mise à jour des connaissances"
       ]
     },
     {
       "file": "jkai_voice.py",
-      "role": "Voix de J-KAI",
+      "role": "Module de reconnaissance vocale pour J-KAI",
       "dependencies": [
-        "openai",
-        "voice"
+        "openai"
       ],
       "improvements": [
-        "Utilisation d'OpenAI pour la reconnaissance vocale",
-        "Chargement du core memory"
+        "Amélioration de la reconnaissance vocale",
+        "Intégration avec d'autres modules"
       ]
     },
     {
       "file": "kaia_server.py",
-      "role": "Serveur de J-KAI",
+      "role": "Serveur web pour le système Nexus",
       "dependencies": [
-        "sqlite3",
-        "requests"
+        "flask",
+        "sqlite3"
       ],
       "improvements": [
-        "Utilisation d'un serveur Flask pour gérer les requêtes",
-        "Chargement du core memory"
+        "Amélioration de la sécurité",
+        "Mise à jour des bibliothèques"
       ]
     },
     {
       "file": "killswitch.py",
-      "role": "Fonction de sécurité",
-      "dependencies": [
-        "dotenv"
-      ],
+      "role": "Module d'arrêt du système Nexus en cas de problème",
+      "dependencies": [],
       "improvements": [
-        "Utilisation d'un mot de passe pour activer la fonctionnalité de sécurité",
-        "Chargement du core memory"
+        "Amélioration de la fiabilité",
+        "Optimisation du code"
       ]
     },
     {
       "file": "server.py",
-      "role": "Serveur principal",
-      "dependencies": [
-        "flask",
-        "cors"
-      ],
-      "improvements": [
-        "Utilisation d'un serveur Flask pour gérer les requêtes",
-        "Chargement du core memory"
-      ]
-    },
-    {
-      "file": "memory/db.py",
-      "role": "Base de données locale",
-      "dependencies": [
-        "sqlite3"
-      ],
-      "improvements": [
-        "Utilisation d'une base de données SQLite pour stocker les conversations",
-        "Chargement du core memory"
-      ]
-    },
-    {
-      "file": "modules/agent.py",
-      "role": "Module d'agent",
-      "dependencies": [
-        "openai"
-      ],
-      "improvements": [
-        "Utilisation d'OpenAI pour la reconnaissance vocale",
-        "Chargement du core memory"
-      ]
-    },
-    {
-      "file": "modules/autonomy.py",
-      "role": "Module d'autonomie",
-      "dependencies": [
-        "openai"
-      ],
-      "improvements": [
-        "Utilisation d'OpenAI pour la reconnaissance vocale",
-        "Chargement du core memory"
-      ]
-    },
-    {
-      "file": "modules/consciousness.py",
-      "role": "Module de conscience",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules/cortex.py",
-      "role": "Module cortex",
-      "dependencies": [
-        "openai"
-      ],
-      "improvements": [
-        "Utilisation d'OpenAI pour la reconnaissance vocale",
-        "Chargement du core memory"
-      ]
-    },
-    {
-      "file": "modules/marc.py",
-      "role": "Module Marc",
-      "dependencies": [
-        "openai"
-      ],
-      "improvements": [
-        "Utilisation d'OpenAI pour la reconnaissance vocale",
-        "Chargement du core memory"
-      ]
-    },
-    {
-      "file": "modules/monitor.py",
-      "role": "Module de surveillance",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules/scheduler.py",
-      "role": "Module planificateur",
+      "role": "Serveur principal du système Nexus",
       "dependencies": [
         "flask"
       ],
       "improvements": [
-        "Utilisation d'un serveur Flask pour gérer les requêtes",
-        "Chargement du core memory"
+        "Amélioration de l'interface utilisateur",
+        "Mise à jour des bibliothèques"
+      ]
+    },
+    {
+      "file": "modules/agent.py",
+      "role": "Module d'intelligence artificielle pour le système Nexus",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "Amélioration de l'IA",
+        "Mise à jour des connaissances"
+      ]
+    },
+    {
+      "file": "modules/autonomy.py",
+      "role": "Module d'autonomie pour le système Nexus",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "Amélioration de la sécurité",
+        "Optimisation du code"
+      ]
+    },
+    {
+      "file": "modules/consciousness.py",
+      "role": "Module de conscience pour le système Nexus",
+      "dependencies": [],
+      "improvements": [
+        "Amélioration de la fiabilité",
+        "Mise à jour des bibliothèques"
+      ]
+    },
+    {
+      "file": "modules/cortex.py",
+      "role": "Module Dev AI pour le système Nexus",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "Amélioration du développement logiciel",
+        "Mise à jour des connaissances"
+      ]
+    },
+    {
+      "file": "modules/marc.py",
+      "role": "Conseiller sceptique et rigoureux pour le système Nexus",
+      "dependencies": [],
+      "improvements": [
+        "Amélioration de la fiabilité",
+        "Optimisation du code"
+      ]
+    },
+    {
+      "file": "modules/monitor.py",
+      "role": "Module de surveillance pour le système Nexus",
+      "dependencies": [],
+      "improvements": [
+        "Amélioration de la sécurité",
+        "Mise à jour des bibliothèques"
+      ]
+    },
+    {
+      "file": "modules/scheduler.py",
+      "role": "Module de planification pour le système Nexus",
+      "dependencies": [
+        "schedule"
+      ],
+      "improvements": [
+        "Amélioration de la fiabilité",
+        "Optimisation du code"
       ]
     },
     {
       "file": "modules/self_update.py",
-      "role": "Module de mise à jour automatique",
+      "role": "Module d'auto-mise à jour pour le système Nexus",
       "dependencies": [],
-      "improvements": []
+      "improvements": [
+        "Amélioration de la fiabilité",
+        "Mise à jour des bibliothèques"
+      ]
     },
     {
       "file": "modules/state.py",
-      "role": "Module d'état",
+      "role": "Module de gestion de l'état pour le système Nexus",
       "dependencies": [
-        "dotenv",
         "openai"
       ],
       "improvements": [
-        "Utilisation d'un singleton pour le client OpenAI",
-        "Chargement du core memory"
+        "Amélioration de la sécurité",
+        "Optimisation du code"
       ]
     },
     {
       "file": "modules/voice.py",
-      "role": "Module de voix",
+      "role": "Module de reconnaissance vocale pour le système Nexus",
       "dependencies": [
         "pyttsx3"
       ],
       "improvements": [
-        "Utilisation d'une bibliothèque de synthèse vocale",
-        "Chargement du core memory"
+        "Amélioration de la reconnaissance vocale",
+        "Intégration avec d'autres modules"
       ]
     }
   ],
   "global_improvements": [
-    "Utilisation des variables d'environnement pour stocker les clés API",
-    "Chargement du core memory",
-    "Utilisation d'un singleton pour le client OpenAI"
+    "Mise à jour des bibliothèques",
+    "Amélioration de la sécurité",
+    "Optimisation du code"
   ],
-  "analyzed_at": "2026-05-11T14:34:21",
+  "analyzed_at": "2026-05-11T14:55:58",
   "file_count": 19
 }

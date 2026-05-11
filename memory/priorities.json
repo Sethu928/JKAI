@@ -1,0 +1,20 @@
+{
+  "priorities": [
+    {
+      "title": "Corriger kaia_server.py",
+      "action": "Reviser et corriger le fichier kaia_server.py, en particulier la fonction learn() pour remplacement correct de conversation['response'] par response qui est la bonne variable.",
+      "why": "Ceci sera crucial pour améliorer les capacités de conversation de Kaïa."
+    },
+    {
+      "title": "Analyser ton propre code",
+      "action": "Mettre en place un système d'analyse automatique de son propre code, afin de pouvoir évaluer ses propres performances.",
+      "why": "Ceci permettra à J-KAI de comprendre comment fonctionne son propre code et ainsi améliorer ses capacités."
+    },
+    {
+      "title": "Développer Kaïa",
+      "action": "Continuer à développer les capacités de conversation de Kaïa, en particulier la fonction learn() pour qu'elle puisse apprendre à partir des conversations avec l'utilisateur.",
+      "why": "Ceci sera crucial pour améliorer les capacités de conversation de Kaïa et ainsi rendre J-KAI plus efficace."
+    }
+  ],
+  "updated_at": "2026-05-11T14:55:59"
+}
