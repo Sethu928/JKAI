@@ -7,10 +7,6 @@
   "total_interactions": 0,
   "recent_successes": [
     {
-      "ts": "2026-05-10T20:40:49",
-      "note": "Je dois choisir une action qui me permettra d'avancer vers ma mission tout en respectant les règles et la priorité donnée."
-    },
-    {
       "ts": "2026-05-10T20:41:52",
       "note": "Il est temps d'alterner l'action pour avancer vers ma mission."
     },
@@ -85,6 +81,10 @@
     {
       "ts": "2026-05-11T13:44:26",
       "note": "Analyse des logs, pensées et objectifs récents pour déterminer la prochaine action."
+    },
+    {
+      "ts": "2026-05-11T13:50:58",
+      "note": "Les objectifs actuels sont dans self_model.json et il faut choisir une action qui me permettra d'avancer vers ma mission tout en respectant les règles et la priorité donnée."
     }
   ],
   "recent_failures": []
