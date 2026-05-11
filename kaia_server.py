@@ -77,11 +77,25 @@ def _wiki_search(query: str) -> list:
 
 
 def _load_knowledge() -> dict:
+    """Charge kaia_knowledge.json et normalise les deux formats en dict {topic: [entries]}."""
     try:
         with open(_KNOWLEDGE_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
     except (OSError, json.JSONDecodeError):
         return {}
+    if not isinstance(data, dict):
+        return {}
+    # Nouveau format {"topics": [{"name": ..., "entries": [...], ...}]}
+    if "topics" in data and isinstance(data["topics"], list):
+        result = {}
+        for topic in data["topics"]:
+            name    = topic.get("name") or topic.get("title", "")
+            entries = topic.get("entries") or topic.get("lessons", [])
+            if name:
+                result[name] = entries if isinstance(entries, list) else []
+        return result
+    # Ancien format {topic: [entries], ...}
+    return data
 
 
 def _save_knowledge(knowledge: dict) -> None:

@@ -39,7 +39,7 @@ run_code            → script Python sandbox, champ "code"
 write_thought       → pensée dans logs/thoughts.log, champ "observation"
 update_memory       → note dans self_model.json, champ "observation"
 log                 → observation dans jkai.log, champ "observation"
-web_search          → recherche DuckDuckGo, champ "code" = requête
+web_search          → recherche Google via Playwright (fallback DDG/Wikipedia), champ "code" = requête
 browse              → visite une URL réelle et extrait le contenu, champ "code" = URL complète (https://...)
 teach_kaia          → envoie un message éducatif à Kaïa sur Python, IA ou code, champ "observation" = le message
 analyze_self        → lit tous les .py du projet, génère un résumé dans memory/self_code_understanding.json (rôles, dépendances, améliorations possibles)

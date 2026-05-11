@@ -11,5 +11,12 @@
     "role": "Analyser l'historique des tâches exécutées par le worker 'analysis'",
     "created_at": "2026-05-11T16:22:45",
     "import_ok": false
+  },
+  {
+    "name": "document_cortex",
+    "file": "modules\\document_cortex.py",
+    "role": "Génération automatique des commentaires dans les fichiers Python",
+    "created_at": "2026-05-11T19:42:41",
+    "import_ok": false
   }
 ]

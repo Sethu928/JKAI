@@ -1,20 +1,20 @@
 {
   "priorities": [
     {
-      "title": "Documenter memory/db.py",
-      "action": "Lire memory/db.py et ajouter des docstrings claires à chaque fonction.",
-      "why": "Le module db.py manque de documentation — objectif concret mesurable."
+      "title": "Corriger les erreurs critiques dans le système",
+      "action": "Revisiter et corriger les erreurs détectées dans memory/exception_handler.py",
+      "why": "Les erreurs critiques doivent être corrigées pour garantir la stabilité et la sécurité du système."
     },
     {
-      "title": "Écrire un test unitaire pour modules/cortex.py",
-      "action": "Créer tests/test_cortex.py avec au moins un test vérifiant execute_code().",
-      "why": "cortex.py est critique mais non testé — un test simple suffit à valider l'objectif."
+      "title": "Mettre en place un système de logging pour les erreurs critiques",
+      "action": "Modifier le fichier memory/exception_handler.py pour inclure un système de logging",
+      "why": "Un système de logging permettra de suivre les erreurs et de prendre des mesures correctives."
     },
     {
-      "title": "Explorer une page web sur l'IA autonome",
-      "action": "Utiliser browse sur une URL relative à l'autonomie des agents IA.",
-      "why": "Alimenter web_knowledge.json avec du contenu frais sur l'IA autonome."
+      "title": "Continuer à documenter toutes les fonctions de memory/db.py",
+      "action": "Recommencer la documentation du fichier modules/memory/db.py",
+      "why": "La documentation est essentielle pour garantir une compréhension claire des fonctionnalités du module db.py."
     }
   ],
-  "updated_at": "2026-05-11T20:00:00"
+  "updated_at": "2026-05-11T19:44:12"
 }

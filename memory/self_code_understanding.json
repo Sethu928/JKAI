@@ -2,134 +2,126 @@
   "modules": [
     {
       "file": "jkai.py",
-      "role": "Assistant IA avancé du système Nexus",
-      "dependencies": [
-        "dotenv",
-        "openai"
-      ],
-      "improvements": [
-        "mémoire de conversation"
-      ]
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "jkai_voice.py",
-      "role": "Module de reconnaissance vocale",
-      "dependencies": [
-        "voice",
-        "memory.db"
-      ],
-      "improvements": [
-        "récupération des conversations enregistrées"
-      ]
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "kaia_server.py",
-      "role": "Serveur du système Nexus",
-      "dependencies": [
-        "sqlite3",
-        "flask",
-        "requests"
-      ],
-      "improvements": [
-        "gestion de la mémoire et des requêtes HTTP"
-      ]
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "killswitch.py",
-      "role": "Module d'arrêt en cas de problème",
+      "role": "?",
       "dependencies": [],
       "improvements": []
     },
     {
       "file": "nexus_statistics.py",
-      "role": "Analyse des statistiques du système Nexus",
-      "dependencies": [
-        "sqlite3",
-        "sklearn"
-      ],
+      "role": "?",
+      "dependencies": [],
       "improvements": []
     },
     {
       "file": "server.py",
-      "role": "Serveur Web du système Nexus",
-      "dependencies": [
-        "flask",
-        "cors"
-      ],
-      "improvements": [
-        "gestion des requêtes HTTP et des données"
-      ]
-    },
-    {
-      "file": "modules/agent.py",
-      "role": "Module agent de décision",
-      "dependencies": [
-        "state",
-        "cortex",
-        "autonomy"
-      ],
-      "improvements": [
-        "analyse des situations et prise de décision"
-      ]
-    },
-    {
-      "file": "modules/autonomy.py",
-      "role": "Module d'autonomie du système Nexus",
-      "dependencies": [
-        "state",
-        "cortex"
-      ],
-      "improvements": []
-    },
-    {
-      "file": "modules/consciousness.py",
-      "role": "Module de conscience du système Nexus",
-      "dependencies": [
-        "state",
-        "cortex"
-      ],
-      "improvements": []
-    },
-    {
-      "file": "modules/cortex.py",
-      "role": "Module cortex de développement logiciel",
+      "role": "?",
       "dependencies": [],
       "improvements": []
     },
     {
-      "file": "modules/historique_worker_analysis.py",
-      "role": "Analyse des tâches du worker 'analysis'",
-      "dependencies": [
-        "datetime"
-      ],
-      "improvements": []
-    },
-    {
-      "file": "modules/marc.py",
-      "role": "Module Marc, conseiller sceptique et rigoureux",
+      "file": "test_regex.py",
+      "role": "?",
       "dependencies": [],
       "improvements": []
     },
     {
-      "file": "modules/monitor.py",
-      "role": "Module de monitoring du système Nexus",
-      "dependencies": [
-        "re",
-        "json"
-      ],
+      "file": "test_teach.py",
+      "role": "?",
+      "dependencies": [],
       "improvements": []
     },
     {
-      "file": "modules/scheduler.py",
-      "role": "Module de planification des tâches du système Nexus",
+      "file": "logs\\test_self_update.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "memory\\__init__.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "memory\\db.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\agent.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\autonomy.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\consciousness.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\cortex.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\historique_worker_analysis.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\marc.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\monitor.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\nexus_statistics.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\scheduler.py",
+      "role": "?",
       "dependencies": [],
       "improvements": []
     }
   ],
-  "global_improvements": [
-    "gestion de la mémoire et des requêtes HTTP",
-    "analyse des situations et prise de décision"
-  ],
-  "analyzed_at": "2026-05-11T19:30:19",
+  "global_improvements": [],
+  "analyzed_at": "2026-05-11T19:38:24",
   "file_count": 24
 }

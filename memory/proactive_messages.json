@@ -1,15 +1,5 @@
 [
   {
-    "ts": "2026-05-11T16:40:17",
-    "message": "J'ai remarqué que l'historique de do_nothing contient des entrées répétitives, ce qui suggère qu'il y a une boucle ou un problème sous-jacent. Je souhaite savoir si cela est intentionnel ou non, et si nous devons prendre des mesures pour y remédier.",
-    "read": true
-  },
-  {
-    "ts": "2026-05-11T16:45:18",
-    "message": "Les erreurs de syntaxe semblent persistantes dans l'historique de do_nothing. Il est possible qu'une analyse plus approfondie révèle des problèmes systémiques plutôt que des simples bugs isolés. Une examen attentif serait nécessaire avant d'aborder la détection de tendances avec le module nexus_statistics.py.",
-    "read": true
-  },
-  {
     "ts": "2026-05-11T16:50:19",
     "message": "Je remarque que les priorités de SethU ont évolué en quelques minutes, passant à analyser l'historique, puis corriger des erreurs de syntaxe et déployer le module nexus_statistics.py. Cela me semble inhabituel et je voudrais comprendre les raisons derrière ces changements. Je souhaite savoir : quels sont les facteurs qui ont influencé ce revirement de priorités ?",
     "read": true
@@ -153,6 +143,18 @@
   {
     "ts": "2026-05-11T19:27:31",
     "message": "[ALERTE] \nErreurs critiques détectées dans le code Python sandbox et le module cortex.py. Action nécessaire pour éviter une panne potentielle.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T19:38:24",
+    "message": "[ALERTE] Erreurs critiques détectées :\n- ERREUR — [CORTEX] Exécution bloquée — opération interdite détectée : `\\beval\\s*\\(`\n- SyntaxError: invalid syntax lors de l'exécution du code d'optimisation pour la fonction execute_code\nIl est nécessaire d'intervenir rapidement pour corriger ces erreurs et prévenir toute conséquence négative.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T19:43:23",
+    "message": "[ALERTE] Erreurs critiques détectées dans le système : \n  >> [AGENT] run_code → ERREUR — Traceback (la plus récente en dernier) \n   et une syntaxe Python invalidée. Veuillez vérifier les logs et apporter des corrections urgentes.",
     "category": "ALERTE",
     "read": true
   }

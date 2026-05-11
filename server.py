@@ -7,7 +7,7 @@ from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
-from modules.state import get_openai_client, get_local_client, LOCAL_MODEL
+from modules.state import get_openai_client, get_local_client, LOCAL_MODEL, _track_api_call
 from memory.db import init_db, save_message, load_history, clear_history, search_history
 from modules.voice import speak, listen
 from modules.marc import ask_marc
@@ -295,6 +295,8 @@ def ask_jkai(user_input):
     if sethu_ctx:
         system_content += "\n\n" + sethu_ctx
     try:
+        if USE_OPENAI:
+            _track_api_call()
         response = active_client.chat.completions.create(
             model=model,
             messages=[{"role": "system", "content": system_content}] + history + [{"role": "user", "content": user_input}]

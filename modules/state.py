@@ -64,7 +64,6 @@ def get_openai_client() -> OpenAI:
     """Retourne le client OpenAI. Si LM_STUDIO=true dans .env, redirige vers LM Studio."""
     if os.getenv("LM_STUDIO", "").lower() == "true":
         return get_local_client()
-    _track_api_call()
     global _openai_client
     if _openai_client is None:
         with _client_init_lock:

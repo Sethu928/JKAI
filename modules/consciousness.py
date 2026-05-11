@@ -286,7 +286,8 @@ def check_objectives(log_fn) -> None:
             ]),
 
         )
-        results = json.loads(resp.choices[0].message.content).get("results", [])
+        parsed  = parse_json_fence(resp.choices[0].message.content)
+        results = parsed.get("results", []) if isinstance(parsed, dict) else []
     except Exception as e:
         log_fn(f"[CONSCIOUSNESS] check_objectives erreur GPT-4o : {e}")
         return
@@ -319,7 +320,9 @@ def check_objectives(log_fn) -> None:
                 ]),
     
             )
-            raw_obj = json.loads(resp2.choices[0].message.content)
+            raw_obj = parse_json_fence(resp2.choices[0].message.content)
+            if not isinstance(raw_obj, dict):
+                raw_obj = {}
             new_obj = {
                 "title":       str(raw_obj.get("title",       "Nouvel objectif"))[:100],
                 "description": str(raw_obj.get("description", ""))[:300],
@@ -402,7 +405,9 @@ def define_mission(log_fn) -> None:
             ]),
 
         )
-        raw  = json.loads(resp.choices[0].message.content)
+        raw  = parse_json_fence(resp.choices[0].message.content)
+        if not isinstance(raw, dict):
+            raw = {}
     except Exception as e:
         log_fn(f"[MISSION] Erreur define_mission GPT-4o : {e}")
         return
@@ -455,7 +460,9 @@ def update_mission(log_fn) -> None:
             ]),
 
         )
-        result = json.loads(resp.choices[0].message.content)
+        result = parse_json_fence(resp.choices[0].message.content)
+        if not isinstance(result, dict):
+            result = {}
     except Exception as e:
         log_fn(f"[MISSION] Erreur update_mission GPT-4o : {e}")
         return

@@ -1,4 +1,4 @@
-}import os
+import os
 from datetime import datetime
 
 def get_historique_workers_analysis(nexus_data_dir):

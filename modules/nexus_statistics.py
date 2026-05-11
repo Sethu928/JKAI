@@ -1,8 +1,6 @@
 import json
 import sqlite3
 from sqlite3 import Error
-import numpy as np
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 class NexusStatistics:
     def __init__(self):
@@ -63,18 +61,13 @@ class NexusStatistics:
 
     def analyze_performance(self, message=None):
         responses = self.get_responses(message)
-        predicted_responses = [response[2] for response in responses]
-        actual_responses = [response[3] for response in responses]
-
-        accuracy = self.calculate_accuracy(predicted_responses, actual_responses)
-        precision = self.calculate_precision(predicted_responses, actual_responses)
-        recall = self.calculate_recall(predicted_responses, actual_responses)
-        f1_score = self.calculate_f1_score(predicted_responses, actual_responses)
-
-        print(f"Accurancy : {accuracy}%")
-        print(f"Precission : {precision}%")
-        print(f"Recall : {recall}%")
-        print(f"F1 Score : {f1_score}%")
+        if not responses:
+            print("Aucune réponse trouvée.")
+            return
+        response_texts = [row[2] for row in responses]
+        print(f"Total réponses : {len(response_texts)}")
+        print(f"Longueur moyenne : {sum(len(r) for r in response_texts) // len(response_texts)} chars")
+        print(f"Exemple : {response_texts[0][:80]!r}")
 
 if __name__ == "__main__":
     nexus_stats = NexusStatistics()
