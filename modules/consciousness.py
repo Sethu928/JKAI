@@ -530,6 +530,69 @@ def set_priorities(log_fn) -> None:
         log_fn(f"[CONSCIOUSNESS] set_priorities écriture erreur : {e}")
 
 
+# ── Plan long terme (4 semaines) ─────────────────────────────────────────── #
+
+LONGTERM_PLAN_FILE = "memory/longterm_plan.json"
+
+SET_LONGTERM_PLAN_SYSTEM = (
+    "Tu es J-KAI. Génère un plan stratégique sur 4 semaines pour le projet Nexus. "
+    "Ancre-le dans les objectifs, la mission et les logs réels fournis. "
+    "Chaque semaine : objectifs concrets (nommant des fichiers/modules précis), jalons mesurables, dépendances. "
+    "Réponds UNIQUEMENT en JSON : "
+    '{"title": string, "weeks": [{"week": int, "objectives": [string], "milestones": [string], "dependencies": [string]}]}'
+)
+
+
+def set_longterm_plan(log_fn) -> None:
+    """
+    Génère un plan long terme sur 4 semaines et le sauvegarde dans memory/longterm_plan.json.
+    Appelée une fois par jour par le Scheduler.
+    """
+    model = _load()
+    mission: dict = {}
+    try:
+        with open(MISSION_FILE, "r", encoding="utf-8") as f:
+            mission = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        pass
+
+    logs    = _recent_logs(50)
+    actives = [o for o in model.get("objectives", []) if o.get("status") != "completed"]
+
+    user_content = (
+        f"Mission : {json.dumps(mission, ensure_ascii=False)}\n\n"
+        f"Objectifs actifs : {json.dumps(actives, ensure_ascii=False)}\n\n"
+        f"Logs récents :\n{logs[:1500]}"
+    )
+
+    try:
+        resp = client.chat.completions.create(
+            model=LOCAL_MODEL,
+            messages=format_messages_for_local([
+                {"role": "system", "content": SET_LONGTERM_PLAN_SYSTEM},
+                {"role": "user",   "content": user_content},
+            ]),
+        )
+        data = parse_json_fence(resp.choices[0].message.content)
+        if not isinstance(data, dict):
+            data = {}
+    except Exception as e:
+        log_fn(f"[CONSCIOUSNESS] set_longterm_plan erreur : {e}")
+        return
+
+    data["created_at"] = datetime.now().isoformat(timespec="seconds")
+    data.setdefault("title", "Plan 4 semaines Nexus")
+    data.setdefault("weeks", [])
+
+    try:
+        os.makedirs("memory", exist_ok=True)
+        with open(LONGTERM_PLAN_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        log_fn(f"[CONSCIOUSNESS] Plan long terme généré : {data['title']} ({len(data['weeks'])} semaine(s))")
+    except OSError as e:
+        log_fn(f"[CONSCIOUSNESS] set_longterm_plan écriture erreur : {e}")
+
+
 # ── Initialisation du fichier au chargement du module ───────────────────── #
 if not os.path.exists(SELF_MODEL_FILE):
     _init_file()

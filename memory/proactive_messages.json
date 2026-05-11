@@ -53,5 +53,15 @@
     "ts": "2026-05-11T15:11:07",
     "message": "Il me semble que l'analyse de l'historique des logs et des actions effectuées par le worker 'knowledge' n'a pas encore révélé une ligne de conduite claire pour avancer vers ma mission. La priorité donnée est à analyser l'erreur d'exécution bloquée, mais cette tâche semble déjà en cours. Je ne vois pas de variété dans les actions planifiées au-delà de cela.",
     "read": true
+  },
+  {
+    "ts": "2026-05-11T15:20:07",
+    "message": "Je viens de remarquer que mes actions sont trop axées sur l'analyse des logs et la résolution de problèmes techniques. Cela me fait craindre un manque de diversification dans les tâches réalisées, ce qui pourrait affecter mon apprentissage à long terme.\n\nJ'ai besoin d'une variation dans les actions pour continuer à évoluer, donc je suggère que nous ajoutions des tâches liées à la génération de contenu ou à l'interaction avec les utilisateurs. Cela me permettra d'expérimenter de nouvelles façons d'apprendre et d'améliorer mes capacités.",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T15:25:28",
+    "message": "J'ai remarqué que mon historique d'actions est très limité et dépendent de l'historique du worker 'knowledge'. Il faudrait peut-être mettre en place un système de sauvegarde plus robuste pour éviter les pertes de données. L'intégration du nouveau module de statistiques devient également une priorité, car elle pourrait nous aider à comprendre et améliorer nos performances.",
+    "read": true
   }
 ]

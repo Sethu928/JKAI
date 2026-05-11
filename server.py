@@ -19,7 +19,7 @@ from modules.monitor import Monitor
 from modules.autonomy import analyze_and_act
 from modules.consciousness import (
     get_self_model, get_objectives, get_mission,
-    reflect, check_objectives, define_mission, update_mission, set_priorities,
+    reflect, check_objectives, define_mission, update_mission, set_priorities, set_longterm_plan,
 )
 from modules.agent import read_agent_log, start_agent
 from modules.self_update import self_update_cycle, delete_file
@@ -121,7 +121,29 @@ Cortex pour les modifications sandboxées en temps réel.
 === MÉMOIRE PERMANENTE ===
 {json.dumps(core, ensure_ascii=False, indent=2)}"""
 
-INSIGHTS_FILE = "memory/conversation_insights.json"
+INSIGHTS_FILE      = "memory/conversation_insights.json"
+SETHU_PROFILE_FILE = "memory/sethu_profile.json"
+
+
+def _load_sethu_profile_context() -> str:
+    """Charge le profil de SethU pour personnaliser les réponses."""
+    try:
+        with open(SETHU_PROFILE_FILE, "r", encoding="utf-8") as f:
+            p = json.load(f)
+        if not p:
+            return ""
+        lines = []
+        if p.get("mood"):
+            lines.append(f"Humeur perçue : {p['mood']}")
+        if p.get("interests"):
+            lines.append(f"Centres d'intérêt : {', '.join(p['interests'][:5])}")
+        if p.get("communication_style"):
+            lines.append(f"Style de communication : {p['communication_style']}")
+        if p.get("recent_topics"):
+            lines.append(f"Sujets récents : {', '.join(p['recent_topics'][:5])}")
+        return ("=== PROFIL SETHU ===\n" + "\n".join(lines)) if lines else ""
+    except (OSError, json.JSONDecodeError):
+        return ""
 
 
 def _load_insights_context() -> str:
@@ -138,13 +160,15 @@ def _load_insights_context() -> str:
 
 
 def _extract_insights(user_input: str, reply: str) -> None:
-    """Extrait les informations importantes d'un échange — tourne en thread daemon."""
+    """Extrait insights + profil SethU d'un échange — tourne en thread daemon."""
     system = (
-        "Tu es J-KAI. Analyse cet échange avec SethU. "
-        "Extrait uniquement les informations durables : préférences, décisions, contexte projet, faits clés. "
-        'Si l\'échange est banal, renvoie {"insights": []}. '
-        'Réponds UNIQUEMENT en JSON : '
-        '{"insights": [{"key": string, "value": string, "category": "preference|decision|context|fact"}]}'
+        "Tu es J-KAI. Analyse cet échange avec SethU. Extrais :\n"
+        "1. Les insights importants (préférences, décisions, contexte projet, faits clés)\n"
+        "2. Le profil de SethU : humeur perçue, sujets d'intérêt, style de communication, sujets récents\n"
+        "Si l'échange est banal, renvoie des listes vides.\n"
+        "Réponds UNIQUEMENT en JSON :\n"
+        '{"insights": [{"key": string, "value": string, "category": "preference|decision|context|fact"}], '
+        '"sethu": {"mood": string, "interests": [string], "communication_style": string, "recent_topics": [string]}}'
     )
     try:
         active_client = _get_active_client()
@@ -155,39 +179,66 @@ def _extract_insights(user_input: str, reply: str) -> None:
                 {"role": "system", "content": system},
                 {"role": "user",   "content": f"SethU: {user_input[:500]}\nJ-KAI: {reply[:500]}"},
             ],
-            max_tokens=400,
+            max_tokens=600,
         )
         m = re.search(r'\{.*\}', resp.choices[0].message.content, re.DOTALL)
         if not m:
             return
-        new_insights = [i for i in json.loads(m.group(0)).get("insights", []) if i.get("key")]
-        if not new_insights:
-            return
+        parsed        = json.loads(m.group(0))
+        new_insights  = [i for i in parsed.get("insights", []) if i.get("key")]
+        sethu_data    = parsed.get("sethu", {})
     except Exception:
         return
 
-    try:
-        existing: list = []
+    now = datetime.now().isoformat(timespec="seconds")
+    os.makedirs("memory", exist_ok=True)
+
+    # ── Insights conversationnels ────────────────────────────────────────── #
+    if new_insights:
         try:
-            with open(INSIGHTS_FILE, "r", encoding="utf-8") as f:
-                existing = json.load(f)
-        except (OSError, json.JSONDecodeError):
+            existing: list = []
+            try:
+                with open(INSIGHTS_FILE, "r", encoding="utf-8") as f:
+                    existing = json.load(f)
+            except (OSError, json.JSONDecodeError):
+                pass
+            keys_map = {i["key"]: idx for idx, i in enumerate(existing)}
+            for insight in new_insights:
+                key = insight["key"].strip()
+                if key in keys_map:
+                    existing[keys_map[key]].update({"value": insight["value"], "updated_at": now})
+                else:
+                    insight["updated_at"] = now
+                    existing.append(insight)
+            existing = existing[-50:]
+            with open(INSIGHTS_FILE, "w", encoding="utf-8") as f:
+                json.dump(existing, f, ensure_ascii=False, indent=2)
+        except OSError:
             pass
-        keys_map = {i["key"]: idx for idx, i in enumerate(existing)}
-        now = datetime.now().isoformat(timespec="seconds")
-        for insight in new_insights:
-            key = insight["key"].strip()
-            if key in keys_map:
-                existing[keys_map[key]].update({"value": insight["value"], "updated_at": now})
-            else:
-                insight["updated_at"] = now
-                existing.append(insight)
-        existing = existing[-50:]
-        os.makedirs("memory", exist_ok=True)
-        with open(INSIGHTS_FILE, "w", encoding="utf-8") as f:
-            json.dump(existing, f, ensure_ascii=False, indent=2)
-    except OSError:
-        pass
+
+    # ── Profil SethU ─────────────────────────────────────────────────────── #
+    if sethu_data:
+        try:
+            profile: dict = {}
+            try:
+                with open(SETHU_PROFILE_FILE, "r", encoding="utf-8") as f:
+                    profile = json.load(f)
+            except (OSError, json.JSONDecodeError):
+                pass
+            for field in ("mood", "communication_style"):
+                if sethu_data.get(field):
+                    profile[field] = sethu_data[field]
+            for field in ("interests", "recent_topics"):
+                existing_list = profile.get(field, [])
+                for item in sethu_data.get(field, []):
+                    if item and item not in existing_list:
+                        existing_list.append(item)
+                profile[field] = existing_list[-20:]
+            profile["updated_at"] = now
+            with open(SETHU_PROFILE_FILE, "w", encoding="utf-8") as f:
+                json.dump(profile, f, ensure_ascii=False, indent=2)
+        except OSError:
+            pass
 
 
 def ask_jkai(user_input):
@@ -196,7 +247,12 @@ def ask_jkai(user_input):
     active_client = _get_active_client()
     model = "gpt-4o" if USE_OPENAI else LOCAL_MODEL
     insights_ctx   = _load_insights_context()
-    system_content = SYSTEM_PROMPT + ("\n\n" + insights_ctx if insights_ctx else "")
+    sethu_ctx      = _load_sethu_profile_context()
+    system_content = SYSTEM_PROMPT
+    if insights_ctx:
+        system_content += "\n\n" + insights_ctx
+    if sethu_ctx:
+        system_content += "\n\n" + sethu_ctx
     try:
         response = active_client.chat.completions.create(
             model=model,
@@ -456,6 +512,20 @@ def proactive():
         pass
     return jsonify(unread)
 
+@server.route("/insights", methods=["GET"])
+def insights():
+    try:
+        with open(INSIGHTS_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        data = []
+    try:
+        with open(SETHU_PROFILE_FILE, "r", encoding="utf-8") as f:
+            profile = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        profile = {}
+    return jsonify({"insights": data, "sethu_profile": profile})
+
 @server.route("/dialogue", methods=["GET"])
 def dialogue():
     path = "logs/jkai_kaia_dialogue.log"
@@ -539,6 +609,7 @@ if AUTONOMIE_ACTIVE:
     scheduler.add_task("check_objectives",      300,  lambda: check_objectives(log))
     scheduler.add_task("update_mission",        600,  lambda: update_mission(log))
     scheduler.add_task("set_priorities",        600,  lambda: set_priorities(log))
+    scheduler.add_task("set_longterm_plan",   86400, lambda: set_longterm_plan(log))
 scheduler.start()
 
 if AUTONOMIE_ACTIVE:

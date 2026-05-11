@@ -10,5 +10,11 @@
     "snippet": "[CORTEX] Exécution bloquée — opération interdite détectée : `subprocess\\.`",
     "last_seen_ts": 1778505409.873021,
     "last_seen": "2026-05-11T15:16:49"
+  },
+  "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmph19h5liq.py\", line 1 python -c \"import sqlite3; conn =": {
+    "count": 1,
+    "snippet": "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmph19h5liq.py\", line 1 python -c \"import sqlite3; conn =",
+    "last_seen_ts": 1778506068.114073,
+    "last_seen": "2026-05-11T15:27:48"
   }
 }

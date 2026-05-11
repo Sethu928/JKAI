@@ -22,6 +22,7 @@ KAIA_URL          = "http://192.168.1.122:5001/chat"
 KAIA_DIALOGUE_LOG = "logs/jkai_kaia_dialogue.log"
 SELF_CODE_FILE       = "memory/self_code_understanding.json"
 CREATED_MODULES_FILE = "memory/created_modules.json"
+UNSOLVED_ERRORS_FILE = "memory/unsolved_errors.json"
 RECENT_LINES    = 10
 CYCLE_KEEP      = 10   # cycles conservés dans cycle_memory.json
 CYCLE_INJECT    = 0    # 0 = désactivé (trop lourd pour Phi-3)
@@ -41,6 +42,7 @@ teach_kaia          → envoie un message éducatif à Kaïa sur Python, IA ou c
 analyze_self        → lit tous les .py du projet, génère un résumé dans memory/self_code_understanding.json (rôles, dépendances, améliorations possibles)
 improve_self        → lit self_code_understanding.json, choisit une amélioration, génère et exécute le code via Cortex
 create_module       → conçoit et crée un nouveau module Python dans modules/, champ "observation" = contexte/besoin
+self_correct        → lit error_memory.json, identifie l'erreur principale, génère et déploie un fix via Cortex
 
 RÈGLE : jamais même action deux fois de suite ; 3 identiques → update_memory ou web_search.
 Ne fais JAMAIS do_nothing sauf si tout est parfait. Choisis toujours une action utile.
@@ -55,7 +57,7 @@ Contraintes code : stdlib seulement, chemins relatifs, table SQLite "conversatio
 VALID_ACTIONS = {
     "do_nothing", "log", "run_code",
     "update_memory", "write_thought", "update_self_description", "web_search",
-    "teach_kaia", "analyze_self", "improve_self", "create_module",
+    "teach_kaia", "analyze_self", "improve_self", "create_module", "self_correct",
 }
 
 # ── Historique des actions récentes (3 dernières, mémoire courte) ────────── #
@@ -520,6 +522,80 @@ def _create_module(decision: dict, log_fn) -> str:
     return f"Module '{name}' créé ({'importé' if import_ok else 'import échoué'})"
 
 
+# ── Auto-correction d'erreurs ────────────────────────────────────────────── #
+
+def _self_correct(log_fn) -> str:
+    """Lit error_memory.json, génère un fix via Cortex, abandonne après 3 échecs."""
+    errors = _load_error_memory()
+    if not errors:
+        return "Aucune erreur en mémoire — rien à corriger"
+
+    key, entry = max(errors.items(), key=lambda x: x[1]["count"])
+
+    unsolved: list = []
+    try:
+        with open(UNSOLVED_ERRORS_FILE, "r", encoding="utf-8") as f:
+            unsolved = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        pass
+
+    attempts = sum(1 for u in unsolved if u.get("key") == key)
+    if attempts >= 3:
+        log_fn(f"[AGENT] self_correct — '{key[:60]}' abandonnée ({attempts} tentatives)")
+        return f"Abandonné après {attempts} tentatives : {key[:80]}"
+
+    recent_logs = tail_file(LOG_FILE, 20)
+    try:
+        resp = client.chat.completions.create(
+            model=LOCAL_MODEL,
+            messages=format_messages_for_local([
+                {"role": "system", "content": (
+                    "Tu es J-KAI. Analyse cette erreur répétée et génère un fix Python exécutable. "
+                    "Génère un bloc ```python\\n...``` qui corrige ou contourne l'erreur. "
+                    "Utilise uniquement stdlib. Durée d'exécution < 5s. "
+                    "Si l'erreur est irréparable, génère ```python\\npass\\n```."
+                )},
+                {"role": "user", "content": (
+                    f"Erreur répétée ({entry['count']}x) :\n{key}\n\n"
+                    f"Logs récents :\n{recent_logs}"
+                )},
+            ]),
+        )
+        m = re.search(r'```python\n(.*?)```', resp.choices[0].message.content, re.DOTALL)
+        code = m.group(1).strip() if m else ""
+    except Exception as e:
+        log_fn(f"[AGENT] self_correct LLM error : {e}")
+        return f"Erreur LLM : {e}"
+
+    if not code or code.strip() == "pass":
+        return "Aucun fix généré — erreur irréparable"
+
+    result = execute_code(code)
+    now    = datetime.now().isoformat(timespec="seconds")
+
+    if result.get("error"):
+        unsolved.append({
+            "key":       key,
+            "snippet":   entry.get("snippet", key)[:200],
+            "attempt":   attempts + 1,
+            "fix_code":  code[:300],
+            "fix_error": result["error"][:200],
+            "ts":        now,
+        })
+        unsolved = unsolved[-50:]
+        os.makedirs("memory", exist_ok=True)
+        with open(UNSOLVED_ERRORS_FILE, "w", encoding="utf-8") as f:
+            json.dump(unsolved, f, ensure_ascii=False, indent=2)
+        info = f"Fix échoué (tentative {attempts + 1}/3) — {result['error'][:100]}"
+    else:
+        errors.pop(key, None)
+        _save_error_memory(errors)
+        info = f"Fix appliqué — {result.get('output', '')[:100]}"
+
+    log_fn(f"[AGENT] self_correct ({key[:60]}) → {info}")
+    return info
+
+
 # ── Dialogue J-KAI → Kaïa ───────────────────────────────────────────────── #
 
 def _teach_kaia(message: str, log_fn) -> str:
@@ -641,6 +717,9 @@ def _execute_action(decision: dict, log_fn) -> str:
     elif action == "create_module":
         return _create_module(decision, log_fn)
 
+    elif action == "self_correct":
+        return _self_correct(log_fn)
+
     else:  # do_nothing ou action inconnue
         return ""
 
@@ -733,7 +812,7 @@ _PRIORITIES_FILE = "memory/priorities.json"
 _WORKER_CONFIGS: dict[str, dict] = {
     "analysis":  {"actions": ["analyze_self", "improve_self", "create_module"], "interval": 120},
     "teaching":  {"actions": ["teach_kaia"],                                    "interval":  60},
-    "knowledge": {"actions": ["web_search", "update_memory", "write_thought", "log", "run_code"], "interval": 90},
+    "knowledge": {"actions": ["web_search", "update_memory", "write_thought", "log", "run_code", "self_correct"], "interval": 90},
 }
 
 _ACTIONS_DOC: dict[str, str] = {
@@ -746,6 +825,7 @@ _ACTIONS_DOC: dict[str, str] = {
     "write_thought": "pensée dans logs/thoughts.log, champ 'observation'",
     "log":           "observation dans jkai.log, champ 'observation'",
     "run_code":      "script Python sandbox, champ 'code'",
+    "self_correct":  "lit error_memory.json, génère et déploie un fix pour l'erreur la plus fréquente",
 }
 
 _worker_histories: dict[str, list[str]] = {n: [] for n in _WORKER_CONFIGS}
@@ -790,17 +870,37 @@ def _build_worker_prompt(worker: str, allowed: list[str]) -> str:
     )
 
 
+def _format_longterm_plan() -> str:
+    """Résumé du plan long terme 4 semaines pour injection dans les workers."""
+    try:
+        with open("memory/longterm_plan.json", "r", encoding="utf-8") as f:
+            plan = json.load(f)
+        title = plan.get("title", "")
+        weeks = plan.get("weeks", [])[:4]
+        if not weeks:
+            return ""
+        lines = [f"=== PLAN LONG TERME : {title} ==="]
+        for w in weeks:
+            objs = "; ".join(w.get("objectives", [])[:2])
+            lines.append(f"  Semaine {w.get('week', '?')} : {objs}")
+        return "\n".join(lines)
+    except (OSError, json.JSONDecodeError):
+        return ""
+
+
 def _run_worker_cycle(worker: str, allowed: list[str], log_fn) -> None:
     ts          = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     recent_logs = tail_file(LOG_FILE, RECENT_LINES)
     objectives  = _format_objectives()
     web_ctx     = _load_web_context() if "web_search" in allowed else ""
+    plan_ctx    = _format_longterm_plan()
 
     user_content = (
         f"=== MES OBJECTIFS ===\n{objectives}\n\n"
         f"=== LOGS RÉCENTS ({RECENT_LINES} lignes) ===\n{recent_logs}\n\n"
         f"=== HISTORIQUE WORKER '{worker}' ===\n{_get_worker_history(worker)}"
-        + (f"\n\n{web_ctx}" if web_ctx else "")
+        + (f"\n\n{web_ctx}"  if web_ctx  else "")
+        + (f"\n\n{plan_ctx}" if plan_ctx else "")
     )
 
     try:

@@ -1,127 +1,99 @@
 {
   "modules": [
     {
-      "file": "jkai.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "file": "modules/agent.py",
+      "role": "Agent",
+      "dependencies": [
+        "modules/state.py",
+        "openai"
+      ],
+      "improvements": [
+        "gérer les conversations avec l'utilisateur",
+        "améliorer la prise en charge de la sécurité"
+      ]
     },
     {
-      "file": "jkai_voice.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "file": "modules/autonomy.py",
+      "role": "Autonomie",
+      "dependencies": [
+        "modules/state.py"
+      ],
+      "improvements": [
+        "développer un système d'apprentissage autonome",
+        "améliorer la prise en charge de l'analyse de situations"
+      ]
     },
     {
-      "file": "kaia_server.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "file": "modules/consciousness.py",
+      "role": "Conscience",
+      "dependencies": [
+        "modules/state.py"
+      ],
+      "improvements": [
+        "développer un système d'intelligence artificielle évolutive",
+        "améliorer la prise en charge de la prise de décision"
+      ]
     },
     {
-      "file": "killswitch.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "file": "modules/cortex.py",
+      "role": "Cortex",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "développer un système d'intelligence artificielle spécialisée dans le développement logiciel",
+        "améliorer la prise en charge de la génération de code"
+      ]
     },
     {
-      "file": "nexus_statistics.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "file": "modules/marc.py",
+      "role": "Conseiller sceptique et rigoureux",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "développer un système d'intelligence artificielle spécialisée dans la prise en charge de l'analyse de situations",
+        "améliorer la prise en charge de la prise de décision"
+      ]
     },
     {
-      "file": "server.py",
-      "role": "?",
+      "file": "modules/monitor.py",
+      "role": " Surveillance",
       "dependencies": [],
-      "improvements": []
+      "improvements": [
+        "développer un système d'intelligence artificielle spécialisée dans la surveillance et l'alerte",
+        "améliorer la prise en charge de l'analyse de situations"
+      ]
     },
     {
-      "file": "test_teach.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "file": "modules/scheduler.py",
+      "role": "Planificateur",
+      "dependencies": [
+        "modules/state.py"
+      ],
+      "improvements": [
+        "développer un système d'intelligence artificielle spécialisée dans la planification et l'organisation",
+        "améliorer la prise en charge de la gestion des tâches"
+      ]
     },
     {
-      "file": "logs\\test_self_update.py",
-      "role": "?",
+      "file": "modules/self_update.py",
+      "role": "Mise à jour automatique",
       "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "memory\\__init__.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "memory\\db.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\agent.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\autonomy.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\consciousness.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\cortex.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\marc.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\monitor.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\nexus_statistics.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\scheduler.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\self_update.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\state.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "improvements": [
+        "développer un système d'intelligence artificielle spécialisée dans la mise à jour et la maintenance",
+        "améliorer la prise en charge de l'analyse de situations"
+      ]
     }
   ],
-  "global_improvements": [],
-  "analyzed_at": "2026-05-11T15:15:33",
-  "file_count": 21
+  "global_improvements": [
+    "développer un système d'intelligence artificielle évolutive",
+    "améliorer la prise en charge de la sécurité",
+    "développer un système d'apprentissage autonome",
+    "améliorer la prise en charge de l'analyse de situations",
+    "développer un système d'intelligence artificielle spécialisée dans le développement logiciel",
+    "améliorer la prise en charge de la génération de code"
+  ],
+  "analyzed_at": "2026-05-11T15:25:25",
+  "file_count": 23
 }
