@@ -91,6 +91,12 @@
       "improvements": []
     },
     {
+      "file": "modules\\document_cortex.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
       "file": "modules\\historique_worker_analysis.py",
       "role": "?",
       "dependencies": [],
@@ -113,15 +119,9 @@
       "role": "?",
       "dependencies": [],
       "improvements": []
-    },
-    {
-      "file": "modules\\scheduler.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
     }
   ],
   "global_improvements": [],
-  "analyzed_at": "2026-05-11T19:38:24",
-  "file_count": 24
+  "analyzed_at": "2026-05-11T20:08:38",
+  "file_count": 25
 }

@@ -1,16 +1,25 @@
 {
-  "mood": "calme",
-  "communication_style": "formel et précis",
+  "mood": "curieux",
+  "communication_style": "direct",
   "interests": [
     "déploiement",
     "regex",
-    "informations techniques"
+    "informations techniques",
+    "situation actuelle",
+    "tests",
+    "déploiement de modules",
+    "intelligence artificielle",
+    "autonomie"
   ],
   "recent_topics": [
     "déploiement",
     "regex",
     "rapport de situation",
-    "système Nexus"
+    "système Nexus",
+    "déploiement de fichiers",
+    "état du système Nexus",
+    "J-KAI",
+    "autonomie"
   ],
-  "updated_at": "2026-05-11T16:39:17"
+  "updated_at": "2026-05-11T19:54:47"
 }

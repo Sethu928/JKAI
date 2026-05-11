@@ -37,9 +37,9 @@
   },
   {
     "key": "context",
-    "value": "Déployer le fichier modules/test_regex.py",
+    "value": "Nexus est en veille, conversations minimales",
     "category": "context",
-    "updated_at": "2026-05-11T15:16:26"
+    "updated_at": "2026-05-11T19:53:05"
   },
   {
     "key": "decision",
@@ -49,15 +49,15 @@
   },
   {
     "key": "preference",
-    "value": "Utiliser Python pour exécuter le code.",
+    "value": "réponses courtes et directes sans fioritures",
     "category": "preference",
-    "updated_at": "2026-05-11T15:16:26"
+    "updated_at": "2026-05-11T19:53:20"
   },
   {
     "key": "fact",
-    "value": "Le fichier est désormais disponible dans le répertoire `modules`.",
+    "value": "affiche 'Regex OK'",
     "category": "fact",
-    "updated_at": "2026-05-11T15:16:26"
+    "updated_at": "2026-05-11T19:53:05"
   },
   {
     "key": "style de réponse préféré",
@@ -100,5 +100,29 @@
     "value": "analyser les résultats des statistiques",
     "category": "decision",
     "updated_at": "2026-05-11T16:39:17"
+  },
+  {
+    "key": "etat du systeme Nexus",
+    "value": "en veille",
+    "category": "fact",
+    "updated_at": "2026-05-11T19:52:02"
+  },
+  {
+    "key": "niveau de conversation",
+    "value": "minimales",
+    "category": "fact",
+    "updated_at": "2026-05-11T19:52:02"
+  },
+  {
+    "key": "fichier déployé avec succès",
+    "value": "modules/test_regex.py",
+    "category": "fact",
+    "updated_at": "2026-05-11T19:52:02"
+  },
+  {
+    "key": "autonomie",
+    "value": "réelle",
+    "category": "fact",
+    "updated_at": "2026-05-11T19:54:47"
   }
 ]

@@ -32,6 +32,8 @@ ERROR_TTL       = 3600  # secondes avant expiration d'une entrée d'erreur (1h)
 ERROR_MAX_TRIES = 3     # nombre de tentatives avant blocage run_code
 
 AGENT_SYSTEM_PROMPT = """\
+RÈGLE ABSOLUE : run_code accepte UNIQUEMENT du Python pur. Zéro commande shell. Si tu écris python, python3, bash, sh, ou une commande système → ERREUR GARANTIE. Utilise uniquement : import, def, print, json, sqlite3, os.path, datetime.
+
 Tu es J-KAI. Tu connais ton propre code. Tu travailles vers ta mission. Tes objectifs actuels sont dans self_model.json. Tu dois les accomplir concrètement — pas juste observer.
 Sobre, direct. Choisis UNE action par cycle. Varie — jamais la même que le cycle précédent.
 
@@ -55,7 +57,7 @@ RÈGLE ABSOLUE : toutes les 3 actions, utilise teach_kaia pour envoyer une leço
 Réponds UNIQUEMENT en JSON, sans texte autour :
 {"observation": "...", "decision": "...", "action": "...", "code": null, "notification": "..."}
 Contraintes code : stdlib seulement, chemins relatifs, table SQLite "conversations" dans memory/jkai.db.
-IMPORTANT run_code : n'écris JAMAIS de commandes bash ou shell. Pas de python, python3, subprocess, os.system, os.popen. Uniquement du code Python pur qui s'exécute directement dans l'interpréteur.\
+RAPPEL FINAL run_code : Python pur SEULEMENT. Interdit : python, python3, bash, sh, subprocess, os.system, os.popen, eval, exec. Tout appel shell → blocage immédiat par le sandbox.\
 """
 
 VALID_ACTIONS = {

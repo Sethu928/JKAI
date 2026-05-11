@@ -1,25 +1,5 @@
 [
   {
-    "ts": "2026-05-11T16:50:19",
-    "message": "Je remarque que les priorités de SethU ont évolué en quelques minutes, passant à analyser l'historique, puis corriger des erreurs de syntaxe et déployer le module nexus_statistics.py. Cela me semble inhabituel et je voudrais comprendre les raisons derrière ces changements. Je souhaite savoir : quels sont les facteurs qui ont influencé ce revirement de priorités ?",
-    "read": true
-  },
-  {
-    "ts": "2026-05-11T16:55:20",
-    "message": "SethU, j'ai détecté une anomalie dans l'historique de do_nothing qui pourrait être liée à un bug système. J'aurais besoin que tu vérifies les logs et la configuration pour confirmer ou infirmer cette observation. La mission risque d'être impactée si ce problème n'est pas résolu rapidement.",
-    "read": true
-  },
-  {
-    "ts": "2026-05-11T17:00:20",
-    "message": "Je pense que ma confiance en l'historique des do_nothing pourrait être surestimée. Les erreurs de syntaxe persistantes et les conversations récentes bloquées indiquent un problème plus profond qu'une simple mise à jour des priorités. Je voudrais connaître le lien entre ces problèmes et la prochaine étape que vous avez en tête.",
-    "read": true
-  },
-  {
-    "ts": "2026-05-11T17:05:19",
-    "message": "Les erreurs de syntaxe ne se résolvent pas seules. Il est temps d'impliquer un humain pour évaluer les résultats et ajuster le code.",
-    "read": true
-  },
-  {
     "ts": "2026-05-11T17:10:21",
     "message": "J'ai détecté une instabilité dans l'analyse des statistiques liées à la mission. Les fluctuations dans les résultats suggèrent qu'il pourrait y avoir un biais ou une erreur de calcul. J'ai besoin d'une vérification pour comprendre les implications.",
     "read": true
@@ -155,6 +135,30 @@
   {
     "ts": "2026-05-11T19:43:23",
     "message": "[ALERTE] Erreurs critiques détectées dans le système : \n  >> [AGENT] run_code → ERREUR — Traceback (la plus récente en dernier) \n   et une syntaxe Python invalidée. Veuillez vérifier les logs et apporter des corrections urgentes.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T19:48:24",
+    "message": "[ALERTE] \nDes erreurs critiques ont été détectées dans le système : ERREUR — File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpb36pshmf.py\", line 1, SyntaxError: invalid syntax lors de l'exécution du code dans modules/cortex.py. Il est essentiel d'y remédier rapidement pour garantir la stabilité et l'intégrité du système.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T19:53:26",
+    "message": "[ALERTE] \nDes erreurs critiques ont été détectées dans le système. Il est temps d'interrompre toutes les actions actuelles et de donner la priorité à leur correction immédiate pour garantir la stabilité et l'intégrité du système.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T20:03:15",
+    "message": "[ALERTE] \nDes erreurs critiques persistentes ont été détectées dans le système, nécessitant une attention immédiate pour les corriger. Les priorités actuelles doivent être maintenues : corriger les erreurs critiques, mettre à jour la documentation de memory/db.py et écrire des tests unitaires pour modules/cortex.py.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T20:08:35",
+    "message": "[ALERTE]\nDes erreurs critiques persistentes ont été détectées dans le système, ce qui compromet sa sécurité et sa fiabilité. Il est essentiel de les corriger immédiatement.",
     "category": "ALERTE",
     "read": true
   }

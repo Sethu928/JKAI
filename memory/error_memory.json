@@ -1,22 +1,4 @@
 {
-  "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpq1deogz8.py\", line 1 python3 python/sandbox/test_regex": {
-    "count": 1,
-    "snippet": "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpq1deogz8.py\", line 1 python3 python/sandbox/test_regex",
-    "last_seen_ts": 1778518451.280751,
-    "last_seen": "2026-05-11T18:54:11"
-  },
-  "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmp4kst0gue.py\", line 1 python -c \"import inspect; print(": {
-    "count": 1,
-    "snippet": "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmp4kst0gue.py\", line 1 python -c \"import inspect; print(",
-    "last_seen_ts": 1778518796.018541,
-    "last_seen": "2026-05-11T18:59:56"
-  },
-  "Traceback (most recent call last): File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpu9eayx1n.py\", line ": {
-    "count": 1,
-    "snippet": "Traceback (most recent call last): File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpu9eayx1n.py\", line ",
-    "last_seen_ts": 1778518889.341195,
-    "last_seen": "2026-05-11T19:01:29"
-  },
   "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmp9cx1_pgi.py\", line 1 python sandbox/execute_code.py ^^": {
     "count": 1,
     "snippet": "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmp9cx1_pgi.py\", line 1 python sandbox/execute_code.py ^^",
@@ -46,5 +28,11 @@
     "snippet": "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpb36pshmf.py\", line 1 python modules/cortex.py execute_",
     "last_seen_ts": 1778521643.538315,
     "last_seen": "2026-05-11T19:47:23"
+  },
+  "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmp97_ygh4g.py\", line 1 python -c \"import cortex; cortex.": {
+    "count": 1,
+    "snippet": "File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmp97_ygh4g.py\", line 1 python -c \"import cortex; cortex.",
+    "last_seen_ts": 1778522201.596528,
+    "last_seen": "2026-05-11T19:56:41"
   }
 }
