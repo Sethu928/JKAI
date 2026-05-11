@@ -706,7 +706,7 @@ def main():
   <a href="/">← CHAT</a> &nbsp;·&nbsp; <a href="/knowledge">MÉMOIRE</a>
 </div>
 <script>
-  const INTERVAL = 5;
+  const INTERVAL = 30;
   let elapsed = 0;
   const fill = document.getElementById('refresh-fill');
   function tick() {{

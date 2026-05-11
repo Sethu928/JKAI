@@ -652,6 +652,25 @@ def _save_kaia_knowledge(data: dict) -> None:
 
 _teach_kaia_use_web = False
 
+_WEB_LESSON_URLS = [
+    "https://realpython.com/python-basics/",
+    "https://docs.python.org/fr/3/tutorial/",
+    "https://openai.com/research/",
+    "https://pytorch.org/tutorials/",
+    "https://scikit-learn.org/stable/tutorial/",
+    "https://flask.palletsprojects.com/en/3.0.x/quickstart/",
+    "https://www.tensorflow.org/tutorials",
+    "https://huggingface.co/blog",
+    "https://arxiv.org/list/cs.AI/recent",
+    "https://towardsdatascience.com/",
+    "https://developer.mozilla.org/fr/docs/Web/JavaScript",
+    "https://css-tricks.com/",
+    "https://www.freecodecamp.org/news/",
+    "https://github.com/trending/python",
+    "https://news.ycombinator.com/",
+]
+_web_lesson_index = 0
+
 _WIKI_NAV_RE = re.compile(
     r"(?:Aller au contenu|Menu principal|Rechercher|Faire un don|"
     r"Créer un compte|Se connecter|Modifier le code|Voir l'historique|"
@@ -665,8 +684,8 @@ def _clean_wiki_content(raw: str) -> str:
     cleaned = _WIKI_NAV_RE.sub("", raw)
     cleaned = re.sub(r"\n{3,}", "\n\n", cleaned).strip()
     if len(cleaned) < 50:
-        return raw.strip()[:300]
-    return cleaned[:300]
+        return raw.strip()[:400]
+    return cleaned[:400]
 
 
 def _send_lesson_to_kaia():
@@ -684,15 +703,18 @@ def _send_lesson_to_kaia():
     _teach_kaia_use_web = not _teach_kaia_use_web
 
     if use_web:
-        raw     = browse_url("https://fr.wikipedia.org/wiki/Special:Random")
+        global _web_lesson_index
+        url     = _WEB_LESSON_URLS[_web_lesson_index % len(_WEB_LESSON_URLS)]
+        _web_lesson_index += 1
+        raw     = browse_url(url)
         content = _clean_wiki_content(raw)
         subject = next((l.strip() for l in content.splitlines() if len(l.strip()) > 3), "")[:60]
         if not subject:
-            subject = f"web_{datetime.now().strftime('%H%M')}"
+            subject = url.split("//")[-1].split("/")[0]
         topic_key = f"web_{datetime.now().strftime('%Y%m%d_%H%M')}"
         lesson    = f"Kaïa, voici ce que j'ai trouvé sur {subject} : {content}"
         source    = "web"
-        log(f"[LEÇON→KAÏA] Leçon internet : {subject}")
+        log(f"[LEÇON→KAÏA] Leçon internet ({url}) : {subject}")
     else:
         lesson    = new_lessons[0]
         topic_key = _get_lesson_key(lesson)

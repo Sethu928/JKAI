@@ -2,168 +2,126 @@
   "modules": [
     {
       "file": "jkai.py",
-      "role": "J-KAI, assistant IA avancé du système Nexus",
+      "role": "Assistant IA avancé du système Nexus",
       "dependencies": [
-        "openai",
-        "dotenv"
+        "OpenAI"
       ],
-      "improvements": [
-        "chargement de la mémoire"
-      ]
+      "improvements": []
     },
     {
       "file": "jkai_voice.py",
-      "role": "J-KAI en mode vocale",
+      "role": "Module de reconnaissance vocale",
       "dependencies": [
-        "openai",
+        "OpenAI",
         "modules.voice"
       ],
-      "improvements": [
-        "intégration de l'API OpenAI pour la reconnaissance vocale"
-      ]
+      "improvements": []
     },
     {
       "file": "kaia_server.py",
-      "role": "Serveur du système Nexus",
+      "role": "Serveur web",
       "dependencies": [
         "sqlite3",
-        "requests",
         "Flask"
       ],
       "improvements": [
-        "implémentation d'un serveur web pour gérer les requêtes et les réponses"
+        "amélioration de la sécurité"
       ]
     },
     {
       "file": "killswitch.py",
-      "role": "Contrôle d'arrêt du système Nexus",
+      "role": "Module de sécurisation",
       "dependencies": [],
-      "improvements": [
-        "implémentation d'une fonctionnalité de contrôle d'arrêt pour éviter la perte de données"
-      ]
+      "improvements": []
     },
     {
       "file": "nexus_statistics.py",
-      "role": "Analyse statistique des réponses du système Nexus",
+      "role": "Statistiques du système Nexus",
       "dependencies": [
-        "sqlite3",
-        "numpy",
-        "scikit-learn"
+        "sqlite3"
       ],
-      "improvements": [
-        "implémentation d'une fonctionnalité de analyse statistique pour évaluer la performance du système"
-      ]
+      "improvements": []
     },
     {
       "file": "server.py",
-      "role": "Serveur principal du système Nexus",
+      "role": "Serveur principal",
       "dependencies": [
         "Flask",
-        "flask_cors"
+        "modules.state"
       ],
-      "improvements": [
-        "implémentation d'un serveur web pour gérer les requêtes et les réponses"
-      ]
+      "improvements": []
     },
     {
       "file": "modules/agent.py",
-      "role": "Agent de recherche du système Nexus",
+      "role": "Agent du système Nexus",
       "dependencies": [
-        "openai",
-        "requests",
-        "threading"
+        "OpenAI"
       ],
-      "improvements": [
-        "implémentation d'une fonctionnalité de recherche pour trouver les informations requises"
-      ]
+      "improvements": []
     },
     {
       "file": "modules/autonomy.py",
-      "role": "Mode autonome du système Nexus",
+      "role": "Module d'autonomie",
       "dependencies": [
-        "openai",
-        "requests"
+        "OpenAI"
       ],
-      "improvements": [
-        "implémentation d'un mode autonome pour la recherche et l'action"
-      ]
+      "improvements": []
     },
     {
       "file": "modules/consciousness.py",
-      "role": "Conscience du système Nexus",
+      "role": "Module de conscience",
       "dependencies": [
-        "threading",
-        "requests"
+        "OpenAI"
       ],
-      "improvements": [
-        "implémentation d'une fonctionnalité de conscience pour gérer les tâches et les priorités"
-      ]
+      "improvements": []
     },
     {
       "file": "modules/cortex.py",
-      "role": "Module Dev AI du système Nexus",
-      "dependencies": [
-        "openai",
-        "requests"
-      ],
+      "role": "Module Dev AI",
+      "dependencies": [],
       "improvements": [
-        "implémentation d'une fonctionnalité de développement logiciel pour générer des codes"
+        "amélioration de la génération de code"
       ]
     },
     {
       "file": "modules/document_cortex.py",
-      "role": "Documenter le code du module Cortex",
+      "role": "Module de documentation pour Cortex",
       "dependencies": [],
-      "improvements": [
-        "implémentation d'une fonctionnalité de documentation pour les codes"
-      ]
+      "improvements": []
     },
     {
       "file": "modules/historique_worker_analysis.py",
-      "role": "Analyse des logs des workers du système Nexus",
+      "role": "Analyse des tâches passées",
       "dependencies": [],
-      "improvements": [
-        "implémentation d'une fonctionnalité d'analyse pour évaluer la performance des workers"
-      ]
+      "improvements": []
     },
     {
       "file": "modules/marc.py",
-      "role": "Conseiller sceptique et rigoureux du système Nexus",
+      "role": "Conseiller sceptique et rigoureux",
       "dependencies": [
-        "openai",
-        "requests"
+        "OpenAI"
       ],
-      "improvements": [
-        "implémentation d'une fonctionnalité de conseil pour évaluer les idées"
-      ]
+      "improvements": []
     },
     {
       "file": "modules/monitor.py",
-      "role": "Contrôle des erreurs du système Nexus",
-      "dependencies": [
-        "threading",
-        "requests"
-      ],
-      "improvements": [
-        "implémentation d'une fonctionnalité de contrôle pour détecter les erreurs"
-      ]
+      "role": "Module de surveillance",
+      "dependencies": [],
+      "improvements": []
     },
     {
       "file": "modules/nexus_statistics.py",
-      "role": "Analyse statistique des réponses du système Nexus",
-      "dependencies": [],
-      "improvements": [
-        "implémentation d'une fonctionnalité de analyse statistique pour évaluer la performance du système"
-      ]
+      "role": "Statistiques du système Nexus",
+      "dependencies": [
+        "sqlite3"
+      ],
+      "improvements": []
     }
   ],
   "global_improvements": [
-    "Implémentation d'un serveur web pour gérer les requêtes et les réponses",
-    "Implémentation d'une fonctionnalité de recherche pour trouver les informations requises",
-    "Implémentation d'un mode autonome pour la recherche et l'action",
-    "Implémentation d'une fonctionnalité de conscience pour gérer les tâches et les priorités",
-    "Implémentation d'une fonctionnalité de développement logiciel pour générer des codes"
+    "amélioration de la sécurité",
+    "amélioration de la génération de code"
   ],
-  "analyzed_at": "2026-05-11T20:25:29",
+  "analyzed_at": "2026-05-11T20:29:55",
   "file_count": 25
 }

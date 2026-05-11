@@ -106,5 +106,29 @@
     "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [MONITOR] Erreur détectée en temps réel — correction lancée : [AGENT] run_code → ERREUR — File \"C:\\Users\\UTILIS~1\\AppDat",
     "fix_attempted": true,
     "result": "Fix échoué (tentative 3/3) — [CORTEX] Exécution bloquée — opération interdite détectée : `subprocess\\.`"
+  },
+  {
+    "ts": "2026-05-11T20:28:19",
+    "error": "[AGENT] improve_self (Implémentation d'un serveur web pour gérer les requêtes et l) → ERREUR — [CORTEX] Exécution bloquée — opération interdite détectée : `\\bexec\\s*\\(`",
+    "fix_attempted": true,
+    "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
+  },
+  {
+    "ts": "2026-05-11T20:28:49",
+    "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [AGENT] improve_self (Implémentation d'un serveur web pour gérer les requêtes et l) → ERREUR — [CORTEX] Exécution bloqué",
+    "fix_attempted": true,
+    "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
+  },
+  {
+    "ts": "2026-05-11T20:32:26",
+    "error": "[AGENT] improve_self (amélioration de la sécurité) → ERREUR — Traceback (most recent call last):",
+    "fix_attempted": true,
+    "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
+  },
+  {
+    "ts": "2026-05-11T20:32:56",
+    "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [AGENT] improve_self (amélioration de la sécurité) → ERREUR — Traceback (most recent call last):",
+    "fix_attempted": true,
+    "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
   }
 ]
