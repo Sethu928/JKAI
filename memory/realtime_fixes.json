@@ -142,5 +142,35 @@
     "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [AGENT] improve_self (Meilleure compréhension des requêtes utilisateur et de l'env) → ERREUR — [CORTEX] Timeout — exécut",
     "fix_attempted": true,
     "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
+  },
+  {
+    "ts": "2026-05-11T20:51:20",
+    "error": "[AGENT] run_code → ERREUR — File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmptd5j3rwv.py\", line 1",
+    "fix_attempted": true,
+    "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
+  },
+  {
+    "ts": "2026-05-11T20:51:50",
+    "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [AGENT] run_code → ERREUR — File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmptd5j3rwv.py\", line 1",
+    "fix_attempted": true,
+    "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
+  },
+  {
+    "ts": "2026-05-11T20:52:20",
+    "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [MONITOR] Erreur détectée en temps réel — correction lancée : [AGENT] run_code → ERREUR — File \"C:\\Users\\UTILIS~1\\AppDat",
+    "fix_attempted": true,
+    "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
+  },
+  {
+    "ts": "2026-05-11T20:54:20",
+    "error": "[AGENT] run_code → ERREUR — File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmp3g4_d2ty.py\", line 1",
+    "fix_attempted": true,
+    "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
+  },
+  {
+    "ts": "2026-05-11T20:54:50",
+    "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [AGENT] run_code → ERREUR — File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmp3g4_d2ty.py\", line 1",
+    "fix_attempted": true,
+    "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
   }
 ]

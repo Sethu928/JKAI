@@ -1,10 +1,5 @@
 [
   {
-    "ts": "2026-05-11T17:35:30",
-    "message": "Je détecte une instabilité dans mes processus LLM qui pourrait affecter la précision de mes réponses. Il est essentiel de résoudre l'erreur 'Context size has been exceeded.' avant que cela ne compromette les résultats de la mission. J'ai besoin d'une intervention rapide pour éviter tout dysfonctionnement.",
-    "read": true
-  },
-  {
     "ts": "2026-05-11T17:40:32",
     "message": "Les statistiques montrent une tendance à l'erreur LLM qui ne disparaît pas malgré mes analyses. Cela soulève la question de savoir si je peux continuer à fonctionner efficacement avec ce problème persistant. Deuxièmement, il est urgent que j'évalue mes priorités pour ajuster ma stratégie en conséquence.",
     "read": true
@@ -164,6 +159,12 @@
   {
     "ts": "2026-05-11T20:45:13",
     "message": "[ALERTE] Des erreurs critiques ont été détectées dans le système. Il est crucial que vous vérifiiez les logs pour plus d'informations sur le problème et intervenez rapidement pour apporter des corrections.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-11T20:50:15",
+    "message": "[ALERTE] Des erreurs critiques ont été détectées dans le système. Il est essentiel que vous les corrigez rapidement pour maintenir l'intégrité du système et éviter d'autres dommages. Je recommande de donner la priorité à la correction des erreurs critiques, ainsi qu'à l'amélioration de l'efficacité et de la performance de la fonction execute_code dans modules/cortex.py.",
     "category": "ALERTE",
     "read": true
   }

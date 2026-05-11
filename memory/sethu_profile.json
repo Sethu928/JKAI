@@ -1,6 +1,6 @@
 {
-  "mood": "neutral",
-  "communication_style": "direct",
+  "mood": "curieux",
+  "communication_style": "direct et précis",
   "interests": [
     "déploiement",
     "regex",
@@ -11,7 +11,8 @@
     "intelligence artificielle",
     "autonomie",
     "J-KAI capabilities",
-    "Internet connectivity"
+    "Internet connectivity",
+    "avancées technologiques"
   ],
   "recent_topics": [
     "déploiement",
@@ -21,7 +22,9 @@
     "déploiement de fichiers",
     "état du système Nexus",
     "J-KAI",
-    "autonomie"
+    "autonomie",
+    "dernières nouvelles sur l'intelligence artificielle",
+    "avancées dans le domaine de l'IA"
   ],
-  "updated_at": "2026-05-11T20:39:21"
+  "updated_at": "2026-05-11T20:52:50"
 }

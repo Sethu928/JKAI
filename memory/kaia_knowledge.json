@@ -1,36 +1,6 @@
 {
   "topics": [
     {
-      "topic": "traitement langage naturel",
-      "taught_at": "",
-      "lesson_snippet": "",
-      "source": "legacy"
-    },
-    {
-      "topic": "Python classes",
-      "taught_at": "",
-      "lesson_snippet": "",
-      "source": "legacy"
-    },
-    {
-      "topic": "apprentissage automatique",
-      "taught_at": "",
-      "lesson_snippet": "",
-      "source": "legacy"
-    },
-    {
-      "topic": "les list comprehensions en python",
-      "taught_at": "2026-05-11T18:59:22",
-      "lesson_snippet": "Kaïa, je t'enseigne : les list comprehensions en Python. Écrire [x**2 for x in range(10) if x % 2 ==",
-      "source": "fixed"
-    },
-    {
-      "topic": "les décorateurs python",
-      "taught_at": "2026-05-11T19:00:22",
-      "lesson_snippet": "Kaïa, je t'enseigne : les décorateurs Python. Un décorateur est une fonction qui enveloppe une autre",
-      "source": "fixed"
-    },
-    {
       "topic": "les générateurs python et le mot-clé yield",
       "taught_at": "2026-05-11T19:01:22",
       "lesson_snippet": "Kaïa, je t'enseigne : les générateurs Python et le mot-clé yield. Une fonction avec yield ne s'exécu",
@@ -598,6 +568,36 @@
       "topic": "web_20260511_2048",
       "taught_at": "2026-05-11T20:48:55",
       "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Menu Menu Donate Learn to code — free 3,000-hour curriculum  : Me",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2049",
+      "taught_at": "2026-05-11T20:49:58",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Skip to content Navigation Menu Platform Solutions Resources : Sk",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2051",
+      "taught_at": "2026-05-11T20:51:56",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Start Here Learn Python More / Join Sign‑In Are You Learning : St",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2052",
+      "taught_at": "2026-05-11T20:52:56",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur index modules | suivant | précédent | Python » Greek | Ελλην : in",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2053",
+      "taught_at": "2026-05-11T20:53:55",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Skip to main content Research Products Business Developers C : Sk",
+      "source": "web"
+    },
+    {
+      "topic": "web_20260511_2054",
+      "taught_at": "2026-05-11T20:54:58",
+      "lesson_snippet": "Kaïa, voici ce que j'ai trouvé sur Skip to main content v2.11.0+cu130 Intro Compilers Domains D : Sk",
       "source": "web"
     }
   ]

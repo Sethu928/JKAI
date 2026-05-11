@@ -314,7 +314,7 @@ def ask_jkai(user_input):
     if _needs_web_search(user_input):
         try:
             from modules.agent import browse_url
-            url        = f"https://www.google.com/search?q={urllib.parse.quote(user_input)}"
+            url        = "https://html.duckduckgo.com/html/?q=" + urllib.parse.quote(user_input[:100])
             web_result = browse_url(url)
             if web_result and len(web_result.strip()) > 20:
                 snippet      = _clean_wiki_content(web_result)

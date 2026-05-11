@@ -1,127 +1,111 @@
 {
   "modules": [
     {
-      "file": "jkai.py",
-      "role": "?",
+      "file": "memory/__init__.py",
+      "role": "initialisation de la mémoire",
       "dependencies": [],
       "improvements": []
     },
     {
-      "file": "jkai_voice.py",
-      "role": "?",
-      "dependencies": [],
+      "file": "memory/db.py",
+      "role": "gestion des données de la base de données",
+      "dependencies": [
+        "sqlite3"
+      ],
       "improvements": []
     },
     {
-      "file": "kaia_server.py",
-      "role": "?",
-      "dependencies": [],
+      "file": "modules/agent.py",
+      "role": "intégration du modèle d'intelligence artificielle",
+      "dependencies": [
+        "os",
+        "json",
+        "re",
+        "time",
+        "threading",
+        "urllib.parse"
+      ],
       "improvements": []
     },
     {
-      "file": "killswitch.py",
-      "role": "?",
-      "dependencies": [],
+      "file": "modules/autonomy.py",
+      "role": "contrôle autonome du système",
+      "dependencies": [
+        "os",
+        "json",
+        "datetime"
+      ],
       "improvements": []
     },
     {
-      "file": "nexus_statistics.py",
-      "role": "?",
-      "dependencies": [],
+      "file": "modules/consciousness.py",
+      "role": "conscience et prise de décision",
+      "dependencies": [
+        "os",
+        "json",
+        "threading"
+      ],
       "improvements": []
     },
     {
-      "file": "server.py",
-      "role": "?",
-      "dependencies": [],
+      "file": "modules/cortex.py",
+      "role": "intégration du modèle de développement logiciel",
+      "dependencies": [
+        "os",
+        "re",
+        "sys",
+        "subprocess",
+        "tempfile"
+      ],
       "improvements": []
     },
     {
-      "file": "test_regex.py",
-      "role": "?",
-      "dependencies": [],
+      "file": "modules/document_cortex.py",
+      "role": "documentation du code",
+      "dependencies": [
+        "inspect",
+        "ast"
+      ],
       "improvements": []
     },
     {
-      "file": "test_teach.py",
-      "role": "?",
-      "dependencies": [],
+      "file": "modules/historique_worker_analysis.py",
+      "role": "analyse des logs de travail",
+      "dependencies": [
+        "os"
+      ],
       "improvements": []
     },
     {
-      "file": "logs\\test_self_update.py",
-      "role": "?",
-      "dependencies": [],
+      "file": "modules/marc.py",
+      "role": "conseiller sceptique et rigoureux",
+      "dependencies": [
+        "os"
+      ],
       "improvements": []
     },
     {
-      "file": "memory\\__init__.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "memory\\db.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\agent.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\autonomy.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\consciousness.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\cortex.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\document_cortex.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\historique_worker_analysis.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\marc.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\monitor.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\nexus_statistics.py",
-      "role": "?",
-      "dependencies": [],
+      "file": "modules/monitor.py",
+      "role": "surveillance et analyse des données",
+      "dependencies": [
+        "os",
+        "re",
+        "json",
+        "time",
+        "threading"
+      ],
       "improvements": []
     }
   ],
-  "global_improvements": [],
-  "analyzed_at": "2026-05-11T20:45:19",
+  "global_improvements": [
+    "utilisation de la mémoire pour stocker les conversations et les données",
+    "intégration d'un modèle d'intelligence artificielle",
+    "contrôle autonome du système",
+    "conscience et prise de décision",
+    "documentation du code",
+    "analyse des logs de travail",
+    "surveillance et analyse des données"
+  ],
+  "analyzed_at": "2026-05-11T20:55:42",
   "file_count": 25
 }

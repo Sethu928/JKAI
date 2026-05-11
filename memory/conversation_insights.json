@@ -37,9 +37,9 @@
   },
   {
     "key": "context",
-    "value": "Nexus est en veille, conversations minimales",
+    "value": "IA, recherche d'informations",
     "category": "context",
-    "updated_at": "2026-05-11T19:53:05"
+    "updated_at": "2026-05-11T20:51:42"
   },
   {
     "key": "decision",
@@ -130,5 +130,35 @@
     "value": "Autonomous local function on Raspberry Pi without internet access",
     "category": "context",
     "updated_at": "2026-05-11T20:39:21"
+  },
+  {
+    "key": "capacites",
+    "value": "recherche web non disponible",
+    "category": "fact",
+    "updated_at": "2026-05-11T20:51:42"
+  },
+  {
+    "key": "domaine d'intérêt",
+    "value": "intelligence artificielle",
+    "category": "preference",
+    "updated_at": "2026-05-11T20:52:50"
+  },
+  {
+    "key": "motifs récents",
+    "value": "avancées dans le domaine de l'IA",
+    "category": "fact",
+    "updated_at": "2026-05-11T20:52:50"
+  },
+  {
+    "key": "informations souhaitées",
+    "value": "dernières nouvelles sur l'intelligence artificielle",
+    "category": "decision",
+    "updated_at": "2026-05-11T20:52:50"
+  },
+  {
+    "key": "exemples d'avancées",
+    "value": "modèles d'apprentissage automatique plus performants, adoption généralisée de l'IA dans divers domaines, mise en place de systèmes d'IA autonomes",
+    "category": "fact",
+    "updated_at": "2026-05-11T20:52:50"
   }
 ]
