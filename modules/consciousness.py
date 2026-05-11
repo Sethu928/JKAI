@@ -54,7 +54,10 @@ CONSCIOUSNESS_PROMPT = (
     "Réponds UNIQUEMENT en JSON avec : "
     '{"confidence": int, "strengths": list, "weaknesses": list, '
     '"self_description": string, "improvement": string, '
-    '"objectives": [{"title": string, "description": string, "priority": int}]}'
+    '"objectives": [{"title": string, "description": string, "priority": int}], '
+    '"anticipations": [string, string, string]}'
+    " — anticipations : 3 choses concrètes que tu anticipes devoir faire dans les 24h suivantes, "
+    "basées sur tes patterns récents et tes objectifs actifs."
 )
 
 CHECK_OBJECTIVES_SYSTEM = (
@@ -204,6 +207,8 @@ def reflect(log_fn) -> None:
     model["improvement"]      = updates.get("improvement",      model["improvement"])
     model["total_interactions"] = total
     model["last_reflection"]  = now
+    raw_ant = updates.get("anticipations", [])
+    model["anticipations"] = [str(a)[:200] for a in raw_ant if a][:3]
 
     # ── Fusion des objectifs ─────────────────────────────────────────────── #
     new_objs      = updates.get("objectives", [])

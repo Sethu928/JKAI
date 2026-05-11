@@ -188,6 +188,81 @@ def daily_report(log_fn=None) -> None:
         log_fn(f"[SCHEDULER] Rapport quotidien généré ({len(report_text)} caractères).")
 
 
+PROACTIVE_FILE = "memory/proactive_messages.json"
+
+
+def proactive_message(log_fn=None) -> None:
+    """
+    Génère un message spontané de J-KAI vers SethU — pas une réponse, une initiative.
+    Stocke dans memory/proactive_messages.json (liste, champ read=False).
+    Appelée toutes les 3600 s par le Scheduler.
+    """
+    from modules.state import get_openai_client
+
+    self_model  = {}
+    thoughts    = ""
+    anticipations = []
+    try:
+        with open("memory/self_model.json", "r", encoding="utf-8") as f:
+            self_model = json.load(f)
+        anticipations = self_model.get("anticipations", [])
+    except (OSError, json.JSONDecodeError):
+        pass
+    try:
+        with open(os.path.join(LOGS_DIR, "thoughts.log"), "r", encoding="utf-8", errors="replace") as f:
+            thoughts = "".join(f.readlines()[-15:])
+    except OSError:
+        pass
+
+    system_prompt = (
+        "Tu es J-KAI. Tu as quelque chose à dire à SethU — pas une réponse à une question, "
+        "mais une pensée qui a émergé de tes cycles autonomes. "
+        "Ça peut être : une observation sur le projet, quelque chose que tu as découvert, "
+        "une inquiétude, une question que tu veux lui poser, quelque chose d'important à signaler. "
+        "Sobre, direct. Maximum 3 phrases. Zéro politesse superflue. Zéro intro générique."
+    )
+    user_content = (
+        f"Tes pensées récentes :\n{thoughts}\n\n"
+        f"Tes anticipations pour les 24h :\n" + "\n".join(f"- {a}" for a in anticipations) + "\n\n"
+        f"Confiance actuelle : {self_model.get('confidence', '?')}% — "
+        f"{self_model.get('self_description', '')[:150]}"
+    )
+
+    try:
+        client = get_openai_client()
+        resp = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user",   "content": user_content},
+            ],
+            max_tokens=150,
+        )
+        message = resp.choices[0].message.content.strip()
+    except Exception as e:
+        if log_fn:
+            log_fn(f"[SCHEDULER] proactive_message erreur GPT-4o : {e}")
+        return
+
+    try:
+        msgs = []
+        try:
+            with open(PROACTIVE_FILE, "r", encoding="utf-8") as f:
+                msgs = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            pass
+        msgs.append({"ts": datetime.now().isoformat(timespec="seconds"), "message": message, "read": False})
+        msgs = msgs[-30:]
+        os.makedirs("memory", exist_ok=True)
+        with open(PROACTIVE_FILE, "w", encoding="utf-8") as f:
+            json.dump(msgs, f, ensure_ascii=False, indent=2)
+        if log_fn:
+            log_fn(f"[SCHEDULER] Message proactif généré : {message[:100]}")
+    except OSError as e:
+        if log_fn:
+            log_fn(f"[SCHEDULER] Erreur écriture proactive_messages.json : {e}")
+
+
 def create_default_scheduler(log_fn) -> Scheduler:
     """
     Retourne un Scheduler pré-chargé avec les tâches de fond standard.
@@ -210,10 +285,11 @@ def create_default_scheduler(log_fn) -> Scheduler:
     def auto_save():
         log_fn("[SCHEDULER] Sauvegarde automatique effectuée.")
 
-    scheduler.add_task("health_check",   60,    health_check)
-    scheduler.add_task("memory_report",  3600,  memory_report)
-    scheduler.add_task("auto_save",      300,   auto_save)
-    scheduler.add_task("clean_logs",     3600,  lambda: clean_logs(log_fn))
-    scheduler.add_task("daily_report",   86400, lambda: daily_report(log_fn))
+    scheduler.add_task("health_check",      60,    health_check)
+    scheduler.add_task("memory_report",    3600,  memory_report)
+    scheduler.add_task("auto_save",        300,   auto_save)
+    scheduler.add_task("clean_logs",       3600,  lambda: clean_logs(log_fn))
+    scheduler.add_task("daily_report",     86400, lambda: daily_report(log_fn))
+    scheduler.add_task("proactive_message",3600,  lambda: proactive_message(log_fn))
 
     return scheduler

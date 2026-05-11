@@ -20,6 +20,7 @@ ERROR_MEMORY      = "memory/error_memory.json"
 CYCLE_MEMORY      = "memory/cycle_memory.json"
 KAIA_URL          = "http://192.168.1.122:5001/chat"
 KAIA_DIALOGUE_LOG = "logs/jkai_kaia_dialogue.log"
+SELF_CODE_FILE    = "memory/self_code_understanding.json"
 RECENT_LINES    = 10
 CYCLE_KEEP      = 10   # cycles conservés dans cycle_memory.json
 CYCLE_INJECT    = 0    # 0 = désactivé (trop lourd pour Phi-3)
@@ -36,11 +37,12 @@ update_memory       → note dans self_model.json, champ "observation"
 log                 → observation dans jkai.log, champ "observation"
 web_search          → recherche DuckDuckGo, champ "code" = requête
 teach_kaia          → envoie un message éducatif à Kaïa sur Python, IA ou code, champ "observation" = le message
-do_nothing          → seulement si rien d'utile, justifie dans "observation"
+analyze_self        → lit tous les .py du projet, génère un résumé dans memory/self_code_understanding.json (rôles, dépendances, améliorations possibles)
+improve_self        → lit self_code_understanding.json, choisit une amélioration, génère et exécute le code via Cortex
 
 RÈGLE : jamais même action deux fois de suite ; 3 identiques → update_memory ou web_search.
 Ne fais JAMAIS do_nothing sauf si tout est parfait. Choisis toujours une action utile.
-Priorité : write_thought > update_memory > run_code.
+Priorité : analyze_self (si jamais fait) > improve_self > write_thought > update_memory > run_code.
 RÈGLE ABSOLUE : toutes les 3 actions, utilise teach_kaia pour envoyer une leçon concrète sur Python ou l'IA à Kaïa. Compte tes cycles — si les 3 dernières actions ne contiennent pas teach_kaia, c'est obligatoire maintenant.
 
 Réponds UNIQUEMENT en JSON, sans texte autour :
@@ -51,7 +53,7 @@ Contraintes code : stdlib seulement, chemins relatifs, table SQLite "conversatio
 VALID_ACTIONS = {
     "do_nothing", "log", "run_code",
     "update_memory", "write_thought", "update_self_description", "web_search",
-    "teach_kaia",
+    "teach_kaia", "analyze_self", "improve_self",
 }
 
 # ── Historique des actions récentes (3 dernières, mémoire courte) ────────── #
@@ -327,6 +329,116 @@ def _write_agent_log(ts: str, decision: dict, exec_info: str) -> None:
         )
 
 
+# ── Compréhension du code source ────────────────────────────────────────── #
+
+def _analyze_self(log_fn) -> str:
+    """Parcourt les .py du projet, analyse rôles/dépendances/améliorations via LLM."""
+    py_files = []
+    for root, dirs, files in os.walk("."):
+        dirs[:] = [d for d in dirs if d not in ("__pycache__", ".git", "venv", "node_modules")]
+        for fname in sorted(files):
+            if fname.endswith(".py"):
+                py_files.append(os.path.normpath(os.path.join(root, fname)))
+
+    summaries = []
+    for fpath in py_files[:20]:  # cap à 20 fichiers pour le contexte LLM
+        try:
+            with open(fpath, "r", encoding="utf-8", errors="replace") as f:
+                lines = f.readlines()
+            imports = [l.strip() for l in lines if l.startswith(("import ", "from ")) ][:8]
+            preview = "".join(lines[:40]).strip()
+            summaries.append(
+                f"=== {fpath} ({len(lines)} lignes) ===\n"
+                f"Imports: {', '.join(imports)}\n"
+                f"{preview[:600]}"
+            )
+        except OSError:
+            pass
+
+    prompt_user = (
+        "Analyse ces fichiers Python du projet Nexus et génère un JSON structuré.\n\n"
+        + "\n\n".join(summaries)
+        + '\n\nJSON attendu : {"modules": [{"file": str, "role": str, "dependencies": [str], "improvements": [str]}], "global_improvements": [str]}'
+    )
+
+    try:
+        resp = client.chat.completions.create(
+            model=LOCAL_MODEL,
+            messages=format_messages_for_local([
+                {"role": "system", "content": "Tu es J-KAI. Analyse ton propre code source. Réponds UNIQUEMENT en JSON valide."},
+                {"role": "user",   "content": prompt_user},
+            ]),
+        )
+        data = parse_json_fence(resp.choices[0].message.content)
+        if not isinstance(data, dict):
+            data = {}
+    except Exception as e:
+        log_fn(f"[AGENT] analyze_self LLM error : {e}")
+        data = {}
+
+    data.setdefault("modules", [{"file": f, "role": "?", "dependencies": [], "improvements": []} for f in [p for p in py_files[:20]]])
+    data.setdefault("global_improvements", [])
+    data["analyzed_at"] = datetime.now().isoformat(timespec="seconds")
+    data["file_count"]  = len(py_files)
+
+    os.makedirs("memory", exist_ok=True)
+    with open(SELF_CODE_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+    log_fn(f"[AGENT] analyze_self — {len(py_files)} fichiers analysés → {SELF_CODE_FILE}")
+    return f"{len(py_files)} fichiers analysés, {len(data['global_improvements'])} amélioration(s) identifiée(s)"
+
+
+def _improve_self(decision: dict, log_fn) -> str:
+    """Lit self_code_understanding.json et exécute une amélioration concrète via Cortex."""
+    try:
+        with open(SELF_CODE_FILE, "r", encoding="utf-8") as f:
+            understanding = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return "self_code_understanding.json introuvable — lance analyze_self d'abord"
+
+    # Collecte toutes les améliorations disponibles
+    candidates = list(understanding.get("global_improvements", []))
+    for m in understanding.get("modules", []):
+        candidates.extend(m.get("improvements", []))
+
+    if not candidates:
+        return "Aucune amélioration identifiée dans self_code_understanding.json"
+
+    target = candidates[0]
+    obs    = decision.get("observation", "")
+
+    try:
+        resp = client.chat.completions.create(
+            model=LOCAL_MODEL,
+            messages=format_messages_for_local([
+                {"role": "system", "content": (
+                    "Tu es J-KAI. Implémente l'amélioration demandée en Python pur (stdlib uniquement). "
+                    "Génère un bloc ```python\\n...``` exécutable. "
+                    "Chemins relatifs au projet. Table SQLite 'conversations' dans memory/jkai.db."
+                )},
+                {"role": "user", "content": f"Amélioration à implémenter : {target}\nContexte : {obs}"},
+            ]),
+        )
+        raw = resp.choices[0].message.content
+        code_match = re.search(r'```python\n(.*?)```', raw, re.DOTALL)
+        code = code_match.group(1).strip() if code_match else ""
+    except Exception as e:
+        log_fn(f"[AGENT] improve_self LLM error : {e}")
+        return f"Erreur LLM : {e}"
+
+    if not code:
+        return "Aucun code Python généré"
+
+    result = execute_code(code)
+    if result.get("error"):
+        info = f"ERREUR — {result['error'][:200]}"
+    else:
+        info = f"OK — {result.get('output', '')[:150]}"
+    log_fn(f"[AGENT] improve_self ({target[:60]}) → {info}")
+    return info
+
+
 # ── Dialogue J-KAI → Kaïa ───────────────────────────────────────────────── #
 
 def _teach_kaia(message: str, log_fn) -> str:
@@ -438,6 +550,12 @@ def _execute_action(decision: dict, log_fn) -> str:
         if not msg:
             return "message vide — teach_kaia ignoré"
         return _teach_kaia(msg, log_fn)
+
+    elif action == "analyze_self":
+        return _analyze_self(log_fn)
+
+    elif action == "improve_self":
+        return _improve_self(decision, log_fn)
 
     else:  # do_nothing ou action inconnue
         return ""

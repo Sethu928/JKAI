@@ -506,6 +506,32 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
 /* ── Hamburger (masqué sur desktop) ────────────────────────────────── */
 #btn-hamburger { display: none; }
 
+/* ── Notification proactive J-KAI ──────────────────────────────────── */
+#proactive-notif {
+  display: none; position: fixed; bottom: 28px; right: 28px;
+  z-index: 150; max-width: 380px; width: calc(100vw - 56px);
+  background: #0a0805; border: 1px solid var(--orange55);
+  border-radius: 4px; padding: 14px 18px;
+  box-shadow: 0 0 30px var(--orange22), 0 4px 24px rgba(0,0,0,0.6);
+  animation: notif-in 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+#proactive-notif.visible { display: block; }
+@keyframes notif-in { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+#proactive-label {
+  font-size: 8px; letter-spacing: 3px; color: var(--orange55);
+  margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+}
+#proactive-close {
+  background: none; border: none; color: var(--orange33);
+  font-size: 14px; cursor: pointer; padding: 0 0 0 12px; line-height: 1;
+  transition: color 0.2s;
+}
+#proactive-close:hover { color: var(--orange); }
+#proactive-text {
+  font-size: 12px; color: #ff550099; line-height: 1.7;
+}
+#proactive-ts { font-size: 9px; color: var(--orange22); margin-top: 8px; letter-spacing: 1px; }
+
 /* ── Sidebar overlay backdrop (masqué par défaut) ──────────────────── */
 #sidebar-overlay {
   display: none; position: fixed; inset: 0; z-index: 70;
@@ -709,6 +735,16 @@ body.monitor-mode { filter: hue-rotate(340deg) brightness(0.7); }
 
 <!-- Sidebar overlay backdrop (mobile) -->
 <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- Notification proactive J-KAI -->
+<div id="proactive-notif">
+  <div id="proactive-label">
+    <span>J-KAI — MESSAGE SPONTANÉ</span>
+    <button id="proactive-close" onclick="dismissProactive()">✕</button>
+  </div>
+  <div id="proactive-text"></div>
+  <div id="proactive-ts"></div>
+</div>
 
 <!-- HUD top -->
 <div id="hud-top">
@@ -1472,6 +1508,41 @@ async function loadMission() {
 }
 setTimeout(loadMission, 7000);
 setInterval(loadMission, 180000);
+
+// ── Messages proactifs de J-KAI ───────────────────────────────────────────
+let _proactiveQueue = [];
+let _proactiveDismissTimer = null;
+
+function dismissProactive() {
+  document.getElementById("proactive-notif").classList.remove("visible");
+  clearTimeout(_proactiveDismissTimer);
+  _proactiveQueue.shift();
+  if (_proactiveQueue.length > 0) setTimeout(showNextProactive, 800);
+}
+
+function showNextProactive() {
+  if (_proactiveQueue.length === 0) return;
+  const msg = _proactiveQueue[0];
+  document.getElementById("proactive-text").textContent = msg.message;
+  document.getElementById("proactive-ts").textContent   = msg.ts ? "— " + msg.ts.replace("T", " ") : "";
+  document.getElementById("proactive-notif").classList.add("visible");
+  clearTimeout(_proactiveDismissTimer);
+  _proactiveDismissTimer = setTimeout(dismissProactive, 20000);
+}
+
+async function checkProactive() {
+  try {
+    const r = await fetch(API + "/proactive");
+    const msgs = await r.json();
+    if (msgs && msgs.length > 0) {
+      _proactiveQueue.push(...msgs);
+      if (_proactiveQueue.length === msgs.length) showNextProactive();
+    }
+  } catch(e) {}
+}
+
+setTimeout(checkProactive, 5000);
+setInterval(checkProactive, 60000);
 </script>
 </body>
 </html>
