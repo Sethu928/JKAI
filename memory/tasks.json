@@ -1,32 +1,32 @@
 [
   {
-    "id": "20260513174510_0",
+    "id": "20260513175430_0",
     "title": "Corriger l'erreur critique dans le module cortex.py",
-    "description": "Reviser les codes sources de cortex.py pour résoudre les erreurs critiques qui bloquent la prise en charge du modèle LLM. Vérifier les importations, les appels à fonctions et les structures de données pour garantir qu'elles sont correctes et cohérentes.",
+    "description": "Relever la priorité 1 en passant en revue le fichier cortex.py et en identifiant les erreurs critiques pour leur correction.",
     "status": "done",
     "attempts": 1,
-    "result": "Aucune erreur en mémoire — rien à corriger",
-    "created_at": "2026-05-13T17:45:03",
-    "updated_at": "2026-05-13T17:45:14"
+    "result": "25 fichiers analysés, 0 amélioration(s) identifiée(s)",
+    "created_at": "2026-05-13T17:54:24",
+    "updated_at": "2026-05-13T17:54:40"
   },
   {
-    "id": "20260513174510_1",
-    "title": "Augmenter le contexte de modèle LLM dans data/llm_context.json",
-    "description": "Mettre à jour la base de données de contextes de modèles LLM stockée dans le fichier data/llm_context.json. Ajouter des descriptions et des exemples supplémentaires pour chaque type de modèle, tels que Transformer, GPT et LLaMA.",
-    "status": "done",
+    "id": "20260513175430_1",
+    "title": "Mettre à jour le modèle LLM",
+    "description": "Prioriser l'augmentation du contexte de modèle LLM, ce qui implique d'étudier la documentation relative aux modèles Transformer, GPT et LLaMA pour déterminer comment les améliorer.",
+    "status": "pending",
     "attempts": 1,
-    "result": "25 fichiers analysés, 2 amélioration(s) identifiée(s)",
-    "created_at": "2026-05-13T17:45:03",
-    "updated_at": "2026-05-13T17:46:36"
+    "result": "",
+    "created_at": "2026-05-13T17:54:24",
+    "updated_at": "2026-05-13T17:55:40"
   },
   {
-    "id": "20260513174510_2",
-    "title": "Mettre à jour les scripts de formation de données dans data/scripts.py",
-    "description": "Reviser les scripts de formation de données stockés dans le fichier data/scripts.py pour prendre en compte les nouveaux contextes de modèle LLM. Assurer que les scripts peuvent générer des données cohérentes et pertinentes pour chaque type de modèle.",
-    "status": "in_progress",
-    "attempts": 2,
-    "result": "ERREUR — [CORTEX] Exécution bloquée — opération interdite détectée : `os\\.remove\\s*\\(`",
-    "created_at": "2026-05-13T17:45:03",
-    "updated_at": "2026-05-13T17:48:58"
+    "id": "20260513175430_2",
+    "title": "Mettre à jour le fichier multimodal.py",
+    "description": "En fonction des connaissances acquises sur l'ingénierie de Context sur les LLMs, mettre à jour le fichier multimodal.py afin qu'il incorpore efficacement le contexte pour améliorer la prédiction du mot suivant dans une phrase",
+    "status": "pending",
+    "attempts": 0,
+    "result": "",
+    "created_at": "2026-05-13T17:54:24",
+    "updated_at": "2026-05-13T17:54:24"
   }
 ]

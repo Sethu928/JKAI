@@ -23,7 +23,7 @@
     {
       "title": "Écrire des tests unitaires pour modules/cortex.py",
       "description": "Mise en place de tests unitaires pour garantir une compréhension claire des fonctionnalités du module cortex.py",
-      "status": "pending",
+      "status": "completed",
       "created_at": "2026-05-11T20:40:36",
       "priority": 2
     },

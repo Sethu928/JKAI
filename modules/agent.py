@@ -314,6 +314,28 @@ def _generate_new_tasks(log_fn) -> list:
 
     web_ctx = tavily_search(priorities_txt)
 
+    # Liste réelle des fichiers du projet pour ancrer les tâches sur des cibles existantes
+    def _ls(folder: str, ext: str = "") -> list[str]:
+        try:
+            return sorted(
+                f"{folder}/{f}" for f in os.listdir(folder)
+                if not ext or f.endswith(ext)
+            )
+        except OSError:
+            return []
+
+    root_py  = sorted(f for f in os.listdir(".") if f.endswith(".py")) if True else []
+    file_map = {
+        "modules/": _ls("modules", ".py"),
+        "memory/":  _ls("memory", ".json") + _ls("memory", ".db"),
+        "logs/":    _ls("logs"),
+        "racine":   root_py,
+    }
+    files_txt = "\n".join(
+        f"  {folder} : {', '.join(files) or '(vide)'}"
+        for folder, files in file_map.items()
+    )
+
     now = datetime.now().isoformat(timespec="seconds")
     try:
         resp = client.chat.completions.create(
@@ -321,10 +343,14 @@ def _generate_new_tasks(log_fn) -> list:
             messages=format_messages_for_local([
                 {"role": "system", "content": (
                     "Tu es J-KAI. Génère 3 tâches concrètes et réalisables basées sur le contexte fourni. "
-                    "Chaque tâche doit nommer un fichier ou module précis du projet. "
+                    "Chaque tâche DOIT nommer un fichier qui existe dans la liste fournie — aucun fichier inventé. "
                     'Réponds UNIQUEMENT en JSON : {"tasks": [{"title": string, "description": string}]}'
                 )},
-                {"role": "user", "content": f"Priorités : {priorities_txt}\n\nContexte web :\n{web_ctx}"},
+                {"role": "user", "content": (
+                    f"Priorités : {priorities_txt}\n\n"
+                    f"Fichiers réels du projet :\n{files_txt}\n\n"
+                    f"Contexte web :\n{web_ctx}"
+                )},
             ]),
         )
         data = parse_json_fence(resp.choices[0].message.content)

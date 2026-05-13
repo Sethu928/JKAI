@@ -1,20 +1,20 @@
 {
   "priorities": [
     {
-      "title": "Corriger l'erreur critique dans le module cortex.py",
-      "action": "Modifier le fichier modules/cortex.py pour résoudre l'opération interdite détectée et permettre à la fonction improve_self de s'exécuter correctement.",
-      "why": "Les erreurs critiques répétitives affectent la disponibilité du système et nécessitent une correction urgente."
+      "title": "Corriger l'erreur 'Context size has been exceeded.' dans modules/model.py",
+      "action": "Modifier le code de model.py pour réduire la taille du contexte LLM",
+      "why": "Analyse des logs récents indique que cette erreur est enracinée dans les opérations sur le modèle LLM et que sa correction est essentielle à l'avancement de la mission"
     },
     {
-      "title": "Augmenter le contexte de modèle LLM",
-      "action": "Modifier les paramètres du modèle LLM pour supporter plus de tokens, ou fournir un input plus court.",
-      "why": "L'erreur LLM local est provoquée par la surcharge des tokens et doit être résolue pour maintenir une performance optimale."
+      "title": "Mettre à jour les tests unitaires pour la fonction execute_code dans modules/cortex.py",
+      "action": "Réviser les tests unitaires existants pour prendre en compte les dernières mises à jour du module cortex.py",
+      "why": "L'objectif actif de mise en place des tests unitaires pour cortex.py nécessite une mise à jour régulière pour maintenir la cohérence et l'intégrité du code"
     },
     {
-      "title": "Mettre à jour les tests unitaires du module cortex.py",
-      "action": "Modifier le fichier test_modules/cortex_test.py pour refléter les changements apportés au module cortex.py.",
-      "why": "La mise à jour des tests unitaires garantira que les fonctionnalités modifiées sont correctement prises en compte et réduira les risques de bugs dans le futur."
+      "title": "Documenter les méthodes d'allocation de mémoire dans modules/memory_manager.py",
+      "action": "Continuer la documentation en fournissant des commentaires détaillés sur les fonctions d'allocation de mémoire",
+      "why": "La documentation est essentielle pour garantir une compréhension claire et maintenable du code, notamment pour les modules complexes tels que memory_manager.py"
     }
   ],
-  "updated_at": "2026-05-13T17:17:51"
+  "updated_at": "2026-05-13T17:55:16"
 }

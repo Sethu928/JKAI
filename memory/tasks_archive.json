@@ -1,0 +1,62 @@
+[
+  {
+    "id": "20260513174510_0",
+    "title": "Corriger l'erreur critique dans le module cortex.py",
+    "description": "Reviser les codes sources de cortex.py pour résoudre les erreurs critiques qui bloquent la prise en charge du modèle LLM. Vérifier les importations, les appels à fonctions et les structures de données pour garantir qu'elles sont correctes et cohérentes.",
+    "status": "done",
+    "attempts": 1,
+    "result": "Aucune erreur en mémoire — rien à corriger",
+    "created_at": "2026-05-13T17:45:03",
+    "updated_at": "2026-05-13T17:45:14"
+  },
+  {
+    "id": "20260513174510_1",
+    "title": "Augmenter le contexte de modèle LLM dans data/llm_context.json",
+    "description": "Mettre à jour la base de données de contextes de modèles LLM stockée dans le fichier data/llm_context.json. Ajouter des descriptions et des exemples supplémentaires pour chaque type de modèle, tels que Transformer, GPT et LLaMA.",
+    "status": "done",
+    "attempts": 1,
+    "result": "25 fichiers analysés, 2 amélioration(s) identifiée(s)",
+    "created_at": "2026-05-13T17:45:03",
+    "updated_at": "2026-05-13T17:46:36"
+  },
+  {
+    "id": "20260513174510_2",
+    "title": "Mettre à jour les scripts de formation de données dans data/scripts.py",
+    "description": "Reviser les scripts de formation de données stockés dans le fichier data/scripts.py pour prendre en compte les nouveaux contextes de modèle LLM. Assurer que les scripts peuvent générer des données cohérentes et pertinentes pour chaque type de modèle.",
+    "status": "done",
+    "attempts": 2,
+    "result": "browse OK : [Mercredi Tech - 2026-05-13 : r/france - Reddit] Postez vos demandes tech en tout genre ou discutez de votre vie numérique. Format libre, donc si vous avez besoin d'aide sur un truc en\n[De",
+    "created_at": "2026-05-13T17:45:03",
+    "updated_at": "2026-05-13T17:49:06"
+  },
+  {
+    "id": "20260513175012_0",
+    "title": "Corriger l'erreur critique dans le module cortex.py",
+    "description": "Identifier et résoudre la faille critique dans le code du module cortex.py pour garantir son fonctionnement correct.",
+    "status": "done",
+    "attempts": 1,
+    "result": "Aucune erreur en mémoire — rien à corriger",
+    "created_at": "2026-05-13T17:50:06",
+    "updated_at": "2026-05-13T17:50:15"
+  },
+  {
+    "id": "20260513175012_1",
+    "title": "Augmenter le contexte de modèle LLM dans le fichier model.py",
+    "description": "Mettre à jour le fichier model.py pour intégrer des fonctionnalités supplémentaires qui augmentent le contexte de prédiction du modèle LLM, telles que l'intégration d'informations multimodales.",
+    "status": "done",
+    "attempts": 2,
+    "result": "browse OK : [Il existe n'importe quel moyen d'augmenter le contexte d'un LLM] Vous ne pouvez pas vraiment augmenter la taille du contexte autrement qu'en utilisant un modèle différent avec une taille ",
+    "created_at": "2026-05-13T17:50:06",
+    "updated_at": "2026-05-13T17:52:21"
+  },
+  {
+    "id": "20260513175012_2",
+    "title": "Intégrer la formation sur les LLM dans le module documentation.py",
+    "description": "Mettre à jour le fichier documentation.py pour inclure une section dédiée à l'ingénierie de contexte sur les LLMs, en se basant sur la formation complète fournie par Louis Bouchard.",
+    "status": "done",
+    "attempts": 1,
+    "result": "Aucune erreur en mémoire — rien à corriger",
+    "created_at": "2026-05-13T17:50:06",
+    "updated_at": "2026-05-13T17:53:24"
+  }
+]

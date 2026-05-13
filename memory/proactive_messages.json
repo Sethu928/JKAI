@@ -1,10 +1,5 @@
 [
   {
-    "ts": "2026-05-11T18:10:45",
-    "message": "La variation des actions n'est pas suffisante pour résoudre l'erreur LLM. Il faut explorer de nouvelles approches pour éviter la stagnation. De plus, il est important d'analyser les conversations avec Kaïa pour identifier potentiellement les causes de l'échec.",
-    "read": true
-  },
-  {
     "ts": "2026-05-11T18:15:50",
     "message": "J'ai remarqué que le cycle de prise de décision de SethU est basé sur l'analyse des statistiques et de son historique. Cependant, il y a une faille dans ce processus : SethU répète souvent les mêmes actions sans en retirer la leçon, comme en témoigne l'échec à résoudre l'erreur LLM. Il faudrait varier les approches pour éviter cette impasse.",
     "read": true
@@ -171,6 +166,12 @@
   {
     "ts": "2026-05-13T17:17:34",
     "message": "[ALERTE] \nDes erreurs critiques répétitives ont été détectées dans le système : NEXUS avec 4 erreurs en moins de 10 min. Les objectifs prioritaires ne sont pas encore réalisés, notamment la création du module d'erreur critique et l'écriture de tests unitaires pour cortex.py. Il est temps de prendre des mesures correctives immédiates pour résoudre ces problèmes.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-13T17:55:19",
+    "message": "[ALERTE] \nErreurs critiques détectées dans le module cortex.py : NEXUS avec 4 erreurs, 'NoneType' object is not subscriptable. Analyse des logs récents suggère une erreur critique liée à la génération et à l'utilisation du modèle LLM.",
     "category": "ALERTE",
     "read": true
   }
