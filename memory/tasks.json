@@ -1,32 +1,32 @@
 [
   {
-    "id": "20260513175430_0",
-    "title": "Corriger l'erreur critique dans le module cortex.py",
-    "description": "Relever la priorité 1 en passant en revue le fichier cortex.py et en identifiant les erreurs critiques pour leur correction.",
-    "status": "done",
-    "attempts": 1,
-    "result": "25 fichiers analysés, 0 amélioration(s) identifiée(s)",
-    "created_at": "2026-05-13T17:54:24",
-    "updated_at": "2026-05-13T17:54:40"
-  },
-  {
-    "id": "20260513175430_1",
-    "title": "Mettre à jour le modèle LLM",
-    "description": "Prioriser l'augmentation du contexte de modèle LLM, ce qui implique d'étudier la documentation relative aux modèles Transformer, GPT et LLaMA pour déterminer comment les améliorer.",
-    "status": "pending",
-    "attempts": 1,
+    "id": "20260513175849_0",
+    "title": "Corriger l'erreur 'Context size has been exceeded.' dans modules/model.py",
+    "description": "Identifier et corriger la source de l'erreur 'Context size has been exceeded.' dans le fichier modules/model.py pour éviter les problèmes de limite de contexte.",
+    "status": "in_progress",
+    "attempts": 2,
     "result": "",
-    "created_at": "2026-05-13T17:54:24",
-    "updated_at": "2026-05-13T17:55:40"
+    "created_at": "2026-05-13T17:58:40",
+    "updated_at": "2026-05-13T17:59:50"
   },
   {
-    "id": "20260513175430_2",
-    "title": "Mettre à jour le fichier multimodal.py",
-    "description": "En fonction des connaissances acquises sur l'ingénierie de Context sur les LLMs, mettre à jour le fichier multimodal.py afin qu'il incorpore efficacement le contexte pour améliorer la prédiction du mot suivant dans une phrase",
+    "id": "20260513175849_1",
+    "title": "Mettre à jour les tests unitaires pour la fonction execute_code dans modules/cortex.py",
+    "description": "Améliorer et mettre à jour les tests unitaires pour la fonction execute_code dans le fichier modules/cortex.py pour garantir une execution fiable et éviter les erreurs potentielles.",
     "status": "pending",
     "attempts": 0,
     "result": "",
-    "created_at": "2026-05-13T17:54:24",
-    "updated_at": "2026-05-13T17:54:24"
+    "created_at": "2026-05-13T17:58:40",
+    "updated_at": "2026-05-13T17:58:40"
+  },
+  {
+    "id": "20260513175849_2",
+    "title": "Optimiser la gestion de la mémoire",
+    "description": "Analyser le fichier memory/tasks.json afin de détecter d'éventuelles optimisations nécessaires pour réduire l'utilisation de la mémoire et résoudre l'erreur de limite de contexte.",
+    "status": "pending",
+    "attempts": 0,
+    "result": "",
+    "created_at": "2026-05-13T17:58:40",
+    "updated_at": "2026-05-13T17:58:40"
   }
 ]

@@ -58,5 +58,35 @@
     "result": "Aucune erreur en mémoire — rien à corriger",
     "created_at": "2026-05-13T17:50:06",
     "updated_at": "2026-05-13T17:53:24"
+  },
+  {
+    "id": "20260513175430_0",
+    "title": "Corriger l'erreur critique dans le module cortex.py",
+    "description": "Relever la priorité 1 en passant en revue le fichier cortex.py et en identifiant les erreurs critiques pour leur correction.",
+    "status": "done",
+    "attempts": 1,
+    "result": "25 fichiers analysés, 0 amélioration(s) identifiée(s)",
+    "created_at": "2026-05-13T17:54:24",
+    "updated_at": "2026-05-13T17:54:40"
+  },
+  {
+    "id": "20260513175430_1",
+    "title": "Mettre à jour le modèle LLM",
+    "description": "Prioriser l'augmentation du contexte de modèle LLM, ce qui implique d'étudier la documentation relative aux modèles Transformer, GPT et LLaMA pour déterminer comment les améliorer.",
+    "status": "done",
+    "attempts": 2,
+    "result": "25 fichiers analysés, 3 amélioration(s) identifiée(s)",
+    "created_at": "2026-05-13T17:54:24",
+    "updated_at": "2026-05-13T17:56:32"
+  },
+  {
+    "id": "20260513175430_2",
+    "title": "Mettre à jour le fichier multimodal.py",
+    "description": "En fonction des connaissances acquises sur l'ingénierie de Context sur les LLMs, mettre à jour le fichier multimodal.py afin qu'il incorpore efficacement le contexte pour améliorer la prédiction du mot suivant dans une phrase",
+    "status": "done",
+    "attempts": 1,
+    "result": "Module 'controleur_contexte' créé (import échoué)",
+    "created_at": "2026-05-13T17:54:24",
+    "updated_at": "2026-05-13T17:57:38"
   }
 ]

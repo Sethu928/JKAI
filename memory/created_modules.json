@@ -18,5 +18,12 @@
     "role": "Génération automatique des commentaires dans les fichiers Python",
     "created_at": "2026-05-11T19:42:41",
     "import_ok": false
+  },
+  {
+    "name": "controleur_contexte",
+    "file": "modules\\controleur_contexte.py",
+    "role": "Module qui permet de contrôler la taille du contexte dans le modèle LLM",
+    "created_at": "2026-05-13T17:57:38",
+    "import_ok": false
   }
 ]

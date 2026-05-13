@@ -2,126 +2,143 @@
   "modules": [
     {
       "file": "jkai.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "role": "Assistant IA avancé du système Nexus",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "mémoire",
+        " apprentissage automatique"
+      ]
     },
     {
       "file": "jkai_voice.py",
-      "role": "?",
-      "dependencies": [],
+      "role": "Voix de l'assistant J-KAI",
+      "dependencies": [
+        "modules.voice"
+      ],
       "improvements": []
     },
     {
       "file": "kaia_server.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "role": "Serveur web du système Nexus",
+      "dependencies": [
+        "sqlite3",
+        "requests"
+      ],
+      "improvements": [
+        "security",
+        "performance"
+      ]
     },
     {
       "file": "killswitch.py",
-      "role": "?",
+      "role": "Système d'arrêt en cas de panne",
       "dependencies": [],
       "improvements": []
     },
     {
       "file": "nexus_statistics.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
+      "role": "Statistiques du système Nexus",
+      "dependencies": [
+        "sqlite3",
+        "scikit-learn"
+      ],
+      "improvements": [
+        "analyse de données"
+      ]
     },
     {
       "file": "server.py",
-      "role": "?",
+      "role": "Serveur principal du système Nexus",
+      "dependencies": [
+        "flask",
+        "flask-cors"
+      ],
+      "improvements": [
+        "security",
+        "performance"
+      ]
+    },
+    {
+      "file": "modules/agent.py",
+      "role": "Module agent du système Nexus",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": [
+        "mémoire",
+        " apprentissage automatique"
+      ]
+    },
+    {
+      "file": "modules/autonomy.py",
+      "role": "Module d'autonomie du système Nexus",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": []
+    },
+    {
+      "file": "modules/consciousness.py",
+      "role": "Module de conscience du système Nexus",
+      "dependencies": [],
+      "improvements": [
+        "analyse de données"
+      ]
+    },
+    {
+      "file": "modules/cortex.py",
+      "role": "Module cortex du système Nexus",
+      "dependencies": [
+        "openai"
+      ],
+      "improvements": []
+    },
+    {
+      "file": "modules/document_cortex.py",
+      "role": "Module de documentation du cortex",
       "dependencies": [],
       "improvements": []
     },
     {
-      "file": "test_regex.py",
-      "role": "?",
+      "file": "modules/historique_worker_analysis.py",
+      "role": "Module d'analyse des logs",
       "dependencies": [],
+      "improvements": [
+        "analyse de données"
+      ]
+    },
+    {
+      "file": "modules/marc.py",
+      "role": "Conseiller sceptique du système Nexus",
+      "dependencies": [
+        "openai"
+      ],
       "improvements": []
     },
     {
-      "file": "test_teach.py",
-      "role": "?",
+      "file": "modules/monitor.py",
+      "role": "Module de monitoring du système Nexus",
       "dependencies": [],
-      "improvements": []
+      "improvements": [
+        "security"
+      ]
     },
     {
-      "file": "logs\\test_self_update.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "memory\\__init__.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "memory\\db.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\agent.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\autonomy.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\consciousness.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\cortex.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\document_cortex.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\historique_worker_analysis.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\marc.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\monitor.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\nexus_statistics.py",
-      "role": "?",
-      "dependencies": [],
+      "file": "modules/nexus_statistics.py",
+      "role": "Statistiques du système Nexus",
+      "dependencies": [
+        "sqlite3"
+      ],
       "improvements": []
     }
   ],
-  "global_improvements": [],
-  "analyzed_at": "2026-05-13T17:54:40",
+  "global_improvements": [
+    "performance",
+    "scalabilité",
+    "sécurité"
+  ],
+  "analyzed_at": "2026-05-13T17:56:32",
   "file_count": 25
 }
