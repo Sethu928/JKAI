@@ -20,7 +20,7 @@ from modules.consciousness import (
     get_self_model, get_objectives, get_mission,
     reflect, check_objectives, define_mission, update_mission, set_priorities, set_longterm_plan,
 )
-from modules.agent import read_agent_log, start_agent, _web_search
+from modules.agent import read_agent_log, start_agent, tavily_search
 from modules.self_update import self_update_cycle, delete_file
 import modules.marc as _marc_mod
 import modules.cortex as _cortex_mod
@@ -312,7 +312,7 @@ def ask_jkai(user_input):
     user_content = user_input
     if _needs_web_search(user_input):
         try:
-            web_result = _web_search(user_input[:100])
+            web_result = tavily_search(user_input[:100])
             if web_result and len(web_result.strip()) > 20:
                 user_content = f"[RECHERCHE WEB] : {web_result.strip()}\n\n{user_input}"
                 log(f"[WEB SEARCH] Injecté pour : {user_input[:60]}")

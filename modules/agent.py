@@ -41,7 +41,7 @@ run_code            → script Python sandbox, champ "code"
 write_thought       → pensée dans logs/thoughts.log, champ "observation"
 update_memory       → note dans self_model.json, champ "observation"
 log                 → observation dans jkai.log, champ "observation"
-web_search          → recherche Google via Playwright (fallback DDG/Wikipedia), champ "code" = requête
+web_search          → recherche Tavily (internet temps réel), champ "code" = requête
 browse              → visite une URL réelle et extrait le contenu, champ "code" = URL complète (https://...)
 teach_kaia          → envoie un message éducatif à Kaïa sur Python, IA ou code, champ "observation" = le message
 analyze_self        → lit tous les .py du projet, génère un résumé dans memory/self_code_understanding.json (rôles, dépendances, améliorations possibles)
@@ -256,172 +256,27 @@ def _load_project_context() -> tuple[str, str]:
     return code_ctx, mission_ctx
 
 
-# ── Recherche web et navigation Playwright ────────────────────────────────── #
+# ── Recherche Tavily ─────────────────────────────────────────────────────── #
 
-_PLAYWRIGHT_UA = (
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-)
-_SEARCH_HEADERS = {"User-Agent": _PLAYWRIGHT_UA}
-
-
-def _playwright_browse(url: str) -> str:
-    """Ouvre Chromium headless, navigue vers l'URL, retourne les 1000 premiers chars de texte visible."""
+def tavily_search(query: str) -> str:
+    """Recherche via Tavily API. Retourne un résumé propre des 3 premiers résultats."""
+    from modules.state import get_tavily_client
+    tc = get_tavily_client()
+    if tc is None:
+        return "Tavily non disponible (TAVILY_API_KEY manquant ou tavily-python non installé)"
     try:
-        from playwright.sync_api import sync_playwright
-    except ImportError:
-        return _browse_requests(url)
-    try:
-        with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=True)
-            try:
-                context = browser.new_context(
-                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-                )
-                context.set_extra_http_headers({
-                    "Accept-Language": "fr-FR,fr;q=0.9",
-                    "Accept": "text/html",
-                })
-                page = context.new_page()
-                page.goto(url, wait_until="domcontentloaded", timeout=15000)
-                text = page.inner_text("body")
-                text = re.sub(r"\s+", " ", text).strip()
-                return text[:1000]
-            finally:
-                browser.close()
-    except Exception as e:
-        return f"Erreur Playwright browse : {e}"
-
-
-def _playwright_search(query: str) -> list[str]:
-    """Recherche Google via Playwright headless, retourne jusqu'à 5 résultats structurés."""
-    try:
-        from playwright.sync_api import sync_playwright
-    except ImportError:
-        return []
-    try:
-        search_url = (
-            "https://www.google.com/search"
-            f"?q={urllib.parse.quote_plus(query)}&hl=fr&gl=fr"
-        )
-        with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=True)
-            try:
-                page = browser.new_page(user_agent=_PLAYWRIGHT_UA)
-                page.goto(search_url, wait_until="domcontentloaded", timeout=15000)
-                results = page.evaluate("""() => {
-                    const out = [];
-                    document.querySelectorAll('h3').forEach(h3 => {
-                        if (out.length >= 5 || !h3.innerText.trim()) return;
-                        const block   = h3.closest('[data-ved]')
-                                     || h3.parentElement.parentElement;
-                        const raw     = block ? block.innerText : '';
-                        const snippet = raw.replace(h3.innerText, '')
-                                           .trim().slice(0, 300);
-                        out.push({ title: h3.innerText.trim(), snippet: snippet });
-                    });
-                    return out;
-                }""")
-            finally:
-                browser.close()
+        response = tc.search(query=query, max_results=3)
         snippets = []
-        for r in (results or [])[:5]:
-            title   = (r.get("title")   or "").strip()
-            snippet = (r.get("snippet") or "").strip()
+        if response.get("answer"):
+            snippets.append(f"[Réponse directe] {response['answer'][:300]}")
+        for r in response.get("results", [])[:3]:
+            title   = r.get("title", "").strip()
+            content = r.get("content", "").strip()[:250]
             if title:
-                line = f"[Google] {title}"
-                if snippet:
-                    line += f" — {snippet[:250]}"
-                snippets.append(line)
-        return snippets
+                snippets.append(f"[{title}] {content}")
+        return "\n".join(snippets) if snippets else "Aucun résultat Tavily."
     except Exception as e:
-        return [f"Erreur Playwright search : {e}"]
-
-
-def _browse_requests(url: str) -> str:
-    """Fallback requests si Playwright non installé."""
-    try:
-        resp = requests.get(url, timeout=10, headers=_SEARCH_HEADERS)
-        resp.raise_for_status()
-        html = resp.text
-        html = re.sub(r"<script[^>]*>.*?</script>", "", html, flags=re.DOTALL | re.IGNORECASE)
-        html = re.sub(r"<style[^>]*>.*?</style>",   "", html, flags=re.DOTALL | re.IGNORECASE)
-        text = re.sub(r"<[^>]+>", " ", html)
-        text = re.sub(r"\s+", " ", text).strip()
-        return text[:1000]
-    except Exception as e:
-        return f"Erreur browse : {e}"
-
-
-def _duckduckgo_search(query: str) -> list[str]:
-    """Fallback DuckDuckGo Instant Answer si Playwright indisponible ou Google vide."""
-    try:
-        resp = requests.get(
-            "https://api.duckduckgo.com/",
-            params={"q": query, "format": "json", "no_html": "1", "skip_disambig": "1"},
-            headers=_SEARCH_HEADERS,
-            timeout=8,
-        )
-        resp.raise_for_status()
-        data = resp.json()
-    except Exception:
-        return []
-    snippets = []
-    if data.get("Answer"):
-        snippets.append(f"[Réponse directe] {data['Answer'][:300]}")
-    if data.get("AbstractText"):
-        src = data.get("AbstractSource", "Source")
-        snippets.append(f"[{src}] {data['AbstractText'][:400]}")
-    for item in data.get("RelatedTopics", []):
-        if len(snippets) >= 3:
-            break
-        if isinstance(item, dict) and item.get("Text"):
-            snippets.append(f"[Résultat] {item['Text'][:250]}")
-        elif isinstance(item, dict):
-            for sub in item.get("Topics", []):
-                if len(snippets) >= 3:
-                    break
-                if isinstance(sub, dict) and sub.get("Text"):
-                    snippets.append(f"[Résultat] {sub['Text'][:250]}")
-    return snippets
-
-
-def _wikipedia_search(query: str) -> list[str]:
-    """Fallback Wikipedia FR — dernier recours."""
-    try:
-        resp = requests.get(
-            "https://fr.wikipedia.org/w/api.php",
-            params={
-                "action":   "query",
-                "list":     "search",
-                "srsearch": query,
-                "srlimit":  3,
-                "format":   "json",
-                "utf8":     1,
-            },
-            headers=_SEARCH_HEADERS,
-            timeout=8,
-        )
-        resp.raise_for_status()
-        data = resp.json()
-    except Exception as e:
-        return [f"Erreur réseau Wikipedia : {e}"]
-    results = data.get("query", {}).get("search", [])
-    snippets = []
-    for r in results[:3]:
-        title   = r.get("title", "")
-        snippet = re.sub(r"<[^>]+>", "", r.get("snippet", "")).strip()
-        if title or snippet:
-            snippets.append(f"[Wikipedia] {title} — {snippet[:300]}")
-    return snippets
-
-
-def _web_search(query: str) -> str:
-    """Recherche via Playwright (Google). Fallback DuckDuckGo → Wikipedia si Playwright échoue ou retourne vide."""
-    snippets = _playwright_search(query)
-    if not snippets or (len(snippets) == 1 and snippets[0].startswith("Erreur")):
-        snippets = _duckduckgo_search(query) or _wikipedia_search(query)
-    return "\n".join(snippets[:3]) if snippets else "Aucun résultat trouvé."
+        return f"Erreur Tavily : {e}"
 
 
 def _save_web_context(query: str, results: str) -> None:
@@ -454,11 +309,9 @@ def _load_web_context() -> str:
         return ""
 
 
-# ── Navigation web directe ───────────────────────────────────────────────── #
-
 def browse_url(url: str) -> str:
-    """Fetche une URL via Playwright headless et retourne les 1000 premiers chars de texte visible."""
-    return _playwright_browse(url)
+    """Alias tavily_search pour la navigation web."""
+    return tavily_search(url)
 
 
 def _browse(decision: dict, log_fn) -> str:
@@ -614,6 +467,17 @@ def _improve_self(decision: dict, log_fn) -> str:
     if not code:
         return "Aucun code Python généré"
 
+    # Validation stricte avant exécution
+    if not re.search(r'\bdef\s+\w+', code):
+        log_fn("[AGENT] improve_self — code invalide (aucune définition de fonction)")
+        return "code invalide — aucun def trouvé, abandon"
+    if re.search(r'\b(?:subprocess|os\.system|os\.popen|bash|sh\s+-c)\b', code):
+        log_fn("[AGENT] improve_self — code invalide (commande shell détectée)")
+        return "code invalide — commande shell détectée, abandon"
+    if re.search(r'\bimport\s+(?:socket|requests|openai|paramiko|ftplib|smtplib)\b', code):
+        log_fn("[AGENT] improve_self — code invalide (import dangereux détecté)")
+        return "code invalide — import dangereux détecté, abandon"
+
     result = execute_code(code)
     if result.get("error"):
         info = f"ERREUR — {result['error'][:200]}"
@@ -657,6 +521,17 @@ def _create_module(decision: dict, log_fn) -> str:
 
     if not name or not code:
         return "name ou code vide — module non créé"
+
+    # Validation stricte avant écriture
+    if not re.search(r'\bdef\s+\w+', code):
+        log_fn("[AGENT] create_module — code invalide (aucune définition de fonction)")
+        return "code invalide — aucun def trouvé, module non créé"
+    if re.search(r'\b(?:subprocess|os\.system|os\.popen|bash|sh\s+-c)\b', code):
+        log_fn("[AGENT] create_module — code invalide (commande shell détectée)")
+        return "code invalide — commande shell détectée, module non créé"
+    if re.search(r'\bimport\s+(?:socket|requests|openai|paramiko|ftplib|smtplib)\b', code):
+        log_fn("[AGENT] create_module — code invalide (import dangereux détecté)")
+        return "code invalide — import dangereux, module non créé"
 
     file_path = os.path.join("modules", f"{name}.py")
     if os.path.exists(file_path):
@@ -969,7 +844,7 @@ def _execute_action(decision: dict, log_fn) -> str:
             if not query:
                 query = "intelligence artificielle autonomie systèmes"
             log_fn(f"[AGENT] web_search query auto-générée depuis priorités : {query}")
-        results = _web_search(query)
+        results = tavily_search(query)
         # Log dans jkai.log → visible dans le prochain cycle (RECENT_LINES)
         log_fn(f"[WEB] {query} →\n{results}")
         # Log dédié dans agent.log avec le format demandé
@@ -1089,15 +964,16 @@ def run_agent_cycle(log_fn) -> None:
     log_fn(f"[AGENT] Cycle terminé — action : {decision['action']} — {decision['notification'][:100]}")
 
 
-# ── Système de 3 workers parallèles ─────────────────────────────────────── #
+# ── Worker unique intelligent ────────────────────────────────────────────── #
 
 _PRIORITIES_FILE = "memory/priorities.json"
+_AGENT_INTERVAL  = 60
 
-_WORKER_CONFIGS: dict[str, dict] = {
-    "analysis":  {"actions": ["analyze_self", "improve_self", "create_module", "restructure"], "interval": 120},
-    "teaching":  {"actions": ["teach_kaia"],                                                   "interval":  60},
-    "knowledge": {"actions": ["web_search", "browse", "update_memory", "write_thought", "log", "run_code", "self_correct"], "interval": 90},
-}
+_ALL_ACTIONS = [
+    "analyze_self", "improve_self", "create_module", "restructure",
+    "web_search", "browse", "update_memory", "write_thought", "log",
+    "run_code", "self_correct",
+]
 
 _ACTIONS_DOC: dict[str, str] = {
     "analyze_self":  "lit tous les .py → memory/self_code_understanding.json",
@@ -1105,7 +981,7 @@ _ACTIONS_DOC: dict[str, str] = {
     "create_module": "conçoit et crée un nouveau module Python dans modules/, champ 'observation' = contexte",
     "restructure":   "identifie les modules >200 lignes, propose une division et crée les sous-modules",
     "teach_kaia":    "envoie un message éducatif à Kaïa, champ 'observation' = message",
-    "web_search":    "recherche DuckDuckGo, champ 'code' = requête",
+    "web_search":    "recherche Tavily (internet temps réel), champ 'code' = requête",
     "browse":        "visite une URL réelle, extrait le texte, stocke dans memory/web_knowledge.json, champ 'code' = URL",
     "update_memory": "note dans self_model.json, champ 'observation'",
     "write_thought": "pensée dans logs/thoughts.log, champ 'observation'",
@@ -1114,7 +990,7 @@ _ACTIONS_DOC: dict[str, str] = {
     "self_correct":  "lit error_memory.json, génère et déploie un fix pour l'erreur la plus fréquente",
 }
 
-_worker_histories: dict[str, list[str]] = {n: [] for n in _WORKER_CONFIGS}
+_worker_histories: dict[str, list[str]] = {"main": []}
 _worker_history_lock = threading.Lock()
 _cycle_memory_lock   = threading.Lock()
 
@@ -1232,19 +1108,16 @@ def _worker_loop(worker: str, allowed: list[str], interval: int, log_fn) -> None
 
 
 def start_agent(log_fn) -> list[threading.Thread]:
-    """Lance 3 workers threads parallèles : analysis (120s), teaching (60s), knowledge (90s)."""
-    threads = []
-    for name, cfg in _WORKER_CONFIGS.items():
-        t = threading.Thread(
-            target=_worker_loop,
-            args=(name, cfg["actions"], cfg["interval"], log_fn),
-            name=f"agent-{name}",
-            daemon=True,
-        )
-        t.start()
-        log_fn(f"[AGENT] Worker '{name}' démarré — intervalle: {cfg['interval']}s — actions: {cfg['actions']}")
-        threads.append(t)
-    return threads
+    """Lance un seul worker thread qui choisit parmi toutes les actions disponibles toutes les 60 secondes."""
+    t = threading.Thread(
+        target=_worker_loop,
+        args=("main", _ALL_ACTIONS, _AGENT_INTERVAL, log_fn),
+        name="agent-main",
+        daemon=True,
+    )
+    t.start()
+    log_fn(f"[AGENT] Worker unique démarré — intervalle: {_AGENT_INTERVAL}s — {len(_ALL_ACTIONS)} actions disponibles")
+    return [t]
 
 
 # ── Lecture du log pour la route /agent/log ──────────────────────────────── #

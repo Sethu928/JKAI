@@ -37,6 +37,25 @@ def _track_api_call() -> None:
         except OSError:
             pass
 
+# ── Client Tavily ────────────────────────────────────────────────────────── #
+_tavily_client = None
+_tavily_lock   = threading.Lock()
+
+
+def get_tavily_client():
+    """Retourne un singleton TavilyClient (None si tavily-python non installé ou clé absente)."""
+    global _tavily_client
+    if _tavily_client is None:
+        with _tavily_lock:
+            if _tavily_client is None:
+                try:
+                    from tavily import TavilyClient
+                    _tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
+                except (ImportError, Exception):
+                    pass
+    return _tavily_client
+
+
 # ── Singleton OpenAI — un seul client partagé par tous les modules ──────── #
 _openai_client: OpenAI | None = None
 _client_init_lock = threading.Lock()
