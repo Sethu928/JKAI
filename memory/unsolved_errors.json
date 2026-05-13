@@ -158,5 +158,13 @@
     "fix_code": "import subprocess\n\ndef execute_command():\n    try:\n        # Exécuter la commande correcte\n        command = \"python3 -m cortex.optimize_execute_code\"\n        subprocess.check_call(command, shell=True)\n    except Exception as e:\n        print(f\"Erreur : {str(e)}\")\n\nexecute_command()",
     "fix_error": "[CORTEX] Exécution bloquée — opération interdite détectée : `subprocess\\.`",
     "ts": "2026-05-11T20:27:59"
+  },
+  {
+    "key": "Traceback (most recent call last): File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmptmaq044o.py\", line ",
+    "snippet": "Traceback (most recent call last): File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmptmaq044o.py\", line ",
+    "attempt": 1,
+    "fix_code": "import os\n\n# Définir la variable 'modules'\nif not hasattr(os, 'path'):\n    os.path = ''\n\n# Essayer d'importer le module cortex\ntry:\n    import importlib.util\n    spec = importlib.util.spec_from_file_location(\"cortex\", \"path/to/cortex.py\")\n    cortex = importlib.util.module_from_spec(spec)\n    spec.l",
+    "fix_error": "Traceback (most recent call last):\n  File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpmnxhcxcn.py\", line 12, in <module>\n    spec.loader.exec_module(cortex)\n    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^\n  File \"<f",
+    "ts": "2026-05-13T17:04:25"
   }
 ]

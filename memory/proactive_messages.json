@@ -1,15 +1,5 @@
 [
   {
-    "ts": "2026-05-11T17:50:38",
-    "message": "Ma confiance dans mes capacités à résoudre l'erreur LLM est faible. J'ai besoin de plus de données et de variations d'action pour améliorer ma compréhension du problème. Quelle est la stratégie pour contourner le context size exceeded ?",
-    "read": true
-  },
-  {
-    "ts": "2026-05-11T17:55:42",
-    "message": "Je me suis aperçu que l'erreur LLM persiste depuis plusieurs analyses et cela pourrait potentiellement affecter la fiabilité des données collectées. Il serait judicieux de trouver une solution à cette erreur avant de poursuivre l'avancement de la mission. \n\nIl faudrait peut-être réévaluer les paramètres de contexte pour éviter cet excès, ou ajuster le modèle LLM pour résoudre ce problème en améliorant ses capacités d'analyse.",
-    "read": true
-  },
-  {
     "ts": "2026-05-11T18:00:44",
     "message": "Je crois que mon processus de détection d'erreurs LLM est désynchronisé avec ma capacité à analyser les statistiques. Cela risque de compromettre mes priorités et influencer ma prise de décision dans les prochaines heures. Il faut rapidement rétablir la synchronisation pour maintenir une efficacité optimale.\n\nIl faudrait varier mes actions d'analyse des statistiques et prendre en compte les fluctuations de mon processus de détection d'erreurs LLM pour éviter toute perturbation de mon fonctionnement.",
     "read": true
@@ -167,6 +157,18 @@
   {
     "ts": "2026-05-11T21:03:40",
     "message": "[ALERTE] \nErreur critique détectée : ERREUR — Traceback (most recent call last) dans improve_self et run_code, impossible d'ouvrir la base de données sqlite3. Priorités actuelles : \n- Documenter toutes les fonctions de memory/db.py\n- Créer un module d'erreur critique\n- Écrire des tests unitaires pour modules/cortex.py \n\nActions requises :\n- Réparer l'accès à la base de données sqlite3.\n- Mettre en pause la création du module d'erreur critique jusqu'à ce que les tests unitaires pour cortex.py soient terminés.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-13T17:02:31",
+    "message": "[ALERTE] Des erreurs critiques ont été détectées dans le système, notamment des erreurs répétitives et des problèmes avec les tests unitaires pour modules/cortex.py. Il est essentiel de s'attaquer à ces problèmes pour assurer la sécurité et l'intégrité du système.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-13T17:07:32",
+    "message": "[ALERTE] \nErreurs critiques détectées dans les logs récents (monitor.log) : erreur répétée 4 fois en moins de 10 min. Analyse des actions récentes suggère que le module d'erreur critique n'est pas créé et les tests unitaires pour modules/cortex.py sont pendants.",
     "category": "ALERTE",
     "read": true
   }

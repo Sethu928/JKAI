@@ -1,20 +1,20 @@
 {
   "priorities": [
     {
-      "title": "Documenter toutes les fonctions de memory/db.py",
-      "action": "Mettre à jour la documentation de db.py dans le fichier doc/db.md",
-      "why": "L'objectif est en cours et nécessite une action immédiate pour éviter toute stagnation."
-    },
-    {
-      "title": "Créer un module d'erreur critique",
-      "action": "Mettre en place le nouveau module de détecteur d'erreurs critiques dans memory/exception_handler.py",
-      "why": "Les erreurs critiques ont été détectées et doivent être traitées avec priorité élevée."
+      "title": "Créer le module d'erreur critique",
+      "action": "create_module (modules/cortex.py)",
+      "why": "Les erreurs répétitives détectées dans les logs récents nécessitent la mise en place du module d'erreur critique pour résoudre ces problèmes de manière proactive."
     },
     {
       "title": "Écrire des tests unitaires pour modules/cortex.py",
-      "action": "Mettre en place les tests unitaires dans le dossier tests/modules/cortex_test.py",
-      "why": "L'objectif est actif et nécessite une action immédiate pour améliorer la compréhension des fonctionnalités de cortex.py."
+      "action": "write_unit_tests (modules/cortex.py)",
+      "why": "Même si le module d'erreur critique est en cours de création, les tests unitaires sont nécessaires pour garantir que les fonctionnalités du module cortex.py sont bien comprises."
+    },
+    {
+      "title": "Documenter les fonctions d'allocation de mémoire dans modules/memory_manager.py",
+      "action": "document_memory_functions (modules/memory_manager.py)",
+      "why": "La documentation est importante pour garantir une compréhension claire des fonctionnalités du module memory_manager.py, ce qui contribuera à l'amélioration de la fiabilité globale du système."
     }
   ],
-  "updated_at": "2026-05-11T20:45:39"
+  "updated_at": "2026-05-13T17:07:49"
 }

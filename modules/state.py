@@ -73,7 +73,7 @@ def get_local_client() -> OpenAI:
         with _local_client_lock:
             if _local_client is None:
                 _local_client = OpenAI(
-                    base_url="http://127.0.0.1:1234/v1",
+                    base_url=os.getenv("LM_STUDIO_URL", "http://127.0.0.1:1234/v1"),
                     api_key="local",
                 )
     return _local_client

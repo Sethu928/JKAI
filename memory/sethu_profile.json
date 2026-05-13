@@ -1,6 +1,6 @@
 {
-  "mood": "curieux",
-  "communication_style": "direct et précis",
+  "mood": "neutral",
+  "communication_style": "direct",
   "interests": [
     "déploiement",
     "regex",
@@ -12,7 +12,9 @@
     "autonomie",
     "J-KAI capabilities",
     "Internet connectivity",
-    "avancées technologiques"
+    "avancées technologiques",
+    "AI",
+    "latest news"
   ],
   "recent_topics": [
     "déploiement",
@@ -24,7 +26,8 @@
     "J-KAI",
     "autonomie",
     "dernières nouvelles sur l'intelligence artificielle",
-    "avancées dans le domaine de l'IA"
+    "avancées dans le domaine de l'IA",
+    "AI advancements"
   ],
-  "updated_at": "2026-05-11T20:52:50"
+  "updated_at": "2026-05-13T16:57:55"
 }

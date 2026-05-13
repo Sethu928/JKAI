@@ -37,14 +37,14 @@
     {
       "title": "Écrire des tests unitaires pour l'optimisation de la fonction execute_code dans modules/cortex.py",
       "description": "Mise en place de tests unitaires pour garantir une compréhension claire des fonctionnalités du module cortex.py",
-      "status": "pending",
+      "status": "in_progress",
       "created_at": "2026-05-11T20:50:33",
       "priority": 2
     },
     {
       "title": "Documenter les fonctions d'allocation de mémoire dans modules/memory_manager.py",
       "description": "Continuer la mise à jour de la documentation pour garantir une compréhension claire des fonctionnalités du module memory_manager.py",
-      "status": "in_progress",
+      "status": "pending",
       "created_at": "2026-05-11T20:56:11",
       "priority": 2
     }
