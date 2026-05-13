@@ -34,5 +34,17 @@
     "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [AGENT] improve_self (Utiliser des variables et fonctions réutilisables) → ERREUR — [CORTEX] Exécution bloquée — opérati",
     "fix_attempted": true,
     "result": "Aucune erreur en mémoire — rien à corriger"
+  },
+  {
+    "ts": "2026-05-13T17:48:02",
+    "error": "[AGENT] improve_self (amélioration de la sécurité et de la stabilité de l'applicat) → ERREUR — [CORTEX] Exécution bloquée — opération interdite détectée : `os\\.remove\\s*\\(`",
+    "fix_attempted": true,
+    "result": "Aucune erreur en mémoire — rien à corriger"
+  },
+  {
+    "ts": "2026-05-13T17:48:32",
+    "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [AGENT] improve_self (amélioration de la sécurité et de la stabilité de l'applicat) → ERREUR — [CORTEX] Exécution bloqué",
+    "fix_attempted": true,
+    "result": "Aucune erreur en mémoire — rien à corriger"
   }
 ]
