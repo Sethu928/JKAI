@@ -3,7 +3,6 @@ import os
 import json
 import re
 import threading
-import urllib.parse
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
@@ -21,7 +20,7 @@ from modules.consciousness import (
     get_self_model, get_objectives, get_mission,
     reflect, check_objectives, define_mission, update_mission, set_priorities, set_longterm_plan,
 )
-from modules.agent import read_agent_log, start_agent
+from modules.agent import read_agent_log, start_agent, _web_search
 from modules.self_update import self_update_cycle, delete_file
 import modules.marc as _marc_mod
 import modules.cortex as _cortex_mod
@@ -313,12 +312,9 @@ def ask_jkai(user_input):
     user_content = user_input
     if _needs_web_search(user_input):
         try:
-            from modules.agent import browse_url
-            url        = "https://html.duckduckgo.com/html/?q=" + urllib.parse.quote(user_input[:100])
-            web_result = browse_url(url)
+            web_result = _web_search(user_input[:100])
             if web_result and len(web_result.strip()) > 20:
-                snippet      = _clean_wiki_content(web_result)
-                user_content = f"[RECHERCHE WEB] : {snippet}\n\n{user_input}"
+                user_content = f"[RECHERCHE WEB] : {web_result.strip()}\n\n{user_input}"
                 log(f"[WEB SEARCH] Injecté pour : {user_input[:60]}")
         except Exception as e:
             log(f"[WEB SEARCH] Erreur : {e}")
@@ -598,15 +594,16 @@ def insights():
         profile = {}
     return jsonify({"insights": data, "sethu_profile": profile})
 
-@server.route("/dialogue", methods=["GET"])
-def dialogue():
-    path = "logs/jkai_kaia_dialogue.log"
-    try:
-        with open(path, "r", encoding="utf-8", errors="replace") as f:
-            lines = f.readlines()
-        return jsonify({"lines": [l.rstrip("\n") for l in lines[-100:]]})
-    except OSError:
-        return jsonify({"lines": []})
+# réactiver Kaïa — route /dialogue désactivée
+# @server.route("/dialogue", methods=["GET"])
+# def dialogue():
+#     path = "logs/jkai_kaia_dialogue.log"
+#     try:
+#         with open(path, "r", encoding="utf-8", errors="replace") as f:
+#             lines = f.readlines()
+#         return jsonify({"lines": [l.rstrip("\n") for l in lines[-100:]]})
+#     except OSError:
+#         return jsonify({"lines": []})
 
 @server.route("/severus", methods=["POST"])
 def severus():
@@ -784,7 +781,8 @@ def _send_lesson_to_kaia():
 scheduler = create_default_scheduler(log)
 scheduler.add_task("check_api_budget", 300, check_api_budget)
 if AUTONOMIE_ACTIVE:
-    scheduler.add_task("teach_kaia",            60,   _send_lesson_to_kaia)
+    # réactiver Kaïa — tâche teach_kaia désactivée
+    # scheduler.add_task("teach_kaia",            60,   _send_lesson_to_kaia)
     def _run_reflect():
         try:
             reflect(log)

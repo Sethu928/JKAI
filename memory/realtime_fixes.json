@@ -172,5 +172,23 @@
     "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [AGENT] run_code → ERREUR — File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmp3g4_d2ty.py\", line 1",
     "fix_attempted": true,
     "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
+  },
+  {
+    "ts": "2026-05-11T21:01:05",
+    "error": "[AGENT] improve_self (utilisation de la mémoire pour stocker les conversations et ) → ERREUR — Traceback (most recent call last):",
+    "fix_attempted": true,
+    "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
+  },
+  {
+    "ts": "2026-05-11T21:01:35",
+    "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [AGENT] improve_self (utilisation de la mémoire pour stocker les conversations et ) → ERREUR — Traceback (most recent ca",
+    "fix_attempted": true,
+    "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
+  },
+  {
+    "ts": "2026-05-11T21:04:05",
+    "error": "Erreur critique détectée : ERREUR — Traceback (most recent call last) dans improve_self et",
+    "fix_attempted": true,
+    "result": "Abandonné après 3 tentatives : File \"C:\\Users\\UTILIS~1\\AppData\\Local\\Temp\\tmpspfb4vxl.py\", line 1 python3 -m co"
   }
 ]
