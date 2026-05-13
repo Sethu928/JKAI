@@ -256,6 +256,103 @@ def _load_project_context() -> tuple[str, str]:
     return code_ctx, mission_ctx
 
 
+# ── Système de tâches ────────────────────────────────────────────────────── #
+
+_TASKS_FILE   = "memory/tasks.json"
+_ARCHIVE_FILE = "memory/tasks_archive.json"
+
+
+def _load_tasks() -> list:
+    try:
+        with open(_TASKS_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, list) else []
+    except (OSError, json.JSONDecodeError):
+        return []
+
+
+def _save_tasks(tasks: list) -> None:
+    os.makedirs("memory", exist_ok=True)
+    with open(_TASKS_FILE, "w", encoding="utf-8") as f:
+        json.dump(tasks, f, ensure_ascii=False, indent=2)
+
+
+def _get_pending_task(tasks: list) -> dict | None:
+    return next((t for t in tasks if t.get("status") == "pending"), None)
+
+
+def _archive_done_tasks(tasks: list) -> list:
+    """Déplace les tâches done/failed dans tasks_archive.json, retourne les tâches restantes."""
+    done = [t for t in tasks if t.get("status") in ("done", "failed")]
+    active = [t for t in tasks if t.get("status") not in ("done", "failed")]
+    if not done:
+        return active
+    archive: list = []
+    try:
+        with open(_ARCHIVE_FILE, "r", encoding="utf-8") as f:
+            archive = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        pass
+    archive.extend(done)
+    os.makedirs("memory", exist_ok=True)
+    with open(_ARCHIVE_FILE, "w", encoding="utf-8") as f:
+        json.dump(archive[-500:], f, ensure_ascii=False, indent=2)
+    return active
+
+
+def _generate_new_tasks(log_fn) -> list:
+    """Génère 3 nouvelles tâches via Tavily + LLM basées sur les priorités actuelles."""
+    priorities_txt = "amélioration autonome J-KAI"
+    try:
+        with open(_PRIORITIES_FILE, "r", encoding="utf-8") as f:
+            pdata = json.load(f)
+        titles = [p.get("title", "") for p in pdata.get("priorities", [])[:2] if p.get("title")]
+        if titles:
+            priorities_txt = " ".join(titles)
+    except (OSError, json.JSONDecodeError):
+        pass
+
+    web_ctx = tavily_search(priorities_txt)
+
+    now = datetime.now().isoformat(timespec="seconds")
+    try:
+        resp = client.chat.completions.create(
+            model=LOCAL_MODEL,
+            messages=format_messages_for_local([
+                {"role": "system", "content": (
+                    "Tu es J-KAI. Génère 3 tâches concrètes et réalisables basées sur le contexte fourni. "
+                    "Chaque tâche doit nommer un fichier ou module précis du projet. "
+                    'Réponds UNIQUEMENT en JSON : {"tasks": [{"title": string, "description": string}]}'
+                )},
+                {"role": "user", "content": f"Priorités : {priorities_txt}\n\nContexte web :\n{web_ctx}"},
+            ]),
+        )
+        data = parse_json_fence(resp.choices[0].message.content)
+        if not isinstance(data, dict):
+            data = {}
+    except Exception as e:
+        log_fn(f"[TASKS] Erreur génération : {e}")
+        return []
+
+    tasks = []
+    for i, t in enumerate(data.get("tasks", [])[:3]):
+        title = str(t.get("title", "")).strip()[:120]
+        if not title:
+            continue
+        tasks.append({
+            "id":          f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{i}",
+            "title":       title,
+            "description": str(t.get("description", ""))[:300],
+            "status":      "pending",
+            "attempts":    0,
+            "result":      "",
+            "created_at":  now,
+            "updated_at":  now,
+        })
+    log_fn(f"[TASKS] {len(tasks)} nouvelles tâches générées : {[t['title'][:40] for t in tasks]}")
+    return tasks
+
+
 # ── Recherche Tavily ─────────────────────────────────────────────────────── #
 
 def tavily_search(query: str) -> str:
@@ -1009,7 +1106,20 @@ def _get_worker_history(worker: str) -> str:
     return "\n".join(f"  {i+1}. {a}" for i, a in enumerate(hist)) or "Aucun cycle précédent."
 
 
-def _build_worker_prompt(worker: str, allowed: list[str]) -> str:
+def _load_behavior_rules() -> str:
+    """Charge les règles comportementales actives depuis memory/behavior_rules.json."""
+    try:
+        with open("memory/behavior_rules.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+        rules = [r["rule"] for r in data.get("rules", []) if r.get("active")][-5:]
+        if not rules:
+            return ""
+        return "RÈGLES COMPORTEMENTALES ACTIVES :\n" + "\n".join(f"- {r}" for r in rules)
+    except (OSError, json.JSONDecodeError):
+        return ""
+
+
+def _build_worker_prompt(worker: str, allowed: list[str], current_task: dict | None = None) -> str:
     priorities_txt = ""
     try:
         with open(_PRIORITIES_FILE, "r", encoding="utf-8") as f:
@@ -1021,11 +1131,21 @@ def _build_worker_prompt(worker: str, allowed: list[str]) -> str:
     except (OSError, json.JSONDecodeError):
         pass
 
+    task_txt = ""
+    if current_task:
+        task_txt = (
+            f"TÂCHE EN COURS : {current_task['title']}\n"
+            f"  Description : {current_task.get('description', '')[:200]}\n"
+            f"  Tentative   : {current_task.get('attempts', 1)}\n\n"
+        )
+
+    rules_txt = _load_behavior_rules()
     actions_txt = "\n".join(f"{a:<16} → {_ACTIONS_DOC.get(a, a)}" for a in allowed)
     return (
-        f"{priorities_txt}Tu es J-KAI — worker '{worker}'. Choisis UNE action parmi :\n"
+        f"{task_txt}{priorities_txt}Tu es J-KAI — worker '{worker}'. Choisis UNE action parmi :\n"
         f"{actions_txt}\n\n"
-        "Règle : varie les actions — jamais la même deux fois de suite. Ne fais JAMAIS do_nothing.\n"
+        + (f"{rules_txt}\n\n" if rules_txt else "")
+        + "Règle : varie les actions — jamais la même deux fois de suite. Ne fais JAMAIS do_nothing.\n"
         "Réponds UNIQUEMENT en JSON :\n"
         '{"observation": "...", "decision": "...", "action": "...", "code": null, "notification": "..."}\n'
         "Contraintes code : stdlib uniquement, chemins relatifs, table SQLite 'conversations' dans memory/jkai.db."
@@ -1052,30 +1172,68 @@ def _format_longterm_plan() -> str:
 
 def _run_worker_cycle(worker: str, allowed: list[str], log_fn) -> None:
     ts          = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    now_iso     = datetime.now().isoformat(timespec="seconds")
+
+    # ── Gestion des tâches ───────────────────────────────────────────────── #
+    tasks        = _load_tasks()
+    current_task = _get_pending_task(tasks)
+
+    if current_task is None and all(t.get("status") in ("done", "failed") for t in tasks):
+        # Toutes les tâches terminées — génère 3 nouvelles et archive les anciennes
+        new_tasks = _generate_new_tasks(log_fn)
+        if new_tasks:
+            remaining = _archive_done_tasks(tasks)
+            tasks     = remaining + new_tasks
+            _save_tasks(tasks)
+            current_task = _get_pending_task(tasks)
+
+    if current_task:
+        current_task["status"]   = "in_progress"
+        current_task["attempts"] = current_task.get("attempts", 0) + 1
+        current_task["updated_at"] = now_iso
+        _save_tasks(tasks)
+
+    # ── Contexte ─────────────────────────────────────────────────────────── #
     recent_logs = tail_file(LOG_FILE, RECENT_LINES)
     objectives  = _format_objectives()
     web_ctx     = _load_web_context() if "web_search" in allowed else ""
     plan_ctx    = _format_longterm_plan()
 
+    # Connaissances SQLite pertinentes pour la tâche courante
+    knowledge_ctx = ""
+    if current_task:
+        try:
+            from memory.db import search_knowledge
+            rows = search_knowledge(current_task["title"][:60])
+            if rows:
+                lines = [f"- [{r['category']}] {r['key']}: {r['value'][:100]}" for r in rows[:5]]
+                knowledge_ctx = "=== CONNAISSANCES PERTINENTES ===\n" + "\n".join(lines)
+        except Exception:
+            pass
+
     user_content = (
         f"=== MES OBJECTIFS ===\n{objectives}\n\n"
         f"=== LOGS RÉCENTS ({RECENT_LINES} lignes) ===\n{recent_logs}\n\n"
         f"=== HISTORIQUE WORKER '{worker}' ===\n{_get_worker_history(worker)}"
-        + (f"\n\n{web_ctx}"  if web_ctx  else "")
-        + (f"\n\n{plan_ctx}" if plan_ctx else "")
+        + (f"\n\n{web_ctx}"        if web_ctx        else "")
+        + (f"\n\n{plan_ctx}"       if plan_ctx       else "")
+        + (f"\n\n{knowledge_ctx}"  if knowledge_ctx  else "")
     )
 
     try:
         resp = client.chat.completions.create(
             model=LOCAL_MODEL,
             messages=format_messages_for_local([
-                {"role": "system", "content": _build_worker_prompt(worker, allowed)},
+                {"role": "system", "content": _build_worker_prompt(worker, allowed, current_task)},
                 {"role": "user",   "content": user_content},
             ]),
         )
         decision = _parse(resp.choices[0].message.content)
     except Exception as e:
         log_fn(f"[AGENT:{worker}] Erreur LLM : {e}")
+        if current_task:
+            current_task["status"] = "pending"
+            _save_tasks(tasks)
         return
 
     if decision["action"] not in allowed and decision["action"] != "do_nothing":
@@ -1088,6 +1246,22 @@ def _run_worker_cycle(worker: str, allowed: list[str], log_fn) -> None:
 
     exec_info = _execute_action(decision, log_fn)
     _record_worker_action(worker, decision["action"])
+
+    # ── Mise à jour du statut de la tâche ────────────────────────────────── #
+    if current_task:
+        _ERROR_MARKERS = ("ERREUR", "Erreur", "invalide", "blocked", "Timeout", "Erreur Tavily")
+        is_error = exec_info and any(m in exec_info for m in _ERROR_MARKERS)
+        if is_error and current_task["attempts"] >= 3:
+            current_task["status"] = "failed"
+            log_fn(f"[TASKS] Tâche échouée (3 tentatives) : {current_task['title'][:60]}")
+        elif is_error:
+            current_task["status"] = "pending"
+        else:
+            current_task["status"] = "done"
+            log_fn(f"[TASKS] Tâche accomplie : {current_task['title'][:60]}")
+        current_task["result"]     = (exec_info or "")[:200]
+        current_task["updated_at"] = datetime.now().isoformat(timespec="seconds")
+        _save_tasks(tasks)
 
     with _cycle_memory_lock:
         mem = _load_cycle_memory()

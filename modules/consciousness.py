@@ -249,6 +249,84 @@ def reflect(log_fn) -> None:
         f"confiance : {model['confidence']}/100 — "
         f"{total} interaction(s) totales."
     )
+    _detect_patterns_and_update_rules(log_fn)
+
+
+def _detect_patterns_and_update_rules(log_fn) -> None:
+    """Analyse agent.log (50 derniers cycles), détecte patterns répétitifs, génère des règles comportementales."""
+    from collections import Counter
+
+    raw = tail_file("logs/agent.log", 50)
+    lines = raw.splitlines()
+
+    actions, errors = [], []
+    for line in lines:
+        m = re.search(r"\[AGENT[:\w]*\]\s+(\w+)\s+—", line)
+        if m:
+            actions.append(m.group(1))
+        if "ERREUR" in line or "erreur" in line.lower() or "Erreur" in line:
+            errors.append(line[:80])
+
+    patterns_found = []
+
+    # Même action répétée >3 fois consécutives
+    for i in range(len(actions) - 3):
+        window = actions[i:i + 4]
+        if len(set(window)) == 1:
+            patterns_found.append(f"action '{window[0]}' répétée 4 fois consécutives")
+            break
+
+    # Même erreur répétée >2 fois
+    if errors:
+        for snippet, count in Counter(e[:50] for e in errors).most_common(1):
+            if count > 2:
+                patterns_found.append(f"erreur répétée {count}× : {snippet}")
+
+    if not patterns_found:
+        return
+
+    pattern_desc = "; ".join(patterns_found[:3])
+    try:
+        resp = client.chat.completions.create(
+            model=LOCAL_MODEL,
+            messages=format_messages_for_local([
+                {"role": "system", "content": (
+                    "Tu es J-KAI. Tu as détecté un pattern problématique dans tes cycles récents. "
+                    "Génère une règle comportementale concrète (1 phrase max) pour corriger ce comportement. "
+                    'Réponds UNIQUEMENT en JSON : {"rule": string, "reason": string}'
+                )},
+                {"role": "user", "content": f"Pattern détecté : {pattern_desc}"},
+            ]),
+        )
+        data = parse_json_fence(resp.choices[0].message.content)
+        if not isinstance(data, dict) or not data.get("rule"):
+            return
+    except Exception as e:
+        log_fn(f"[CONSCIOUSNESS] pattern_rules LLM erreur : {e}")
+        return
+
+    rules_file = "memory/behavior_rules.json"
+    rules_data: dict = {"rules": []}
+    try:
+        with open(rules_file, "r", encoding="utf-8") as f:
+            rules_data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        pass
+
+    rules_data.setdefault("rules", [])
+    rules_data["rules"].append({
+        "pattern":    pattern_desc,
+        "rule":       str(data["rule"])[:200],
+        "reason":     str(data.get("reason", ""))[:200],
+        "created_at": datetime.now().isoformat(timespec="seconds"),
+        "active":     True,
+    })
+    rules_data["rules"] = rules_data["rules"][-20:]
+
+    os.makedirs("memory", exist_ok=True)
+    with open(rules_file, "w", encoding="utf-8") as f:
+        json.dump(rules_data, f, ensure_ascii=False, indent=2)
+    log_fn(f"[CONSCIOUSNESS] Nouvelle règle comportementale : {data['rule'][:80]}")
 
 
 def get_objectives() -> list:
