@@ -1,20 +1,20 @@
 {
   "priorities": [
     {
-      "title": "Créer le module d'erreur critique",
-      "action": "create_module (modules/cortex.py)",
-      "why": "Les erreurs répétitives détectées dans les logs récents nécessitent la mise en place du module d'erreur critique pour résoudre ces problèmes de manière proactive."
+      "title": "Corriger l'erreur critique dans le module cortex.py",
+      "action": "Modifier le fichier modules/cortex.py pour résoudre l'opération interdite détectée et permettre à la fonction improve_self de s'exécuter correctement.",
+      "why": "Les erreurs critiques répétitives affectent la disponibilité du système et nécessitent une correction urgente."
     },
     {
-      "title": "Écrire des tests unitaires pour modules/cortex.py",
-      "action": "write_unit_tests (modules/cortex.py)",
-      "why": "Même si le module d'erreur critique est en cours de création, les tests unitaires sont nécessaires pour garantir que les fonctionnalités du module cortex.py sont bien comprises."
+      "title": "Augmenter le contexte de modèle LLM",
+      "action": "Modifier les paramètres du modèle LLM pour supporter plus de tokens, ou fournir un input plus court.",
+      "why": "L'erreur LLM local est provoquée par la surcharge des tokens et doit être résolue pour maintenir une performance optimale."
     },
     {
-      "title": "Documenter les fonctions d'allocation de mémoire dans modules/memory_manager.py",
-      "action": "document_memory_functions (modules/memory_manager.py)",
-      "why": "La documentation est importante pour garantir une compréhension claire des fonctionnalités du module memory_manager.py, ce qui contribuera à l'amélioration de la fiabilité globale du système."
+      "title": "Mettre à jour les tests unitaires du module cortex.py",
+      "action": "Modifier le fichier test_modules/cortex_test.py pour refléter les changements apportés au module cortex.py.",
+      "why": "La mise à jour des tests unitaires garantira que les fonctionnalités modifiées sont correctement prises en compte et réduira les risques de bugs dans le futur."
     }
   ],
-  "updated_at": "2026-05-13T17:07:49"
+  "updated_at": "2026-05-13T17:17:51"
 }

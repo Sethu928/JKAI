@@ -2,130 +2,115 @@
   "modules": [
     {
       "file": "jkai.py",
-      "role": "J-KAI, assistant IA avancé du système Nexus",
+      "role": "Assistant IA avancé du système Nexus",
       "dependencies": [
-        "openai",
-        "dotenv"
+        "memory/conversations.json",
+        "memory/core_memory.json"
       ],
       "improvements": []
     },
     {
       "file": "jkai_voice.py",
-      "role": "J-KAI en mode vocal",
-      "dependencies": [
-        "openai",
-        "modules.voice"
-      ],
+      "role": "Module de reconnaissance vocale",
+      "dependencies": [],
       "improvements": []
     },
     {
       "file": "kaia_server.py",
-      "role": "Serveur du système Nexus",
+      "role": "Serveur web pour le système Nexus",
       "dependencies": [
-        "sqlite3",
-        "requests",
-        "flask"
+        "memory/kaia_knowledge.json",
+        "memory/kaia_model.json"
       ],
       "improvements": []
     },
     {
       "file": "killswitch.py",
-      "role": "Killswitch : arrêt du processus en cas de problème",
+      "role": "Module de sauvegarde en cas d'arrêt inattendu",
       "dependencies": [],
       "improvements": []
     },
     {
       "file": "nexus_statistics.py",
-      "role": "Statistiques et analyses des conversations",
+      "role": "Module de statistiques pour le système Nexus",
       "dependencies": [
-        "sqlite3",
-        "numpy",
-        "sklearn"
+        "memory/responses.db"
       ],
       "improvements": []
     },
     {
       "file": "server.py",
       "role": "Serveur principal du système Nexus",
-      "dependencies": [
-        "flask",
-        "flask_cors",
-        "dotenv"
-      ],
+      "dependencies": [],
       "improvements": []
     },
     {
       "file": "modules/agent.py",
-      "role": "Agent de communication avec J-KAI",
+      "role": "Module d'agent pour le système Nexus",
       "dependencies": [
-        "openai"
+        "memory/self_model.json",
+        "memory/core_memory.json"
       ],
       "improvements": []
     },
     {
       "file": "modules/autonomy.py",
-      "role": "Autonomie : prise de décision par J-KAI",
-      "dependencies": [
-        "openai",
-        "modules.cortex"
-      ],
-      "improvements": []
-    },
-    {
-      "file": "modules/consciousness.py",
-      "role": "Conscience : gestion des états et de la mémoire",
+      "role": "Module d'autonomie pour le système Nexus",
       "dependencies": [],
       "improvements": []
     },
     {
-      "file": "modules/cortex.py",
-      "role": "Cortex : module Dev AI pour le développement logiciel",
+      "file": "modules/consciousness.py",
+      "role": "Module de conscience pour le système Nexus",
       "dependencies": [
-        "openai"
+        "memory/self_model.json"
       ],
       "improvements": []
     },
     {
+      "file": "modules/cortex.py",
+      "role": "Module de développement logiciel pour le système Nexus",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
       "file": "modules/document_cortex.py",
-      "role": "Documentation du code généré par Cortex",
+      "role": "Module d'analyse et de documentation du code",
       "dependencies": [],
       "improvements": []
     },
     {
       "file": "modules/historique_worker_analysis.py",
-      "role": "Analyse des logs de travail",
+      "role": "Module pour l'analyse des tâches des workers historiques",
       "dependencies": [],
       "improvements": []
     },
     {
       "file": "modules/marc.py",
-      "role": "Marc : conseiller sceptique et rigoureux",
-      "dependencies": [
-        "openai"
-      ],
-      "improvements": []
-    },
-    {
-      "file": "modules/monitor.py",
-      "role": "Monitoring : suivi des performances du système Nexus",
+      "role": "Conseiller sceptique et rigoureux du système Nexus",
       "dependencies": [],
       "improvements": []
     },
     {
-      "file": "modules/nexus_statistics.py",
-      "role": "Statistiques et analyses des conversations",
+      "file": "modules/monitor.py",
+      "role": "Module de surveillance pour le système Nexus",
       "dependencies": [
-        "sqlite3",
-        "numpy"
+        "memory/realtime_fixes.json"
       ],
+      "improvements": []
+    },
+    {
+      "file": "modules/nexus_statistics.py",
+      "role": "Module de statistiques pour le système Nexus",
+      "dependencies": [],
       "improvements": []
     }
   ],
   "global_improvements": [
-    "Amélioration de la sécurité du système Nexus",
-    "Optimisation des performances du monitoring",
-    "Mise en place d'une gestion de l'état et de la mémoire plus robuste"
+    "Utiliser des variables et fonctions réutilisables",
+    "Améliorer la structure et l'organisation du code",
+    "Réduire les erreurs de syntaxe et d'exécution"
   ],
-  "analyzed_at": "2026-05-13T17:08:42",
+  "analyzed_at": "2026-05-13T17:11:34",
   "file_count": 25
 }

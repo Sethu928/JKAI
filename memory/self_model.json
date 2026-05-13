@@ -16,7 +16,7 @@
     {
       "title": "Créer un module d'erreur critique pour détecter les erreurs répétitives dans le système",
       "description": "Mise en place d'un nouveau module pour détecter et résoudre les erreurs critiques en temps réel",
-      "status": "in_progress",
+      "status": "completed",
       "created_at": "2026-05-11T20:24:09",
       "priority": 1
     },

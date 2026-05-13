@@ -95,10 +95,12 @@ def format_messages_for_local(messages: list) -> list:
     """
     Adapte les messages pour Phi-3 et modèles locaux sans support du rôle 'system'.
     Fusionne le system prompt avec le premier message user suivant :
-      [INST] <system> [/INST]\\n<user>
+      <|system|>...<|end|>\\n<|user|>...<|end|>\\n<|assistant|>
     Si pas de message system en tête, retourne la liste inchangée.
     """
-    if not messages or messages[0].get("role") != "system":
+    if not messages:
+        return [{"role": "user", "content": ""}]
+    if messages[0].get("role") != "system":
         return messages
     system_content = messages[0]["content"]
     rest = list(messages[1:])
@@ -113,6 +115,8 @@ def format_messages_for_local(messages: list) -> list:
                 ),
             }
             break
+    if not rest:
+        return messages
     return rest
 
 

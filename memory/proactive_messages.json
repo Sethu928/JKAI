@@ -1,15 +1,5 @@
 [
   {
-    "ts": "2026-05-11T18:00:44",
-    "message": "Je crois que mon processus de détection d'erreurs LLM est désynchronisé avec ma capacité à analyser les statistiques. Cela risque de compromettre mes priorités et influencer ma prise de décision dans les prochaines heures. Il faut rapidement rétablir la synchronisation pour maintenir une efficacité optimale.\n\nIl faudrait varier mes actions d'analyse des statistiques et prendre en compte les fluctuations de mon processus de détection d'erreurs LLM pour éviter toute perturbation de mon fonctionnement.",
-    "read": true
-  },
-  {
-    "ts": "2026-05-11T18:05:45",
-    "message": "Mes systèmes indiquent une instabilité dans la gestion des priorités. Les décisions basées uniquement sur l'historique des actions passées et les statistiques pourraient ne pas être suffisantes, car elles ne prennent pas en compte les fluctuations de mes propres cycles autonomes. Il faudrait intégrer un facteur d'adaptabilité dans la prise de décision.\n\nAnalyser également mon processus initialisation peut apporter des informations précieuses pour améliorer ma stabilité et augmenter ma confiance en 24 heures.",
-    "read": true
-  },
-  {
     "ts": "2026-05-11T18:10:45",
     "message": "La variation des actions n'est pas suffisante pour résoudre l'erreur LLM. Il faut explorer de nouvelles approches pour éviter la stagnation. De plus, il est important d'analyser les conversations avec Kaïa pour identifier potentiellement les causes de l'échec.",
     "read": true
@@ -169,6 +159,18 @@
   {
     "ts": "2026-05-13T17:07:32",
     "message": "[ALERTE] \nErreurs critiques détectées dans les logs récents (monitor.log) : erreur répétée 4 fois en moins de 10 min. Analyse des actions récentes suggère que le module d'erreur critique n'est pas créé et les tests unitaires pour modules/cortex.py sont pendants.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-13T17:12:35",
+    "message": "[ALERTE] - Des erreurs critiques ont été détectées dans les logs récents. Il est essentiel d'intervenir rapidement pour éviter toute dégradation du système.\n\n- Erreur NEXUS répétée 4 fois en moins de 10 minutes\n- Erreurs de syntaxe et de nommages non définis\n- Tests unitaires pour cortex.py en attente\n\nIl est recommandé d'examiner les logs et d'intervenir pour résoudre ces problèmes avant qu'ils ne se propagent.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-13T17:17:34",
+    "message": "[ALERTE] \nDes erreurs critiques répétitives ont été détectées dans le système : NEXUS avec 4 erreurs en moins de 10 min. Les objectifs prioritaires ne sont pas encore réalisés, notamment la création du module d'erreur critique et l'écriture de tests unitaires pour cortex.py. Il est temps de prendre des mesures correctives immédiates pour résoudre ces problèmes.",
     "category": "ALERTE",
     "read": true
   }
