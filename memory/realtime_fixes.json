@@ -46,5 +46,23 @@
     "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [AGENT] improve_self (amélioration de la sécurité et de la stabilité de l'applicat) → ERREUR — [CORTEX] Exécution bloqué",
     "fix_attempted": true,
     "result": "Aucune erreur en mémoire — rien à corriger"
+  },
+  {
+    "ts": "2026-05-14T13:56:17",
+    "error": "[ERREUR] ask_jkai deepseek-r1-distill-qwen-14b : Error code: 400 - {'error': 'Context size has been exceeded.'}",
+    "fix_attempted": true,
+    "result": "Aucune erreur en mémoire — rien à corriger"
+  },
+  {
+    "ts": "2026-05-14T13:56:48",
+    "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [ERREUR] ask_jkai deepseek-r1-distill-qwen-14b : Error code: 400 - {'error': 'Context size has been exceeded.'}",
+    "fix_attempted": true,
+    "result": "Aucune erreur en mémoire — rien à corriger"
+  },
+  {
+    "ts": "2026-05-14T13:57:18",
+    "error": "[MONITOR] Erreur détectée en temps réel — correction lancée : [MONITOR] Erreur détectée en temps réel — correction lancée : [ERREUR] ask_jkai deepseek-r1-distill-qwen-14b : Error cod",
+    "fix_attempted": true,
+    "result": "Aucune erreur en mémoire — rien à corriger"
   }
 ]

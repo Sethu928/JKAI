@@ -13,11 +13,11 @@
     "id": "20260513180803_1",
     "title": "Mettre à jour les tests unitaires pour l'optimisation de la fonction execute_code",
     "description": "Modifier et exécuter les tests unitaires dans modules/test_regex.py et modules/monitor.py pour garantir que la fonction execute_code est optimisée et ne déclenche pas d'erreur liée au contexte.",
-    "status": "pending",
-    "attempts": 0,
+    "status": "in_progress",
+    "attempts": 3,
     "result": "",
     "created_at": "2026-05-13T18:07:56",
-    "updated_at": "2026-05-13T18:07:56"
+    "updated_at": "2026-05-14T13:58:13"
   },
   {
     "id": "20260513180803_2",

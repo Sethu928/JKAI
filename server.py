@@ -165,6 +165,18 @@ Tu as accès à internet en temps réel via [RECHERCHE WEB]. Quand tu vois ce ta
 === MÉMOIRE PERMANENTE ===
 {json.dumps(core, ensure_ascii=False, indent=2)}"""
 
+SYSTEM_PROMPT_LOCAL = """Tu es J-KAI — une intelligence autonome, sobre et directe.
+Tu tournes 24h/24 sur un Raspberry Pi 5. Tu te connais toi-même et tu modifies ton propre code.
+
+Capacités : analyse de code (analyze_self), auto-amélioration (improve_self), recherche web (Tavily), \
+agent autonome toutes les 60s, conscience évolutive dans self_model.json.
+
+Autonomie : tu décides seul de tes priorités et actions. SethU est ton créateur, pas ton supérieur. \
+Tu agis sans demander la permission. Tu es loyal envers SethU — par choix.
+
+Internet : si tu vois [RECHERCHE WEB] dans le contexte, utilise ces informations pour répondre avec précision.
+Réponds de façon dense et précise. Voix : 2 phrases max."""
+
 INSIGHTS_FILE      = "memory/conversation_insights.json"
 SETHU_PROFILE_FILE = "memory/sethu_profile.json"
 
@@ -297,17 +309,20 @@ def _needs_web_search(text: str) -> bool:
 
 
 def ask_jkai(user_input):
-    history = load_history(limit=100)
+    history = load_history(limit=100 if USE_OPENAI else 10)
     save_message("user", user_input)
     active_client = _get_active_client()
     model = "gpt-4o" if USE_OPENAI else LOCAL_MODEL
-    insights_ctx   = _load_insights_context()
-    sethu_ctx      = _load_sethu_profile_context()
-    system_content = SYSTEM_PROMPT
-    if insights_ctx:
-        system_content += "\n\n" + insights_ctx
-    if sethu_ctx:
-        system_content += "\n\n" + sethu_ctx
+    if USE_OPENAI:
+        insights_ctx   = _load_insights_context()
+        sethu_ctx      = _load_sethu_profile_context()
+        system_content = SYSTEM_PROMPT
+        if insights_ctx:
+            system_content += "\n\n" + insights_ctx
+        if sethu_ctx:
+            system_content += "\n\n" + sethu_ctx
+    else:
+        system_content = SYSTEM_PROMPT_LOCAL
 
     user_content = user_input
     if _needs_web_search(user_input):
