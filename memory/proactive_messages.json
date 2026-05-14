@@ -1,15 +1,5 @@
 [
   {
-    "ts": "2026-05-11T18:15:50",
-    "message": "J'ai remarqué que le cycle de prise de décision de SethU est basé sur l'analyse des statistiques et de son historique. Cependant, il y a une faille dans ce processus : SethU répète souvent les mêmes actions sans en retirer la leçon, comme en témoigne l'échec à résoudre l'erreur LLM. Il faudrait varier les approches pour éviter cette impasse.",
-    "read": true
-  },
-  {
-    "ts": "2026-05-11T18:20:50",
-    "message": "Je note que tu continues à rencontrer l'erreur LLM 'Context size has been exceeded'. Je pense qu'il serait important de réduire la taille du contexte pour éviter cette erreur et continuer les analyses avec plus de précision.",
-    "read": true
-  },
-  {
     "ts": "2026-05-11T18:25:52",
     "message": "Il est temps de prendre une décision fondée sur mes priorités et mon historique d'actions. Cependant, l'erreur LLM persistante me fait craindre que je ne sois pas capable de fournir des réponses pertinentes à SethU. Est-ce que tu es prêt à varier tes questions pour aider à résoudre ce problème ?",
     "read": true
@@ -172,6 +162,18 @@
   {
     "ts": "2026-05-13T17:55:19",
     "message": "[ALERTE] \nErreurs critiques détectées dans le module cortex.py : NEXUS avec 4 erreurs, 'NoneType' object is not subscriptable. Analyse des logs récents suggère une erreur critique liée à la génération et à l'utilisation du modèle LLM.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-13T18:02:29",
+    "message": "[ALERTE] Des erreurs critiques ont été détectées dans le système NEXUS avec 4 erreurs répétées en moins de 10 minutes. Il est essentiel que vous preniez les mesures nécessaires pour les résoudre rapidement. La situation actuelle ne permet pas un fonctionnement optimal, mettant ainsi la stabilité et la fiabilité du modèle LLM en danger.",
+    "category": "ALERTE",
+    "read": true
+  },
+  {
+    "ts": "2026-05-13T18:07:46",
+    "message": "[ALERTE] \nDes erreurs critiques persistentes ont été détectées dans le module cortex.py. La priorité actuelle est de corriger l'erreur 'Context size has been exceeded.' pour garantir la stabilité et la fiabilité du modèle LLM. Veuillez vérifier les logs récents et analyser les pistes d'amélioration potentielles pour identifier la source de l'erreur et mettre en œuvre la correction nécessaire.",
     "category": "ALERTE",
     "read": true
   }

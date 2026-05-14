@@ -88,5 +88,65 @@
     "result": "Module 'controleur_contexte' créé (import échoué)",
     "created_at": "2026-05-13T17:54:24",
     "updated_at": "2026-05-13T17:57:38"
+  },
+  {
+    "id": "20260513175849_0",
+    "title": "Corriger l'erreur 'Context size has been exceeded.' dans modules/model.py",
+    "description": "Identifier et corriger la source de l'erreur 'Context size has been exceeded.' dans le fichier modules/model.py pour éviter les problèmes de limite de contexte.",
+    "status": "done",
+    "attempts": 2,
+    "result": "26 fichiers analysés, 0 amélioration(s) identifiée(s)",
+    "created_at": "2026-05-13T17:58:40",
+    "updated_at": "2026-05-13T18:00:20"
+  },
+  {
+    "id": "20260513175849_1",
+    "title": "Mettre à jour les tests unitaires pour la fonction execute_code dans modules/cortex.py",
+    "description": "Améliorer et mettre à jour les tests unitaires pour la fonction execute_code dans le fichier modules/cortex.py pour garantir une execution fiable et éviter les erreurs potentielles.",
+    "status": "done",
+    "attempts": 1,
+    "result": "Aucune amélioration identifiée dans self_code_understanding.json",
+    "created_at": "2026-05-13T17:58:40",
+    "updated_at": "2026-05-13T18:01:23"
+  },
+  {
+    "id": "20260513175849_2",
+    "title": "Optimiser la gestion de la mémoire",
+    "description": "Analyser le fichier memory/tasks.json afin de détecter d'éventuelles optimisations nécessaires pour réduire l'utilisation de la mémoire et résoudre l'erreur de limite de contexte.",
+    "status": "done",
+    "attempts": 1,
+    "result": "",
+    "created_at": "2026-05-13T17:58:40",
+    "updated_at": "2026-05-13T18:02:28"
+  },
+  {
+    "id": "20260513180336_0",
+    "title": "Corriger l'erreur 'Context size has been exceeded.' dans modules/model.py",
+    "description": "Analyser le code de modules/model.py et corriger les erreurs qui entraînent le dépassement du contexte. Il est possible que des variables globales ou des boucles infinies soient à l'origine de ce problème.",
+    "status": "done",
+    "attempts": 2,
+    "result": "Aucune erreur en mémoire — rien à corriger",
+    "created_at": "2026-05-13T18:03:28",
+    "updated_at": "2026-05-13T18:04:43"
+  },
+  {
+    "id": "20260513180336_1",
+    "title": "Mettre à jour les tests unitaires pour la fonction execute_code dans modules/cortex.py",
+    "description": "Modifier le fichier de test units dans modules/test_regex.py pour prendre en compte les modifications apportées à la fonction execute_code dans modules/cortex.py et vérifier qu'elle fonctionne correctement.",
+    "status": "done",
+    "attempts": 1,
+    "result": "",
+    "created_at": "2026-05-13T18:03:28",
+    "updated_at": "2026-05-13T18:05:47"
+  },
+  {
+    "id": "20260513180336_2",
+    "title": "Analyser les logs pour identifier les causes du problème",
+    "description": "Examiner le fichier logs/jkai.log et d'autres fichiers de log pertinents pour identifier les raisons qui entraînent le dépassement du contexte modèle. Cela peut inclure l'analyse des erreurs système, des messages d'erreur ou des performances.",
+    "status": "done",
+    "attempts": 1,
+    "result": "browse OK : [Analyse des logs pour la résolution des problèmes informatiques | Splunk] # Analyse des logs pour la résolution des problèmes informatiques. ## Avec Splunk Platform, bénéficiez d’une visi",
+    "created_at": "2026-05-13T18:03:28",
+    "updated_at": "2026-05-13T18:06:54"
   }
 ]

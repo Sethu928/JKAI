@@ -93,28 +93,40 @@ def get_openai_client() -> OpenAI:
 
 def format_messages_for_local(messages: list) -> list:
     """
-    Adapte les messages pour Phi-3 et modèles locaux sans support du rôle 'system'.
-    Fusionne le system prompt avec le premier message user suivant :
-      <|system|>...<|end|>\\n<|user|>...<|end|>\\n<|assistant|>
+    Adapte les messages pour les modèles locaux sans support natif du rôle 'system'.
+
+    - DeepSeek R1 : balises <|im_start|>/<|im_end|> (ChatML)
+    - Phi-3 / défaut : balises <|system|>/<|end|>
+
     Si pas de message system en tête, retourne la liste inchangée.
     """
     if not messages:
         return [{"role": "user", "content": ""}]
     if messages[0].get("role") != "system":
         return messages
+
     system_content = messages[0]["content"]
     rest = list(messages[1:])
+
+    is_deepseek = "deepseek" in LOCAL_MODEL.lower()
+
     for i, msg in enumerate(rest):
         if msg.get("role") == "user":
-            rest[i] = {
-                "role":    "user",
-                "content": (
+            if is_deepseek:
+                content = (
+                    f"<|im_start|>system\n{system_content}<|im_end|>\n"
+                    f"<|im_start|>user\n{msg['content']}<|im_end|>\n"
+                    f"<|im_start|>assistant\n"
+                )
+            else:
+                content = (
                     f"<|system|>\n{system_content}<|end|>\n"
                     f"<|user|>\n{msg['content']}<|end|>\n"
                     f"<|assistant|>"
-                ),
-            }
+                )
+            rest[i] = {"role": "user", "content": content}
             break
+
     if not rest:
         return messages
     return rest

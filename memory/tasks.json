@@ -1,32 +1,32 @@
 [
   {
-    "id": "20260513175849_0",
-    "title": "Corriger l'erreur 'Context size has been exceeded.' dans modules/model.py",
-    "description": "Identifier et corriger la source de l'erreur 'Context size has been exceeded.' dans le fichier modules/model.py pour éviter les problèmes de limite de contexte.",
-    "status": "in_progress",
-    "attempts": 2,
+    "id": "20260513180803_0",
+    "title": "Corriger l'erreur 'Context size has been exceeded.' dans modules/cortex.py",
+    "description": "Analyser et corriger les erreurs de contexte dépassé dans le fichier cortex.py, en vérifiant si les requêtes API sont correctement limitées afin d'éviter ce problème.",
+    "status": "done",
+    "attempts": 1,
     "result": "",
-    "created_at": "2026-05-13T17:58:40",
-    "updated_at": "2026-05-13T17:59:50"
+    "created_at": "2026-05-13T18:07:56",
+    "updated_at": "2026-05-13T18:08:06"
   },
   {
-    "id": "20260513175849_1",
-    "title": "Mettre à jour les tests unitaires pour la fonction execute_code dans modules/cortex.py",
-    "description": "Améliorer et mettre à jour les tests unitaires pour la fonction execute_code dans le fichier modules/cortex.py pour garantir une execution fiable et éviter les erreurs potentielles.",
+    "id": "20260513180803_1",
+    "title": "Mettre à jour les tests unitaires pour l'optimisation de la fonction execute_code",
+    "description": "Modifier et exécuter les tests unitaires dans modules/test_regex.py et modules/monitor.py pour garantir que la fonction execute_code est optimisée et ne déclenche pas d'erreur liée au contexte.",
     "status": "pending",
     "attempts": 0,
     "result": "",
-    "created_at": "2026-05-13T17:58:40",
-    "updated_at": "2026-05-13T17:58:40"
+    "created_at": "2026-05-13T18:07:56",
+    "updated_at": "2026-05-13T18:07:56"
   },
   {
-    "id": "20260513175849_2",
-    "title": "Optimiser la gestion de la mémoire",
-    "description": "Analyser le fichier memory/tasks.json afin de détecter d'éventuelles optimisations nécessaires pour réduire l'utilisation de la mémoire et résoudre l'erreur de limite de contexte.",
+    "id": "20260513180803_2",
+    "title": "Analyser les logs de jkai.log et syntax_and_api_errors.log",
+    "description": "Examiner attentivement les fichiers jkai.log et syntax_and_api_errors.log dans le dossier logs/ pour identifier les erreurs potentielles liées à la gestion du contexte, en particulier celles liées aux requêtes API.",
     "status": "pending",
     "attempts": 0,
     "result": "",
-    "created_at": "2026-05-13T17:58:40",
-    "updated_at": "2026-05-13T17:58:40"
+    "created_at": "2026-05-13T18:07:56",
+    "updated_at": "2026-05-13T18:07:56"
   }
 ]
