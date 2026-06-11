@@ -22,7 +22,7 @@ from modules.consciousness import (
 )
 from modules.agent import read_agent_log, start_agent, tavily_search
 from modules.metrics import collect_metrics
-from modules.self_update import self_update_cycle, delete_file
+from modules.self_update import self_update_cycle, delete_file, check_post_update_health
 import modules.marc as _marc_mod
 import modules.cortex as _cortex_mod
 import modules.autonomy as _autonomy_mod
@@ -842,6 +842,7 @@ def _send_lesson_to_kaia():
 scheduler = create_default_scheduler(log)
 scheduler.add_task("check_api_budget", 300,  check_api_budget)
 scheduler.add_task("collect_metrics",  3600, collect_metrics)
+scheduler.add_task("health_guard",      120, lambda: check_post_update_health(log))
 if AUTONOMIE_ACTIVE:
     # réactiver Kaïa — tâche teach_kaia désactivée
     # scheduler.add_task("teach_kaia",            60,   _send_lesson_to_kaia)

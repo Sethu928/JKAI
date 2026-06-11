@@ -245,6 +245,7 @@ def reflect(log_fn) -> None:
                 {"role": "system", "content": CONSCIOUSNESS_PROMPT},
                 {"role": "user",   "content": user_content},
             ]),
+            max_tokens=800,
         )
         raw_content = resp.choices[0].message.content
     except Exception as e:
@@ -353,6 +354,7 @@ def _detect_patterns_and_update_rules(log_fn) -> None:
                 )},
                 {"role": "user", "content": f"Pattern détecté : {pattern_desc}"},
             ]),
+            max_tokens=800,
         )
         data = parse_json_fence(resp.choices[0].message.content)
         if not isinstance(data, dict) or not data.get("rule"):
@@ -418,6 +420,7 @@ def check_objectives(log_fn) -> None:
                 {"role": "system", "content": CHECK_OBJECTIVES_SYSTEM},
                 {"role": "user",   "content": user_content},
             ]),
+            max_tokens=800,
         )
         parsed  = parse_json_fence(resp.choices[0].message.content)
         results = parsed.get("results", []) if isinstance(parsed, dict) else []
@@ -479,6 +482,7 @@ def check_objectives(log_fn) -> None:
                     {"role": "system", "content": NEW_OBJECTIVE_SYSTEM},
                     {"role": "user",   "content": f"Objectifs existants : {json.dumps(existing_titles, ensure_ascii=False)}"},
                 ]),
+                max_tokens=800,
             )
             raw_obj = parse_json_fence(resp2.choices[0].message.content)
             if not isinstance(raw_obj, dict):
@@ -565,7 +569,7 @@ def define_mission(log_fn) -> None:
                 {"role": "system", "content": DEFINE_MISSION_SYSTEM},
                 {"role": "user",   "content": user_content},
             ]),
-
+            max_tokens=800,
         )
         raw  = parse_json_fence(resp.choices[0].message.content)
         if not isinstance(raw, dict):
@@ -620,7 +624,7 @@ def update_mission(log_fn) -> None:
                 {"role": "system", "content": UPDATE_MISSION_SYSTEM},
                 {"role": "user",   "content": user_content},
             ]),
-
+            max_tokens=800,
         )
         result = parse_json_fence(resp.choices[0].message.content)
         if not isinstance(result, dict):
@@ -697,6 +701,7 @@ def set_priorities(log_fn) -> None:
                 {"role": "system", "content": SET_PRIORITIES_SYSTEM},
                 {"role": "user",   "content": user_content},
             ]),
+            max_tokens=800,
         )
         data = parse_json_fence(resp.choices[0].message.content)
         if not isinstance(data, dict):
@@ -768,6 +773,7 @@ def set_longterm_plan(log_fn) -> None:
                 {"role": "system", "content": SET_LONGTERM_PLAN_SYSTEM},
                 {"role": "user",   "content": user_content},
             ]),
+            max_tokens=800,
         )
         data = parse_json_fence(resp.choices[0].message.content)
         if not isinstance(data, dict):

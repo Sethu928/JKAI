@@ -357,6 +357,7 @@ def _generate_new_tasks(log_fn) -> list:
                     f"Contexte web :\n{web_ctx}"
                 )},
             ]),
+            max_tokens=800,
         )
         data = parse_json_fence(resp.choices[0].message.content)
         if not isinstance(data, dict):
@@ -531,6 +532,7 @@ def _analyze_self(log_fn) -> str:
                 {"role": "system", "content": "Tu es J-KAI. Analyse ton propre code source. Réponds UNIQUEMENT en JSON valide."},
                 {"role": "user",   "content": prompt_user},
             ]),
+            max_tokens=800,
         )
         data = parse_json_fence(resp.choices[0].message.content)
         if not isinstance(data, dict):
@@ -620,6 +622,7 @@ def _improve_self(decision: dict, log_fn) -> str:
                 )},
                 {"role": "user", "content": f"Amélioration à implémenter : {target}\nContexte : {obs}"},
             ]),
+            max_tokens=800,
         )
         raw = resp.choices[0].message.content
         code_match = re.search(r'```python\n(.*?)```', raw, re.DOTALL)
@@ -674,6 +677,7 @@ def _create_module(decision: dict, log_fn) -> str:
                 )},
                 {"role": "user", "content": f"Contexte / besoin : {obs or 'Améliore le projet Nexus.'}\nConçois un module utile."},
             ]),
+            max_tokens=800,
         )
         data = parse_json_fence(resp.choices[0].message.content)
         if not isinstance(data, dict):
@@ -782,6 +786,7 @@ def _self_correct(log_fn) -> str:
                     f"Logs récents :\n{recent_logs}"
                 )},
             ]),
+            max_tokens=800,
         )
         m = re.search(r'```python\n(.*?)```', resp.choices[0].message.content, re.DOTALL)
         code = m.group(1).strip() if m else ""
@@ -916,6 +921,7 @@ def _restructure(log_fn) -> str:
                     f"Code source (2000 premiers chars) :\n{source_code[:2000]}"
                 )},
             ]),
+            max_tokens=800,
         )
         data = parse_json_fence(resp.choices[0].message.content)
         if not isinstance(data, dict):
@@ -1126,6 +1132,7 @@ def run_agent_cycle(log_fn) -> None:
                 {"role": "system", "content": AGENT_SYSTEM_PROMPT},
                 {"role": "user",   "content": user_content},
             ]),
+            max_tokens=800,
         )
         raw      = resp.choices[0].message.content
         decision = _parse(raw)
@@ -1347,6 +1354,7 @@ def _run_worker_cycle(worker: str, allowed: list[str], log_fn) -> None:
                 {"role": "system", "content": _build_worker_prompt(worker, allowed, current_task)},
                 {"role": "user",   "content": user_content},
             ]),
+            max_tokens=800,
         )
         decision = _parse(resp.choices[0].message.content)
     except Exception as e:
