@@ -25,5 +25,12 @@
     "role": "Module qui permet de contrôler la taille du contexte dans le modèle LLM",
     "created_at": "2026-05-13T17:57:38",
     "import_ok": false
+  },
+  {
+    "name": "memory_allocation_helper",
+    "file": "modules\\memory_allocation_helper.py",
+    "role": "Aide à la gestion et à la documentation des fonctions d'allocation mémoire.",
+    "created_at": "2026-06-11T19:39:18",
+    "import_ok": true
   }
 ]

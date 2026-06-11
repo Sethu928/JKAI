@@ -1,6 +1,12 @@
 {
   "modules": [
     {
+      "file": "conftest.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
       "file": "jkai.py",
       "role": "?",
       "dependencies": [],
@@ -25,25 +31,13 @@
       "improvements": []
     },
     {
-      "file": "nexus_statistics.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
       "file": "server.py",
       "role": "?",
       "dependencies": [],
       "improvements": []
     },
     {
-      "file": "test_regex.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "test_teach.py",
+      "file": "watchdog.py",
       "role": "?",
       "dependencies": [],
       "improvements": []
@@ -85,25 +79,13 @@
       "improvements": []
     },
     {
-      "file": "modules\\controleur_contexte.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
       "file": "modules\\cortex.py",
       "role": "?",
       "dependencies": [],
       "improvements": []
     },
     {
-      "file": "modules\\document_cortex.py",
-      "role": "?",
-      "dependencies": [],
-      "improvements": []
-    },
-    {
-      "file": "modules\\historique_worker_analysis.py",
+      "file": "modules\\llm_utils.py",
       "role": "?",
       "dependencies": [],
       "improvements": []
@@ -115,13 +97,31 @@
       "improvements": []
     },
     {
+      "file": "modules\\metrics.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
       "file": "modules\\monitor.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\nexus_statistics.py",
+      "role": "?",
+      "dependencies": [],
+      "improvements": []
+    },
+    {
+      "file": "modules\\scheduler.py",
       "role": "?",
       "dependencies": [],
       "improvements": []
     }
   ],
   "global_improvements": [],
-  "analyzed_at": "2026-05-13T18:00:20",
-  "file_count": 26
+  "analyzed_at": "2026-06-11T19:22:38",
+  "file_count": 24
 }

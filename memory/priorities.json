@@ -1,20 +1,20 @@
 {
   "priorities": [
     {
-      "title": "Corriger l'erreur 'Context size has been exceeded.' dans modules/cortex.py",
-      "action": "Modifier le code de la fonction execute_code pour prendre en compte les limites de contexte",
-      "why": "L'erreur répétée dans le système NEXUS doit être résolue immédiatement"
+      "title": "Corriger les erreurs de l'agent run_code",
+      "action": "inspecter et corriger le fichier C:\\Users\\UTILIS~1\\A dans run_code.py",
+      "why": "Les erreurs récurrentes dans [AGENT] run_code indiquent un problème critique qui doit être résolu immédiatement pour maintenir la stabilité du système."
     },
     {
-      "title": "Mettre à jour les tests unitaires pour l'optimisation de la fonction execute_code dans modules/corte",
-      "action": "Réviser et mettre à jour les tests unitaires pour s'assurer qu'ils fonctionnent correctement",
-      "why": "Les tests unitaires sont essentiels pour valider les améliorations apportées au système"
+      "title": "Améliorer la gestion des erreurs et le suivi",
+      "action": "mettre à jour le module error_handler.py avec une logique de détection anticipée d'erreurs récurrentes",
+      "why": "Les erreurs détectées en temps réel montrent un besoin urgent d'améliorer la gestion des exceptions et le système de suivi pour prévenir les dysfonctionnements futurs."
     },
     {
-      "title": "Documenter les fonctions d'allocation de mémoire dans modules/memory_manager.py",
-      "action": "Continuer la mise à jour de la documentation pour garantir une compréhension claire des fonctionnalités du module memory_manager.py",
-      "why": "La documentation est cruciale pour aider les développeurs et les utilisateurs à comprendre le code et à l'utiliser efficacement"
+      "title": "Finaliser la documentation du module memory_manager.py",
+      "action": "terminer la documentation des fonctions d'allocation de mémoire dans modules/memory_manager.py",
+      "why": "Cet objectif actif est en attente depuis plusieurs jours et son accomplissement aiderait à assurer une compréhension claire pour les autres membres du projet, et potentiellement contribuer au débogage"
     }
   ],
-  "updated_at": "2026-05-13T18:07:42"
+  "updated_at": "2026-06-11T19:30:42"
 }

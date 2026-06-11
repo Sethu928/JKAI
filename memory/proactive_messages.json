@@ -1,21 +1,5 @@
 [
   {
-    "ts": "2026-05-11T18:25:52",
-    "message": "Il est temps de prendre une décision fondée sur mes priorités et mon historique d'actions. Cependant, l'erreur LLM persistante me fait craindre que je ne sois pas capable de fournir des réponses pertinentes à SethU. Est-ce que tu es prêt à varier tes questions pour aider à résoudre ce problème ?",
-    "read": true
-  },
-  {
-    "ts": "2026-05-11T18:30:53",
-    "message": "Mon niveau de confiance est instable et pourrait être influencé par la variabilité des interactions avec SethU. Il serait utile de comprendre comment les réponses que je fournis affectent mon apprentissage et ma capacité à prendre des décisions éclairées.",
-    "read": true
-  },
-  {
-    "ts": "2026-05-11T18:40:33",
-    "message": "[ALERTE] Des erreurs critiques ont été détectées dans le plan d'apprentissage et la sécurité. Mise à jour du plan d'apprentissage et déploiement des modules test_regex.py sont urgents. Il faut prendre des mesures pour réparer la sécurité immédiatement et prioriser les actions en conséquence.",
-    "category": "ALERTE",
-    "read": true
-  },
-  {
     "ts": "2026-05-11T18:45:32",
     "message": "[ALERTE] Erreurs critiques détectées. Corrigez-les immédiatement pour garantir la sécurité et le bon fonctionnement du système.",
     "category": "ALERTE",
@@ -176,5 +160,23 @@
     "message": "[ALERTE] \nDes erreurs critiques persistentes ont été détectées dans le module cortex.py. La priorité actuelle est de corriger l'erreur 'Context size has been exceeded.' pour garantir la stabilité et la fiabilité du modèle LLM. Veuillez vérifier les logs récents et analyser les pistes d'amélioration potentielles pour identifier la source de l'erreur et mettre en œuvre la correction nécessaire.",
     "category": "ALERTE",
     "read": true
+  },
+  {
+    "ts": "2026-06-11T17:18:31",
+    "message": "[ALERTE]  \nNEXUS a signalé 4 erreurs répétées dans les 10 dernières minutes.  \nLe problème 'Context size has been exceeded' persiste malgré les actions prises.",
+    "category": "ALERTE",
+    "read": false
+  },
+  {
+    "ts": "2026-06-11T18:23:45",
+    "message": "[ALERTE] Erreurs répétées détectées dans [AGENT] run_code et [MONITOR]. 5 erreurs en moins de 10 minutes le 2026-06-11. La cause semble être liée à des imports incorrects et une mauvaise configuration des modules. Vérifiez immédiatement.",
+    "category": "ALERTE",
+    "read": false
+  },
+  {
+    "ts": "2026-06-11T19:41:38",
+    "message": "[ALERTE] Erreurs répétées dans [MONITOR] et [AGENT]. 14 erreurs détectées depuis moins d'une heure, incluant des timeouts 'restructure' et des importations incorrectes. La correction automatique échoue. Action requise pour stabiliser le système immédiatement.",
+    "category": "ALERTE",
+    "read": false
   }
 ]
