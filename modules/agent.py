@@ -9,7 +9,7 @@ import tempfile
 import urllib.parse
 import requests
 from datetime import datetime
-from modules.state import self_model_lock, get_local_client, LOCAL_MODEL, format_messages_for_local, tail_file, parse_json_fence
+from modules.state import self_model_lock, get_local_client, LOCAL_MODEL, format_messages_for_local, tail_file, parse_json_fence, check_llm_alive
 from modules.cortex import execute_code
 
 client = get_local_client()
@@ -792,22 +792,45 @@ def _self_correct(log_fn) -> str:
     if not code or code.strip() == "pass":
         return "Aucun fix généré — erreur irréparable"
 
-    result = execute_code(code)
-    now    = datetime.now().isoformat(timespec="seconds")
+    now = datetime.now().isoformat(timespec="seconds")
 
-    if result.get("error"):
+    def _write_unsolved(reason: str) -> None:
         unsolved.append({
             "key":       key,
             "snippet":   entry.get("snippet", key)[:200],
             "attempt":   attempts + 1,
             "fix_code":  code[:300],
-            "fix_error": result["error"][:200],
+            "fix_error": reason[:200],
             "ts":        now,
         })
-        unsolved = unsolved[-50:]
+        trimmed = unsolved[-50:]
         os.makedirs("memory", exist_ok=True)
         with open(UNSOLVED_ERRORS_FILE, "w", encoding="utf-8") as f:
-            json.dump(unsolved, f, ensure_ascii=False, indent=2)
+            json.dump(trimmed, f, ensure_ascii=False, indent=2)
+
+    # Validation par la suite de tests AVANT d'appliquer le fix
+    flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+    try:
+        test_proc = subprocess.run(
+            [sys.executable, "-m", "pytest", "tests/test_smoke.py", "-q", "--tb=no"],
+            capture_output=True, text=True, timeout=60, creationflags=flags,
+        )
+        tests_ok = test_proc.returncode == 0
+    except Exception as e:
+        log_fn(f"[SELF_CORRECT] pytest inaccessible : {e}")
+        tests_ok = False
+        test_proc = None
+
+    if not tests_ok:
+        details = (test_proc.stdout if test_proc else "")[-200:].strip()
+        log_fn(f"[SELF_CORRECT] fix rejeté — tests cassés : {details}")
+        _write_unsolved(f"tests cassés : {details}")
+        return f"Fix rejeté — tests cassés (tentative {attempts + 1}/3)"
+
+    result = execute_code(code)
+
+    if result.get("error"):
+        _write_unsolved(result["error"])
         info = f"Fix échoué (tentative {attempts + 1}/3) — {result['error'][:100]}"
     else:
         errors.pop(key, None)
@@ -1264,6 +1287,10 @@ def _verify_done_check(task: dict, log_fn) -> str:
 
 
 def _run_worker_cycle(worker: str, allowed: list[str], log_fn) -> None:
+    if not check_llm_alive():
+        log_fn("[AGENT] LLM local indisponible — cycle sauté")
+        return
+
     ts          = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     now_iso     = datetime.now().isoformat(timespec="seconds")
 

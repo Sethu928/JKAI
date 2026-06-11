@@ -65,6 +65,25 @@ def test_execute_code_blocked_by_sandbox():
     assert result["blocked"] is True
 
 
+def test_execute_code_shell_python_dash_m_blocked():
+    from modules.cortex import execute_code
+    result = execute_code("python3 -m cortex.optimize")
+    assert result["blocked"] is True
+    assert "[CORTEX] Refusé" in result["error"]
+
+
+def test_execute_code_shell_pip_blocked():
+    from modules.cortex import execute_code
+    result = execute_code("pip install numpy")
+    assert result["blocked"] is True
+
+
+def test_execute_code_shell_no_python_tokens_blocked():
+    from modules.cortex import execute_code
+    result = execute_code("sudo systemctl restart jkai")
+    assert result["blocked"] is True
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # 3. modules/llm_utils.py — strip_think
 # ══════════════════════════════════════════════════════════════════════════════

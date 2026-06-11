@@ -2,6 +2,7 @@ import os
 import re
 import json
 import threading
+import requests as _requests
 from datetime import datetime
 
 from dotenv import load_dotenv
@@ -65,6 +66,16 @@ _local_client: OpenAI | None = None
 _local_client_lock = threading.Lock()
 
 LOCAL_MODEL = os.getenv("LM_STUDIO_MODEL", "local-model")
+
+
+def check_llm_alive(timeout: int = 3) -> bool:
+    """Ping rapide du serveur LM Studio. Retourne True/False sans lever d'exception."""
+    base_url = os.getenv("LM_STUDIO_URL", "http://127.0.0.1:1234/v1")
+    try:
+        r = _requests.get(f"{base_url}/models", timeout=timeout)
+        return r.status_code == 200
+    except Exception:
+        return False
 
 
 def get_local_client() -> OpenAI:

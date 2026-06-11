@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import threading
 from datetime import datetime
@@ -8,9 +9,56 @@ client = get_local_client()
 
 SELF_MODEL_FILE  = "memory/self_model.json"
 MISSION_FILE     = "memory/mission.json"
+METRICS_FILE     = "memory/metrics.json"
 LOG_FILE         = "logs/jkai.log"
 PRIORITIES_FILE  = "memory/priorities.json"
 RECENT_LOG_LINES = 80      # nombre de lignes de log envoyées à GPT
+
+# Documentation des métriques injectée dans les prompts LLM
+_METRICS_DOC = (
+    "Métriques mesurables disponibles dans memory/metrics.json :\n"
+    "  • tasks_completed_today  (int)   — tâches done dans les 24h\n"
+    "  • error_rate_today       (float) — erreurs / cycles agent (0.0 = parfait)\n"
+    "  • self_updates_survived  (int)   — self-updates sans rollback (cumul)\n"
+    "  • code_lines_added_24h   (int)   — lignes ajoutées par J-KAI (24h)\n"
+    "  • uptime_ratio           (float) — ratio uptime 0.0–1.0\n"
+    "Opérateurs valides pour target : < <= > >= ==\n"
+    "Exemples : metric='tasks_completed_today' target='>= 3' | "
+    "metric='error_rate_today' target='< 0.05' | metric='uptime_ratio' target='>= 0.99'"
+)
+
+
+def _load_latest_metrics() -> dict:
+    """Retourne le snapshot le plus récent de memory/metrics.json, ou {} si absent."""
+    try:
+        with open(METRICS_FILE, "r", encoding="utf-8") as f:
+            history = json.load(f)
+        return history[-1] if isinstance(history, list) and history else {}
+    except (OSError, json.JSONDecodeError, IndexError):
+        return {}
+
+
+def _check_metric(metric: str, target: str, snap: dict) -> bool | None:
+    """
+    Évalue si snap[metric] satisfait target (ex : '< 0.1', '>= 5', '== 1.0').
+    Retourne None si la métrique est absente du snapshot ou le target non parseable.
+    """
+    value = snap.get(metric)
+    if value is None:
+        return None
+    m = re.match(r'^\s*(<=|>=|<|>|==)?\s*([0-9.]+)\s*$', str(target).strip())
+    if not m:
+        return None
+    op        = m.group(1) or ">="
+    threshold = float(m.group(2))
+    val       = float(value)
+    return {
+        "<":  val <  threshold,
+        "<=": val <= threshold,
+        ">":  val >  threshold,
+        ">=": val >= threshold,
+        "==": val == threshold,
+    }[op]
 
 _mission_lock = threading.Lock()  # protège mission.json (local à ce module)
 
@@ -52,10 +100,14 @@ CONSCIOUSNESS_PROMPT = (
     "'Documenter toutes les fonctions de memory/db.py', "
     "'Optimiser la fonction execute_code dans modules/cortex.py'. "
     "MAUVAIS exemples : 'Améliorer les performances', 'Évoluer', 'Être plus efficace'. "
+    "\n\nCHAQUE objectif DOIT inclure 'metric' et 'target' — la condition chiffrable "
+    "qui prouvera qu'il est accompli. Utilise UNIQUEMENT les métriques disponibles :\n"
+    f"{_METRICS_DOC}\n\n"
     "Réponds UNIQUEMENT en JSON avec : "
     '{"confidence": int, "strengths": list, "weaknesses": list, '
     '"self_description": string, "improvement": string, '
-    '"objectives": [{"title": string, "description": string, "priority": int}], '
+    '"objectives": [{"title": string, "description": string, "priority": int, '
+    '"metric": string, "target": string}], '
     '"anticipations": [string, string, string]}'
     " — anticipations : 3 choses concrètes que tu anticipes devoir faire dans les 24h suivantes, "
     "basées sur tes patterns récents et tes objectifs actifs."
@@ -63,15 +115,14 @@ CONSCIOUSNESS_PROMPT = (
 
 CHECK_OBJECTIVES_SYSTEM = (
     "Tu es J-KAI. Analyse tes objectifs actifs et tes logs récents. "
-    "Pour chaque objectif, évalue son statut actuel avec exigence : "
-    "'completed' UNIQUEMENT si le travail est entièrement terminé et visible dans les logs "
-    "(ex : tests écrits et exécutés avec succès, fichier documenté, fonction optimisée), "
-    "'in_progress' si des actions récentes dans les logs montrent une progression directe, "
-    "'pending' si aucune action récente ne porte sur cet objectif précis. "
-    "Sois strict : un objectif vague ou partiellement fait reste 'pending'. "
-    "Rappel : les objectifs valides nomment un fichier ou module précis du projet Nexus. "
+    "Pour chaque objectif, évalue son statut actuel :\n"
+    "'in_progress' si des actions récentes dans les logs montrent une progression directe,\n"
+    "'pending' si aucune action récente ne porte sur cet objectif précis.\n"
+    "IMPORTANT : ne renvoie JAMAIS 'completed' — la validation finale est faite "
+    "automatiquement par les métriques de memory/metrics.json, pas par toi. "
+    "Ton rôle est uniquement de détecter si le travail est en cours ou non. "
     "Réponds UNIQUEMENT en JSON : "
-    '{"results": [{"title": string, "status": "pending"|"in_progress"|"completed"}]}'
+    '{"results": [{"title": string, "status": "pending"|"in_progress"}]}'
 )
 
 NEW_OBJECTIVE_SYSTEM = (
@@ -87,8 +138,11 @@ NEW_OBJECTIVE_SYSTEM = (
     "'Documenter toutes les routes Flask de server.py avec docstrings', "
     "'Ajouter une validation des entrées dans memory/db.py'. "
     "Il doit être différent de tous les objectifs existants listés dans le contexte. "
+    "\n\nL'objectif DOIT inclure 'metric' et 'target' — la condition chiffrable qui prouvera "
+    "son accomplissement. Métriques disponibles :\n"
+    f"{_METRICS_DOC}\n\n"
     "Réponds UNIQUEMENT en JSON : "
-    '{"title": string, "description": string, "priority": int}'
+    '{"title": string, "description": string, "priority": int, "metric": string, "target": string}'
 )
 
 DEFINE_MISSION_SYSTEM = (
@@ -236,6 +290,8 @@ def reflect(log_fn) -> None:
             kept.append({
                 "title":       title,
                 "description": str(obj_data.get("description", ""))[:300],
+                "metric":      str(obj_data.get("metric",      ""))[:50],
+                "target":      str(obj_data.get("target",      ""))[:20],
                 "status":      "pending",
                 "created_at":  now,
                 "priority":    max(1, min(5, int(obj_data.get("priority", 3)))),
@@ -354,35 +410,62 @@ def check_objectives(log_fn) -> None:
         f"Logs récents :\n{logs}"
     )
 
-    # ── 1. Évaluation du statut ──────────────────────────────────────────── #
+    # ── 1. LLM : détecte la progression (pending ↔ in_progress uniquement) ── #
     try:
-        resp    = client.chat.completions.create(
+        resp = client.chat.completions.create(
             model=LOCAL_MODEL,
             messages=format_messages_for_local([
                 {"role": "system", "content": CHECK_OBJECTIVES_SYSTEM},
                 {"role": "user",   "content": user_content},
             ]),
-
         )
         parsed  = parse_json_fence(resp.choices[0].message.content)
         results = parsed.get("results", []) if isinstance(parsed, dict) else []
     except Exception as e:
-        log_fn(f"[CONSCIOUSNESS] check_objectives erreur GPT-4o : {e}")
+        log_fn(f"[CONSCIOUSNESS] check_objectives erreur LLM : {e}")
         return
 
-    status_map     = {r["title"]: r["status"] for r in results}
+    status_map = {
+        r["title"]: r["status"]
+        for r in results
+        if isinstance(r, dict) and r.get("status") in ("pending", "in_progress")
+    }
+
+    # ── 2. Métriques réelles : seul arbitre pour "completed" ─────────────── #
+    metrics_snap   = _load_latest_metrics()
     all_objectives = model.get("objectives", [])
     completed_new  = 0
 
     for obj in all_objectives:
-        new_status = status_map.get(obj["title"])
-        if new_status and new_status != obj.get("status"):
-            obj["status"] = new_status
-            if new_status == "completed":
-                completed_new += 1
-                log_fn(f"[CONSCIOUSNESS] Objectif accompli : {obj['title']}")
+        if obj.get("status") == "completed":
+            continue
 
-    # ── 2. Génération d'un nouvel objectif par objectif complété ─────────── #
+        # Transitions pending ↔ in_progress décidées par le LLM
+        llm_status = status_map.get(obj["title"])
+        if llm_status in ("pending", "in_progress"):
+            obj["status"] = llm_status
+
+        # "completed" : la métrique seule décide
+        metric = obj.get("metric", "").strip()
+        target = obj.get("target", "").strip()
+        if metric and target:
+            check = _check_metric(metric, target, metrics_snap)
+            if check is True:
+                obj["status"] = "completed"
+                completed_new += 1
+                log_fn(
+                    f"[CONSCIOUSNESS] Objectif accompli "
+                    f"({metric}={metrics_snap.get(metric)} {target}) : {obj['title'][:60]}"
+                )
+            elif check is False and obj.get("status") == "completed":
+                obj["status"] = "in_progress"   # régression détectée
+        else:
+            # Sans métrique mesurable, l'objectif ne peut jamais passer à "completed"
+            log_fn(
+                f"[CONSCIOUSNESS] Objectif sans métrique — restera 'pending' : {obj['title'][:60]}"
+            )
+
+    # ── 3. Génération d'un nouvel objectif par objectif complété ─────────── #
     now = datetime.now().isoformat(timespec="seconds")
     for _ in range(completed_new):
         remaining = [o for o in all_objectives if o.get("status") != "completed"]
@@ -390,13 +473,12 @@ def check_objectives(log_fn) -> None:
             break
         existing_titles = [o["title"] for o in remaining]
         try:
-            resp2   = client.chat.completions.create(
+            resp2 = client.chat.completions.create(
                 model=LOCAL_MODEL,
                 messages=format_messages_for_local([
                     {"role": "system", "content": NEW_OBJECTIVE_SYSTEM},
                     {"role": "user",   "content": f"Objectifs existants : {json.dumps(existing_titles, ensure_ascii=False)}"},
                 ]),
-    
             )
             raw_obj = parse_json_fence(resp2.choices[0].message.content)
             if not isinstance(raw_obj, dict):
@@ -404,6 +486,8 @@ def check_objectives(log_fn) -> None:
             new_obj = {
                 "title":       str(raw_obj.get("title",       "Nouvel objectif"))[:100],
                 "description": str(raw_obj.get("description", ""))[:300],
+                "metric":      str(raw_obj.get("metric",      ""))[:50],
+                "target":      str(raw_obj.get("target",      ""))[:20],
                 "status":      "pending",
                 "created_at":  now,
                 "priority":    max(1, min(5, int(raw_obj.get("priority", 3)))),

@@ -21,6 +21,7 @@ from modules.consciousness import (
     reflect, check_objectives, define_mission, update_mission, set_priorities, set_longterm_plan,
 )
 from modules.agent import read_agent_log, start_agent, tavily_search
+from modules.metrics import collect_metrics
 from modules.self_update import self_update_cycle, delete_file
 import modules.marc as _marc_mod
 import modules.cortex as _cortex_mod
@@ -40,8 +41,10 @@ LOG_FILE                   = "logs/jkai.log"
 API_USAGE_FILE             = "memory/api_usage.json"
 API_COST_PER_1K_TOKENS_EUR = 0.0092   # gpt-4o output ~$10/1M ≈ €9.2/1M
 API_DAILY_BUDGET_EUR       = 0.50
-AUTONOMIE_ACTIVE = True
-USE_OPENAI       = True
+AUTONOMIE_ACTIVE        = True
+USE_OPENAI              = True
+AUTO_UPDATE_FROM_CHAT   = False   # sécurité : désactivé par défaut
+START_TIME       = datetime.now()
 
 init_db()
 
@@ -415,7 +418,8 @@ def chat():
     data = request.get_json(silent=True) or {}
     user_input = data.get("message", "")
     reply = ask_jkai(user_input)
-    _try_auto_update(reply)
+    if AUTO_UPDATE_FROM_CHAT:
+        _try_auto_update(reply)
     return jsonify({"reply": reply})
 
 @server.route("/history", methods=["GET"])
@@ -560,11 +564,15 @@ def self_delete():
 
 @server.route("/config", methods=["GET"])
 def config_get():
-    return jsonify({"AUTONOMIE_ACTIVE": AUTONOMIE_ACTIVE, "USE_OPENAI": USE_OPENAI})
+    return jsonify({
+        "AUTONOMIE_ACTIVE":      AUTONOMIE_ACTIVE,
+        "USE_OPENAI":            USE_OPENAI,
+        "AUTO_UPDATE_FROM_CHAT": AUTO_UPDATE_FROM_CHAT,
+    })
 
 @server.route("/config", methods=["POST"])
 def config_post():
-    global USE_OPENAI, AUTONOMIE_ACTIVE
+    global USE_OPENAI, AUTONOMIE_ACTIVE, AUTO_UPDATE_FROM_CHAT
     data    = request.get_json(silent=True) or {}
     changed = []
     if "USE_OPENAI" in data:
@@ -574,8 +582,15 @@ def config_post():
     if "AUTONOMIE_ACTIVE" in data:
         AUTONOMIE_ACTIVE = bool(data["AUTONOMIE_ACTIVE"])
         changed.append(f"AUTONOMIE_ACTIVE={AUTONOMIE_ACTIVE}")
+    if "AUTO_UPDATE_FROM_CHAT" in data:
+        AUTO_UPDATE_FROM_CHAT = bool(data["AUTO_UPDATE_FROM_CHAT"])
+        changed.append(f"AUTO_UPDATE_FROM_CHAT={AUTO_UPDATE_FROM_CHAT}")
     log(f"[CONFIG] {', '.join(changed) if changed else 'aucun changement'}")
-    return jsonify({"AUTONOMIE_ACTIVE": AUTONOMIE_ACTIVE, "USE_OPENAI": USE_OPENAI})
+    return jsonify({
+        "AUTONOMIE_ACTIVE":      AUTONOMIE_ACTIVE,
+        "USE_OPENAI":            USE_OPENAI,
+        "AUTO_UPDATE_FROM_CHAT": AUTO_UPDATE_FROM_CHAT,
+    })
 
 @server.route("/proactive", methods=["GET"])
 def proactive():
@@ -627,6 +642,37 @@ def severus():
 @server.route("/budget", methods=["GET"])
 def budget():
     return jsonify(check_api_budget())
+
+
+@server.route("/health", methods=["GET"])
+def health():
+    uptime = int((datetime.now() - START_TIME).total_seconds())
+
+    try:
+        from memory.db import _connect
+        with _connect() as conn:
+            conn.execute("SELECT COUNT(*) FROM conversations").fetchone()
+        db_ok = True
+    except Exception:
+        db_ok = False
+
+    agent_alive = any(t.name == "agent-main" for t in threading.enumerate())
+
+    lm_url = os.getenv("LM_STUDIO_URL", "http://127.0.0.1:1234/v1")
+    try:
+        r = _requests.get(f"{lm_url}/models", timeout=3)
+        llm_local_ok = r.status_code == 200
+    except Exception:
+        llm_local_ok = False
+
+    return jsonify({
+        "status":         "ok",
+        "uptime_seconds": uptime,
+        "db_ok":          db_ok,
+        "agent_alive":    agent_alive,
+        "llm_local_ok":   llm_local_ok,
+    })
+
 
 register_killswitch(server, log)
 
@@ -794,7 +840,8 @@ def _send_lesson_to_kaia():
 
 
 scheduler = create_default_scheduler(log)
-scheduler.add_task("check_api_budget", 300, check_api_budget)
+scheduler.add_task("check_api_budget", 300,  check_api_budget)
+scheduler.add_task("collect_metrics",  3600, collect_metrics)
 if AUTONOMIE_ACTIVE:
     # réactiver Kaïa — tâche teach_kaia désactivée
     # scheduler.add_task("teach_kaia",            60,   _send_lesson_to_kaia)

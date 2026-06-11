@@ -43,6 +43,24 @@ _BLOCKLIST = [
 MAX_OUTPUT = 4000   # caractères max renvoyés
 TIMEOUT    = 10     # secondes
 
+_SHELL_FIRST_LINE = re.compile(
+    r'^\s*(python3?|pip3?|bash|sh|cd|ls|git|sudo)\b',
+    re.IGNORECASE,
+)
+_PYTHON_TOKENS = re.compile(
+    r'\b(?:def|import|print|for|while|class)\b|(?<![=!<>])=(?!=)',
+)
+
+
+def _looks_like_shell(code: str) -> bool:
+    """Retourne True si le code ressemble à une commande shell plutôt qu'à du Python."""
+    first = next((ln for ln in code.splitlines() if ln.strip()), "")
+    if _SHELL_FIRST_LINE.match(first):
+        return True
+    if re.match(r'^\s*-m\s+\S', first):
+        return True
+    return not bool(_PYTHON_TOKENS.search(code))
+
 
 def _strip_markdown(code: str) -> str:
     """Retire les blocs ```python ... ``` si GPT les ajoute quand même."""
@@ -80,6 +98,14 @@ def execute_code(code: str) -> dict:
     Exécute le code Python dans un subprocess isolé.
     Retourne un dict { output, error, blocked }.
     """
+    # Rejet des commandes shell déguisées en code Python
+    if _looks_like_shell(code):
+        return {
+            "output":  "",
+            "error":   "[CORTEX] Refusé — ressemble à une commande shell, pas du Python",
+            "blocked": True,
+        }
+
     # Vérification sandbox
     safe, pattern = _is_safe(code)
     if not safe:

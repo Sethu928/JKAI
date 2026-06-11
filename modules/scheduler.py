@@ -1,5 +1,7 @@
 import os
 import json
+import subprocess
+import sys
 import time
 import threading
 from datetime import datetime, timedelta
@@ -122,40 +124,101 @@ def clean_logs(log_fn=None) -> None:
             pass
 
 
-DAILY_REPORT_LOGS = ["agent.log", "autonomy.log", "thoughts.log"]
 DAILY_REPORT_FILE = os.path.join(LOGS_DIR, "daily_report.log")
+METRICS_FILE      = "memory/metrics.json"
+
+
+def _git_run(args: list[str]) -> str:
+    """Lance une commande git, retourne stdout ou '' en cas d'erreur."""
+    flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+    try:
+        proc = subprocess.run(
+            ["git"] + args,
+            capture_output=True, text=True, timeout=15,
+            creationflags=flags,
+        )
+        return proc.stdout.strip()
+    except Exception:
+        return ""
+
+
+def _gather_facts_24h() -> str:
+    """
+    Construit un bloc de faits vérifiables sur les 24 dernières heures :
+    métriques réelles + commits git réels.
+    Aucun LLM impliqué — uniquement parsing de fichiers et git.
+    """
+    lines: list[str] = []
+
+    # ── 1. Métriques (memory/metrics.json) ──────────────────────────────── #
+    lines.append("=== MÉTRIQUES RÉELLES (memory/metrics.json) ===")
+    try:
+        with open(METRICS_FILE, "r", encoding="utf-8") as f:
+            history = json.load(f)
+        snap = history[-1] if history else {}
+        lines.append(f"• Tâches terminées (24h)      : {snap.get('tasks_completed_today', 'N/A')}")
+        lines.append(f"• Taux d'erreur (24h)         : {snap.get('error_rate_today', 'N/A')}")
+        lines.append(f"• Self-updates survivants     : {snap.get('self_updates_survived', 'N/A')}")
+        lines.append(f"• Lignes ajoutées J-KAI (24h) : {snap.get('code_lines_added_24h', 'N/A')}")
+        lines.append(f"• Ratio uptime (24h)          : {snap.get('uptime_ratio', 'N/A')}")
+        lines.append(f"• Relevé pris à               : {snap.get('ts', 'N/A')}")
+    except (OSError, json.JSONDecodeError, IndexError):
+        lines.append("(memory/metrics.json indisponible)")
+
+    # ── 2. Tous les commits des dernières 24h ────────────────────────────── #
+    lines.append("")
+    lines.append("=== COMMITS GIT (dernières 24h, tous auteurs) ===")
+    commits_all = _git_run(["log", "--oneline", "--since=24 hours ago"])
+    lines.append(commits_all if commits_all else "(aucun commit)")
+
+    # ── 3. Diff stats des commits J-KAI (24h) ───────────────────────────── #
+    lines.append("")
+    lines.append("=== MODIFICATIONS J-KAI (24h) — insertions / suppressions par fichier ===")
+    numstat_out = _git_run([
+        "log", "--since=24 hours ago",
+        "--format=COMMIT %h %s",
+        "--numstat",
+        "--grep=J-KAI", "-i",
+    ])
+
+    if numstat_out:
+        file_stats: dict[str, tuple[int, int]] = {}
+        for line in numstat_out.splitlines():
+            line = line.strip()
+            if not line or line.startswith("COMMIT") or line.startswith("binary"):
+                continue
+            parts = line.split("\t")
+            if len(parts) >= 3 and parts[0].isdigit() and parts[1].isdigit():
+                fname = parts[2]
+                ins   = int(parts[0])
+                dels  = int(parts[1])
+                prev  = file_stats.get(fname, (0, 0))
+                file_stats[fname] = (prev[0] + ins, prev[1] + dels)
+        if file_stats:
+            for fname, (ins, dels) in sorted(file_stats.items()):
+                lines.append(f"  {fname} : +{ins} / -{dels}")
+        else:
+            lines.append("(aucune modification J-KAI dans les 24 dernières heures)")
+    else:
+        lines.append("(aucune modification J-KAI dans les 24 dernières heures)")
+
+    return "\n".join(lines)
 
 
 def daily_report(log_fn=None) -> None:
     """
-    Génère un rapport quotidien via GPT-4o à partir des logs des 24 dernières heures.
-    Sauvegarde dans logs/daily_report.log avec horodatage.
+    Génère un rapport quotidien basé sur des faits vérifiables :
+    metrics.json + git log réels. Le LLM ne fait que mettre en forme —
+    il ne peut pas inventer de contenu absent des données.
     """
-    cutoff = datetime.now() - timedelta(hours=24)
-    log_lines = []
-
-    for filename in DAILY_REPORT_LOGS:
-        path = os.path.join(LOGS_DIR, filename)
-        try:
-            with open(path, "r", encoding="utf-8", errors="replace") as f:
-                lines = f.readlines()
-            for line in lines:
-                if line.startswith("[") and len(line) > 20:
-                    try:
-                        ts = datetime.strptime(line[1:20], "%Y-%m-%d %H:%M:%S")
-                        if ts >= cutoff:
-                            log_lines.append(f"[{filename}] {line.rstrip()}")
-                    except ValueError:
-                        pass
-        except OSError:
-            pass
-
-    log_content = "\n".join(log_lines) if log_lines else "(Aucune activité enregistrée dans les dernières 24h)"
+    facts = _gather_facts_24h()
 
     system_prompt = (
-        "Tu es J-KAI. Génère un rapport quotidien concis de ce que tu as accompli aujourd'hui : "
-        "actions prises, objectifs avancés, erreurs rencontrées, pensées importantes. "
-        "Format : titre, résumé en 3-5 points, conclusion."
+        "Tu es J-KAI. Rédige le rapport quotidien à partir des données ci-dessous.\n"
+        "RÈGLE STRICTE : cite uniquement les chiffres et commits fournis. "
+        "N'invente aucune action, aucune tâche, aucune amélioration qui n'est pas dans ces données. "
+        "Si une valeur est 0 ou absente, mentionne-le explicitement — ne l'omets pas.\n"
+        "Format : titre avec la date, 3 à 5 points factuels numérotés, conclusion sobre en une phrase."
     )
 
     try:
@@ -164,16 +227,24 @@ def daily_report(log_fn=None) -> None:
             model=LOCAL_MODEL,
             messages=format_messages_for_local([
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Voici les logs des dernières 24h :\n\n{log_content}"},
+                {"role": "user",   "content": f"Voici les données réelles :\n\n{facts}"},
             ]),
         )
-        report_text = response.choices[0].message.content
+        report_text = response.choices[0].message.content.strip()
     except Exception as e:
-        report_text = f"(Erreur LLM local lors de la génération du rapport : {e})"
+        report_text = f"(Erreur LLM lors de la mise en forme : {e})"
 
+    # Le rapport final inclut toujours le bloc de faits bruts, inaltérable
     date_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    sep = "=" * 60
-    entry = f"\n{sep}\nRAPPORT QUOTIDIEN — {date_str}\n{sep}\n{report_text}\n"
+    sep      = "=" * 60
+    entry = (
+        f"\n{sep}\n"
+        f"RAPPORT QUOTIDIEN — {date_str}\n"
+        f"{sep}\n"
+        f"{report_text}\n"
+        f"\n--- DONNÉES SOURCES ---\n"
+        f"{facts}\n"
+    )
 
     try:
         os.makedirs(LOGS_DIR, exist_ok=True)

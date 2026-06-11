@@ -1,15 +1,62 @@
 import os
+import re
 import sys
 import socket
 import subprocess
 import tempfile
-from datetime import datetime
+from datetime import datetime, timedelta
 
-# ── Fichiers protégés — jamais modifiables via self_update ──────────────── #
-_PROTECTED = {"killswitch.py", ".env"}
+# ── Sécurité des modifications — double logique allowlist + blocklist ─────── #
+#
+# ALLOWLIST : seuls ces patterns sont modifiables/supprimables par l'agent.
+#   • modules/<name>.py   — tous les modules sauf exceptions ci-dessous
+#   • memory/<name>.json  — fichiers d'état persistant
+#
+# BLOCKLIST absolue (vérifiée même si le chemin est dans l'allowlist) :
+#   • server.py, killswitch.py, .env  — infrastructure critique
+#   • modules/state.py                — singleton partagé entre tous les modules
+#   • modules/self_update.py          — l'agent ne peut pas modifier son propre garde
+#   • watchdog.py, conftest.py        — sécurité système / CI
 
-# Fichiers supplémentaires interdits à la suppression
-_PROTECTED_DELETE = _PROTECTED | {"server.py", "modules/state.py"}
+_HARD_BLOCKED_NAMES = frozenset({
+    "server.py",
+    "killswitch.py",
+    ".env",
+    "watchdog.py",
+    "conftest.py",
+})
+
+_HARD_BLOCKED_REL = frozenset({
+    "modules/state.py",
+    "modules/self_update.py",
+})
+
+
+def _is_in_allowlist(path: str) -> bool:
+    """
+    Retourne True uniquement si le chemin est dans la liste blanche ET absent
+    de la blocklist absolue.  Chemin normalisé en '/' relatif à la racine projet.
+    """
+    rel = os.path.relpath(os.path.abspath(path), os.path.abspath("."))
+    rel = rel.replace("\\", "/")
+
+    # Blocklist absolue — niveau basename
+    if os.path.basename(rel) in _HARD_BLOCKED_NAMES:
+        return False
+    # Blocklist absolue — niveau chemin relatif
+    if rel in _HARD_BLOCKED_REL:
+        return False
+
+    # Allowlist : modules/*.py  ou  memory/*.json
+    parts = rel.split("/")
+    if len(parts) == 2:
+        folder, filename = parts
+        if folder == "modules" and filename.endswith(".py"):
+            return True
+        if folder == "memory" and filename.endswith(".json"):
+            return True
+
+    return False
 
 PI_HOST = "192.168.1.122"
 PI_USER = "pi"
@@ -48,8 +95,8 @@ def write_and_test(path: str, new_code: str, log_fn) -> bool:
         log_fn(f"[SELF_UPDATE] Chemin refusé (hors projet) : {path}")
         return False
 
-    if os.path.basename(path) in _PROTECTED:
-        log_fn(f"[SELF_UPDATE] Fichier protégé — refusé : {os.path.basename(path)}")
+    if not _is_in_allowlist(path):
+        log_fn(f"[SELF_UPDATE] Fichier hors liste blanche — refusé : {path}")
         return False
 
     # Test syntaxe + import dynamique dans un fichier temporaire
@@ -123,6 +170,34 @@ def write_and_test(path: str, new_code: str, log_fn) -> bool:
     return True
 
 
+# ── Constantes pour la garde post-update ─────────────────────────────────── #
+
+_JKAI_LOG = "logs/jkai.log"
+_FATAL_RE = re.compile(
+    r"\[ERREUR\]|Traceback \(most recent|^\s*\w+Error:",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+
+# ── Tests post-update ─────────────────────────────────────────────────────── #
+
+def _run_tests(log_fn) -> bool:
+    """Lance tests/test_smoke.py via subprocess. Retourne True si tous les tests passent."""
+    flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+    try:
+        proc = subprocess.run(
+            [sys.executable, "-m", "pytest", "tests/test_smoke.py", "-q", "--tb=no"],
+            capture_output=True, text=True, timeout=120, creationflags=flags,
+        )
+        passed = proc.returncode == 0
+        summary = proc.stdout.strip().splitlines()[-1] if proc.stdout.strip() else "(aucune sortie)"
+        log_fn(f"[SELF_UPDATE] Tests post-update : {'OK' if passed else 'ÉCHEC'} | {summary}")
+        return passed
+    except Exception as e:
+        log_fn(f"[SELF_UPDATE] Tests post-update inaccessibles : {e}")
+        return False
+
+
 # ── Git ───────────────────────────────────────────────────────────────────── #
 
 def _run_git(args: list, log_fn) -> tuple[bool, str]:
@@ -154,12 +229,32 @@ def _get_remote_url() -> str:
         return ""
 
 
+def _git_push(log_fn) -> bool:
+    """Push avec injection du token GitHub si disponible. Restaure l'URL après. Retourne True si succès."""
+    token        = os.getenv("GITHUB_TOKEN", "").strip()
+    original_url = _get_remote_url()
+    url_patched  = False
+
+    if token and original_url.startswith("https://github.com/"):
+        auth_url = original_url.replace("https://github.com/", f"https://{token}@github.com/")
+        _run_git(["remote", "set-url", "origin", auth_url], log_fn)
+        url_patched = True
+        log_fn("[SELF_UPDATE] Token GitHub injecté dans l'URL remote (temporaire)")
+
+    ok, out = _run_git(["push"], log_fn)
+    log_fn(f"[SELF_UPDATE] git push → {'OK' if ok else 'ERREUR'} | {out[:200]}")
+
+    if url_patched and original_url:
+        _run_git(["remote", "set-url", "origin", original_url], log_fn)
+        log_fn("[SELF_UPDATE] URL remote restaurée.")
+
+    return ok
+
+
 def git_commit_and_push(file_path: str, message: str, log_fn) -> bool:
     """
     git add <file_path> → git commit -m message → git push.
     Seul le fichier ciblé est stagé — évite de commiter des fichiers non liés.
-    Si GITHUB_TOKEN est défini, injecte le token dans l'URL HTTPS de origin
-    pour le push, puis restaure l'URL d'origine.
     Retourne True si le push réussit.
     """
     ok, out = _run_git(["add", "--", file_path], log_fn)
@@ -175,29 +270,7 @@ def git_commit_and_push(file_path: str, message: str, log_fn) -> bool:
     if not ok and "nothing to commit" not in out:
         return False
 
-    # ── Push avec injection du token si disponible ──────────────────────── #
-    token        = os.getenv("GITHUB_TOKEN", "").strip()
-    original_url = _get_remote_url()
-    url_patched  = False
-
-    if token and original_url.startswith("https://github.com/"):
-        auth_url = original_url.replace(
-            "https://github.com/",
-            f"https://{token}@github.com/",
-        )
-        _run_git(["remote", "set-url", "origin", auth_url], log_fn)
-        url_patched = True
-        log_fn("[SELF_UPDATE] Token GitHub injecté dans l'URL remote (temporaire)")
-
-    ok, out = _run_git(["push"], log_fn)
-    log_fn(f"[SELF_UPDATE] git push → {'OK' if ok else 'ERREUR'} | {out[:200]}")
-
-    # Restaure l'URL originale (token jamais persisté dans .git/config)
-    if url_patched and original_url:
-        _run_git(["remote", "set-url", "origin", original_url], log_fn)
-        log_fn("[SELF_UPDATE] URL remote restaurée.")
-
-    return ok
+    return _git_push(log_fn)
 
 
 # ── Déploiement SSH Pi ────────────────────────────────────────────────────── #
@@ -301,9 +374,8 @@ def delete_file(file_path: str, message: str, log_fn) -> dict:
         log_fn(f"[SELF_DELETE] {result['error']}")
         return result
 
-    normalized = file_path.replace("\\", "/")
-    if os.path.basename(file_path) in _PROTECTED_DELETE or normalized in _PROTECTED_DELETE:
-        result["error"] = f"Fichier protégé — suppression refusée : {file_path}"
+    if not _is_in_allowlist(file_path):
+        result["error"] = f"Fichier hors liste blanche — suppression refusée : {file_path}"
         log_fn(f"[SELF_DELETE] {result['error']}")
         return result
 
@@ -358,6 +430,29 @@ def delete_file(file_path: str, message: str, log_fn) -> dict:
     return result
 
 
+# ── Rollback ─────────────────────────────────────────────────────────────── #
+
+def _run_rollback(log_fn) -> bool:
+    """
+    Annule le dernier commit (git revert --no-edit HEAD), re-push et re-déploie.
+    Retourne True si le rollback complet a réussi.
+    """
+    ok, out = _run_git(["revert", "--no-edit", "HEAD"], log_fn)
+    log_fn(f"[SELF_UPDATE] git revert → {'OK' if ok else 'ERREUR'} | {out[:300]}")
+    if not ok:
+        log_fn("[SELF_UPDATE] ROLLBACK échoué — revert impossible")
+        return False
+
+    push_ok = _git_push(log_fn)
+    if not push_ok:
+        log_fn("[SELF_UPDATE] ROLLBACK — push échoué après revert")
+        return False
+
+    deploy_ok = deploy_to_pi(log_fn)
+    log_fn(f"[SELF_UPDATE] ROLLBACK terminé — deploy={deploy_ok}")
+    return True
+
+
 # ── Pipeline complet ──────────────────────────────────────────────────────── #
 
 def self_update_cycle(file_path: str, new_code: str, message: str, log_fn) -> dict:
@@ -370,12 +465,13 @@ def self_update_cycle(file_path: str, new_code: str, message: str, log_fn) -> di
     log_fn(f"[SELF_UPDATE] Cycle démarré — {file_path} — {ts}")
 
     result = {
-        "file_path":  file_path,
-        "ts":         ts,
-        "write_ok":   False,
-        "commit_ok":  False,
-        "deploy_ok":  False,
-        "error":      "",
+        "file_path":   file_path,
+        "ts":          ts,
+        "write_ok":    False,
+        "commit_ok":   False,
+        "deploy_ok":   False,
+        "rolled_back": False,
+        "error":       "",
     }
 
     if not write_and_test(file_path, new_code, log_fn):
@@ -392,6 +488,64 @@ def self_update_cycle(file_path: str, new_code: str, message: str, log_fn) -> di
     if not result["deploy_ok"]:
         result["error"] = "Échec déploiement Pi (SSH)"
 
-    log_fn(f"[SELF_UPDATE] Cycle terminé — write={result['write_ok']} "
-           f"commit={result['commit_ok']} deploy={result['deploy_ok']}")
+    # ── Vérification post-déploiement : tests de sécurité ───────────────── #
+    if not _run_tests(log_fn):
+        log_fn("[SELF_UPDATE] ROLLBACK — tests cassés après update, commit annulé")
+        result["rolled_back"] = _run_rollback(log_fn)
+        result["error"] = (
+            "Rollback effectué — tests échoués après update"
+            if result["rolled_back"]
+            else "Tests échoués + rollback impossible"
+        )
+
+    log_fn(
+        f"[SELF_UPDATE] Cycle terminé — write={result['write_ok']} "
+        f"commit={result['commit_ok']} deploy={result['deploy_ok']} "
+        f"rolled_back={result['rolled_back']}"
+    )
     return result
+
+
+# ── Garde post-update ─────────────────────────────────────────────────────── #
+
+def check_post_update_health(
+    log_fn,
+    window_minutes: int = 10,
+    max_errors: int = 3,
+) -> dict:
+    """
+    Garde de sécurité à appeler périodiquement après un update.
+    Lit logs/jkai.log sur les window_minutes dernières minutes et compte
+    les erreurs fatales. Si ≥ max_errors, déclenche un rollback automatique.
+
+    Retourne {"error_count": int, "rolled_back": bool}.
+    """
+    cutoff      = datetime.now() - timedelta(minutes=window_minutes)
+    error_count = 0
+
+    try:
+        with open(_JKAI_LOG, "r", encoding="utf-8", errors="replace") as f:
+            lines = f.readlines()
+    except OSError:
+        return {"error_count": 0, "rolled_back": False}
+
+    for line in lines:
+        if len(line) > 21 and line[0] == "[":
+            try:
+                ts = datetime.strptime(line[1:20], "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                continue
+            if ts < cutoff:
+                continue
+            if _FATAL_RE.search(line):
+                error_count += 1
+
+    rolled_back = False
+    if error_count >= max_errors:
+        log_fn(
+            f"[SELF_UPDATE] Garde post-update : {error_count} erreurs fatales "
+            f"en {window_minutes} min — rollback déclenché"
+        )
+        rolled_back = _run_rollback(log_fn)
+
+    return {"error_count": error_count, "rolled_back": rolled_back}
