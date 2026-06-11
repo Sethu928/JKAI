@@ -1,1 +1,0 @@
-print("Regex OK")

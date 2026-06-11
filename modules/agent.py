@@ -1,8 +1,11 @@
 import os
+import sys
 import json
 import re
 import time
 import threading
+import subprocess
+import tempfile
 import urllib.parse
 import requests
 from datetime import datetime
@@ -283,8 +286,8 @@ def _get_pending_task(tasks: list) -> dict | None:
 
 def _archive_done_tasks(tasks: list) -> list:
     """Déplace les tâches done/failed dans tasks_archive.json, retourne les tâches restantes."""
-    done = [t for t in tasks if t.get("status") in ("done", "failed")]
-    active = [t for t in tasks if t.get("status") not in ("done", "failed")]
+    done = [t for t in tasks if t.get("status") in ("done", "failed", "needs_review")]
+    active = [t for t in tasks if t.get("status") not in ("done", "failed", "needs_review")]
     if not done:
         return active
     archive: list = []
@@ -344,7 +347,9 @@ def _generate_new_tasks(log_fn) -> list:
                 {"role": "system", "content": (
                     "Tu es J-KAI. Génère 3 tâches concrètes et réalisables basées sur le contexte fourni. "
                     "Chaque tâche DOIT nommer un fichier qui existe dans la liste fournie — aucun fichier inventé. "
-                    'Réponds UNIQUEMENT en JSON : {"tasks": [{"title": string, "description": string}]}'
+                    "Inclus un champ 'done_check' : une instruction Python assert() exécutable qui prouve que "
+                    "la tâche est accomplie (ex: assert os.path.exists('modules/foo.py')). "
+                    'Réponds UNIQUEMENT en JSON : {"tasks": [{"title": string, "description": string, "done_check": string}]}'
                 )},
                 {"role": "user", "content": (
                     f"Priorités : {priorities_txt}\n\n"
@@ -369,6 +374,7 @@ def _generate_new_tasks(log_fn) -> list:
             "id":          f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{i}",
             "title":       title,
             "description": str(t.get("description", ""))[:300],
+            "done_check":  str(t.get("done_check", ""))[:400],
             "status":      "pending",
             "attempts":    0,
             "result":      "",
@@ -546,6 +552,41 @@ def _analyze_self(log_fn) -> str:
     return f"{len(py_files)} fichiers analysés, {len(data['global_improvements'])} amélioration(s) identifiée(s)"
 
 
+# ── Vérification syntaxe avant exécution/écriture ──────────────────────── #
+
+def _check_syntax(code: str, log_fn, label: str) -> bool:
+    """Compile le code en dry-run via py_compile dans un subprocess isolé.
+
+    Même logique que write_and_test() dans modules/self_update.py.
+    Retourne True si la syntaxe est valide, False sinon (l'erreur est loggée).
+    """
+    tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False, encoding="utf-8")
+    try:
+        tmp.write(code)
+        tmp.close()
+        flags = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+        proc = subprocess.run(
+            [sys.executable, "-m", "py_compile", tmp.name],
+            capture_output=True, text=True, timeout=10, creationflags=flags,
+        )
+        if proc.returncode != 0:
+            err = (proc.stdout + proc.stderr).strip()
+            log_fn(f"[AGENT] {label} — syntaxe invalide :\n{err[:300]}")
+            return False
+        return True
+    except subprocess.TimeoutExpired:
+        log_fn(f"[AGENT] {label} — py_compile timeout")
+        return False
+    except Exception as e:
+        log_fn(f"[AGENT] {label} — py_compile erreur système : {e}")
+        return False
+    finally:
+        try:
+            os.unlink(tmp.name)
+        except OSError:
+            pass
+
+
 def _improve_self(decision: dict, log_fn) -> str:
     """Lit self_code_understanding.json et exécute une amélioration concrète via Cortex."""
     try:
@@ -601,6 +642,9 @@ def _improve_self(decision: dict, log_fn) -> str:
         log_fn("[AGENT] improve_self — code invalide (import dangereux détecté)")
         return "code invalide — import dangereux détecté, abandon"
 
+    if not _check_syntax(code, log_fn, "improve_self"):
+        return "code invalide — erreur de syntaxe, abandon"
+
     result = execute_code(code)
     if result.get("error"):
         info = f"ERREUR — {result['error'][:200]}"
@@ -655,6 +699,9 @@ def _create_module(decision: dict, log_fn) -> str:
     if re.search(r'\bimport\s+(?:socket|requests|openai|paramiko|ftplib|smtplib)\b', code):
         log_fn("[AGENT] create_module — code invalide (import dangereux détecté)")
         return "code invalide — import dangereux, module non créé"
+
+    if not _check_syntax(code, log_fn, "create_module"):
+        return "code invalide — erreur de syntaxe, module non créé"
 
     file_path = os.path.join("modules", f"{name}.py")
     if os.path.exists(file_path):
@@ -1196,6 +1243,26 @@ def _format_longterm_plan() -> str:
         return ""
 
 
+def _verify_done_check(task: dict, log_fn) -> str:
+    """
+    Exécute le done_check de la tâche via le sandbox.
+    Retourne "done", "in_progress" (assert échoué), ou "needs_review" (pas de check).
+    """
+    check = (task.get("done_check") or "").strip()
+    if not check:
+        log_fn(f"[TASKS] Tâche sans done_check → needs_review : {task['title'][:60]}")
+        return "needs_review"
+    result = execute_code(check)
+    if result.get("blocked"):
+        log_fn(f"[TASKS] done_check bloqué par sandbox → needs_review : {task['title'][:60]}")
+        return "needs_review"
+    if result.get("error"):
+        log_fn(f"[TASKS] done_check échoué ({result['error'][:80]}) → in_progress : {task['title'][:60]}")
+        return "in_progress"
+    log_fn(f"[TASKS] done_check validé → done : {task['title'][:60]}")
+    return "done"
+
+
 def _run_worker_cycle(worker: str, allowed: list[str], log_fn) -> None:
     ts          = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     now_iso     = datetime.now().isoformat(timespec="seconds")
@@ -1204,7 +1271,7 @@ def _run_worker_cycle(worker: str, allowed: list[str], log_fn) -> None:
     tasks        = _load_tasks()
     current_task = _get_pending_task(tasks)
 
-    if current_task is None and all(t.get("status") in ("done", "failed") for t in tasks):
+    if current_task is None and all(t.get("status") in ("done", "failed", "needs_review") for t in tasks):
         # Toutes les tâches terminées — génère 3 nouvelles et archive les anciennes
         new_tasks = _generate_new_tasks(log_fn)
         if new_tasks:
@@ -1283,8 +1350,7 @@ def _run_worker_cycle(worker: str, allowed: list[str], log_fn) -> None:
         elif is_error:
             current_task["status"] = "pending"
         else:
-            current_task["status"] = "done"
-            log_fn(f"[TASKS] Tâche accomplie : {current_task['title'][:60]}")
+            current_task["status"] = _verify_done_check(current_task, log_fn)
         current_task["result"]     = (exec_info or "")[:200]
         current_task["updated_at"] = datetime.now().isoformat(timespec="seconds")
         _save_tasks(tasks)

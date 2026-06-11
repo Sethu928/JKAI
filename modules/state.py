@@ -6,6 +6,7 @@ from datetime import datetime
 
 from dotenv import load_dotenv
 from openai import OpenAI
+from modules.llm_utils import strip_think
 
 load_dotenv()
 
@@ -161,7 +162,7 @@ def parse_json_fence(raw: str) -> dict:
     - Fallback : extrait le premier bloc { ... } trouvé dans le texte.
     - Retourne un dict vide en cas d'échec total.
     """
-    raw = raw.strip()
+    raw = strip_think(raw)
     m = _MD_FENCE.match(raw)
     if m:
         raw = m.group(1).strip()
