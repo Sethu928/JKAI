@@ -6,7 +6,7 @@ from modules.voice import speak, listen
 from memory.db import init_db, save_message, load_history
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("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"))
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 init_db()
 

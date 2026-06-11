@@ -23,10 +23,10 @@
     "id": "20260513180803_2",
     "title": "Analyser les logs de jkai.log et syntax_and_api_errors.log",
     "description": "Examiner attentivement les fichiers jkai.log et syntax_and_api_errors.log dans le dossier logs/ pour identifier les erreurs potentielles liées à la gestion du contexte, en particulier celles liées aux requêtes API.",
-    "status": "pending",
-    "attempts": 0,
+    "status": "in_progress",
+    "attempts": 1,
     "result": "",
     "created_at": "2026-05-13T18:07:56",
-    "updated_at": "2026-05-13T18:07:56"
+    "updated_at": "2026-05-14T14:08:13"
   }
 ]
